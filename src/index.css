@@ -1,13 +1,125 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: "Montserrat", "Helvetica", sans-serif;
+}
+html {
+  background-image: url("images/background-sky.png"),
+    linear-gradient(
+      rgb(255, 255, 255) 0%,
+      rgb(218, 239, 240) 14.35%,
+      rgb(13, 140, 199) 77.32%,
+      rgb(0, 134, 196) 100%
+    );
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: contain;
+  background-position: left bottom;
+  height: 100%;
+}
+.active {
+  border-bottom: 3px solid orange;
+}
+.total-usd {
+  min-width: 50px;
+}
+.black {
+  color: black;
+}
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2;
+}
+.modal-content {
+  overflow: auto;
+  width: 42%;
+  max-height: 700px;
+  background: rgba(0, 0, 0, 0)
+    linear-gradient(rgb(218, 239, 240) 0%, rgba(218, 239, 240, 0.9) 100%) repeat
+    scroll 0% 0%;
+  border-radius: 8px;
+  opacity: 1;
+}
+.active-network {
+  background-color: rgb(128, 180, 209) !important;
+}
+.network_wrapper {
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  width: 50%;
+  padding: 25px 0px;
+}
+.network_wrapper img {
+  max-width: 50px;
+}
+.network_wrapper span {
+  margin-top: 15px;
+  font-weight: bold;
+  font-size: 24px;
+}
+.modal-title {
+  font-weight: bold;
+  margin-top: 10px;
+}
+#form-file-upload {
+  height: 16rem;
+  width: 28rem;
+  max-width: 100%;
+  text-align: center;
+  position: relative;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+#input-file-upload {
+  display: none;
+}
+
+#label-file-upload {
+  height: 100%;
+  width:100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-width: 2px;
+  border-radius: 1rem;
+  border-style: dashed;
+  border-color: #cbd5e1;
+  background-color: #f8fafc;
+}
+
+.upload-button {
+  cursor: pointer;
+  padding: 0.25rem;
+  font-size: 1rem;
+  border: none;
+  font-family: 'Oswald', sans-serif;
+  background-color: transparent;
+}
+
+.upload-button:hover {
+  text-decoration-line: underline;
+}
+#label-file-upload.drag-active {
+  background-color: #ffffff;
+}
+#drag-file-element {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 1rem;
+  top: 0px;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
 }

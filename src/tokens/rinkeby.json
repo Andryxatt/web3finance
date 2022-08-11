@@ -1,0 +1,14 @@
+{
+    "Tokenization": [
+        {
+            "name": "USDC",
+            "decimal": 8,
+            "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926"
+        },
+        {
+            "name": "LINK",
+            "decimal": 8,
+            "address": "0x01BE23585060835E02B77ef475b0Cc51aA1e0709"
+        }
+    ]
+}
