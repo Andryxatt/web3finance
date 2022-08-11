@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import AccountBalanceWalletTwoToneIcon from '@mui/icons-material/AccountBalanceWalletTwoTone'
 import { Button } from "@material-tailwind/react"
 import WalletNetwork from "./WalletNetwork"
@@ -19,8 +19,12 @@ const WalletModal = () => {
     library,
     account,
     activate,
+    active
   } = useWeb3React();
   const [modalShown, toggleModal] = React.useState(false);
+  useEffect(()=>{
+
+  },[active])
   return (
     <>
       <Button onClick={() => {

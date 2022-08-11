@@ -6,6 +6,7 @@ import sortDownIcon from '../../images/sort-down.png';
 import { Contract, ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import AnimatedDots from '../AnimatedDots';
+
 const contractsAddresses = require("../../contracts/AddressesContracts.json")
 const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
 const TableElement = (props: any) => {
@@ -23,14 +24,15 @@ const TableElement = (props: any) => {
     const [tokenPrice, setTokenPrice] = useState("0");
     const [totalSuplay, setTotalSuplay] = useState("0");
     const { library, active, account, connector } = useWeb3React();
+
     const handleAmountChange = (event: any) => {
         const value = Math.max(0, Math.min(parseFloat(userBalance), Number(event.target.value)));
         setAmountDeposit(value);
     };
     const getPrice = async (decimal: any) => {
+        console.log(active, "active");
         if (active && props.network === "Rinkeby Testnet") {
             const contract = new Contract(contractsAddresses[0].oracle, OracleAbi.abi, library?.getSigner())
-            console.log(contract, "oracle")
             const res = await contract.getAssetPrice(props.token.address);
             setTokenPrice(ethers.utils.formatUnits(res._hex, decimal));
         }
@@ -60,18 +62,33 @@ const TableElement = (props: any) => {
     const setMaxPrice = () => {
         setAmountDeposit(parseFloat(userBalance));
     }
-    const depositAmount = () => {
-        const contract = new Contract(contractsAddresses[2].rLINK, RTokenAbi, library?.getSigner())
-        console.log(contract)
+    const depositAmount = (name:string) => {
+        let contract = null;
+        switch (name) {
+            case "USDC":
+               contract = new Contract(contractsAddresses[3].rUSDC, RTokenAbi, library?.getSigner())
+                break;
+            case "LINK":
+                contract = new Contract(contractsAddresses[2].rLINK, RTokenAbi, library?.getSigner())
+                break;
+            default:
+                break;
+        }
+        // contract?.approve(contractsAddresses[1].feeShare, amountDeposit, { gasLimit: 200000 });
+        // contract?.transferFrom(account, contractsAddresses[1].feeShare, amountDeposit, { gasLimit: 200000 });
+           
+        
+        //  contract?.transferFrom(account, contractsAddresses[1].feeShare, amountDeposit, { gasLimit: 200000 });
+        const oracle = new Contract(contractsAddresses[0].oracle, OracleAbi.abi, library?.getSigner())
+        
+        console.log(oracle, "oracle");
+        console.log(contract, "RToken");
     }
   
     useEffect(() => {
-        setInterval(()=>{
-            getPrice(props.token.decimal);
-        }, 3000)
-      
+        getPrice(props.token.decimal);
         tokenBalance(props.token.address, props.token.decimal, props.token.name);
-    }, [])
+    }, [userBalance, active]);
     return (
         <div className="flex justify-between flex-col">
             <div className={isOpen ? "flex flex-col px-5 py-3 bg-blue-100 rounded-lg mr-3 ml-3 mb-5 " : "flex flex-col px-5 py-3 mb-5 hover:bg-blue-100 hover:rounded-lg mr-3 ml-3 cursor-pointer"}>
@@ -107,7 +124,7 @@ const TableElement = (props: any) => {
 
                         </div>
                         <div className='flex flex-col w-[40%] ml-4'>
-                            <button onClick={() => depositAmount()} disabled={userBalance !== "0" ? false : true} className={userBalance !== "0" ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
+                            <button onClick={() => depositAmount(props.token.name)} disabled={userBalance !== "0" ? false : true} className={userBalance !== "0" ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
                             <ModalMultiDeposit userBalance={userBalance} />
                         </div>
                     </div>
