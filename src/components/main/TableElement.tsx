@@ -6,7 +6,6 @@ import sortDownIcon from '../../images/sort-down.png';
 import { Contract, ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import AnimatedDots from '../AnimatedDots';
-
 const contractsAddresses = require("../../contracts/AddressesContracts.json")
 const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
 const TableElement = (props: any) => {
@@ -32,10 +31,16 @@ const TableElement = (props: any) => {
     const getPrice = async (decimal: any) => {
         console.log(active, "active");
         if (active && props.network === "Rinkeby Testnet") {
-            const contract = new Contract(contractsAddresses[0].oracle, OracleAbi.abi, library?.getSigner())
+            const contract = new Contract(contractsAddresses.oracle, OracleAbi.abi, library?.getSigner())
+            contract.on("AssetSourceUpdated", (asset, source) => {
+                console.log(asset, source);
+            })
             const res = await contract.getAssetPrice(props.token.address);
             setTokenPrice(ethers.utils.formatUnits(res._hex, decimal));
         }
+    }
+    const getUserBalanceRToken = () =>{
+
     }
     const tokenBalance = async (address: any, decimal: any, tokenName: any) => {
         if (active && props.network === "Rinkeby Testnet") {
@@ -62,29 +67,38 @@ const TableElement = (props: any) => {
     const setMaxPrice = () => {
         setAmountDeposit(parseFloat(userBalance));
     }
-    const depositAmount = (name:string) => {
+    const depositAmount = (name: string) => {
         let contract = null;
+        let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner())
         switch (name) {
             case "USDC":
-               contract = new Contract(contractsAddresses[3].rUSDC, RTokenAbi, library?.getSigner())
+                contract = new Contract(contractsAddresses.USDC, RTokenAbi, library?.getSigner());
+                  contract?.approve(contractsAddresses.feeShare, (amountDeposit! * 100000000), { gasLimit: 200000 }).then((response: any) => {
+                    console.log(response);
+                });
+                contract.allowance(account, contractsAddresses.feeShare).then((res: any) => {
+                    console.log(ethers.utils.formatUnits(res._hex, 8))
+                });
+                feeShare.deposit(contractsAddresses.USDC, (amountDeposit! * 100000000), { gasLimit: 200000 })
                 break;
             case "LINK":
-                contract = new Contract(contractsAddresses[2].rLINK, RTokenAbi, library?.getSigner())
+                contract = new Contract(contractsAddresses.rLINK, RTokenAbi, library?.getSigner())
+                contract?.approve(contractsAddresses.feeShare, (amountDeposit! * 100000000), { gasLimit: 200000 }).then((response: any) => {
+                    console.log(response);
+                });
+                contract.allowance(account, contractsAddresses.feeShare).then((res: any) => {
+                    console.log(ethers.utils.formatUnits(res._hex, 8))
+                });
+                feeShare.deposit(contractsAddresses.LINK, (amountDeposit! * 100000000), { gasLimit: 200000 })
                 break;
             default:
                 break;
         }
-        // contract?.approve(contractsAddresses[1].feeShare, amountDeposit, { gasLimit: 200000 });
-        // contract?.transferFrom(account, contractsAddresses[1].feeShare, amountDeposit, { gasLimit: 200000 });
-           
-        
-        //  contract?.transferFrom(account, contractsAddresses[1].feeShare, amountDeposit, { gasLimit: 200000 });
-        const oracle = new Contract(contractsAddresses[0].oracle, OracleAbi.abi, library?.getSigner())
-        
-        console.log(oracle, "oracle");
-        console.log(contract, "RToken");
+
+        // contract?.transferFrom(account, contractsAddresses.feeShare, amountDeposit, { gasLimit: 200000 });
+        //  contract?.transferFrom(account, contractsAddresses.feeShare, amountDeposit, { gasLimit: 200000 });
+
     }
-  
     useEffect(() => {
         getPrice(props.token.decimal);
         tokenBalance(props.token.address, props.token.decimal, props.token.name);
