@@ -20,7 +20,7 @@ const TableResponsive = () => {
             isSelected: true
         },
         {
-            name: "Some Filter 1",
+            name: "Token Price",
             isSelected: false
         },
         {
@@ -154,7 +154,7 @@ const TableResponsive = () => {
             </div>
             <div className="px-5 py-2 flex justify-between border-gray-300">
                 <div className="flex cursor-pointer">Asset <img className="w-[26px]" src={iconSort} alt="icon" /></div>
-                <div className="flex cursor-pointer">Some Filter <img className="w-[26px]" src={iconSort} alt="icon" /></div>
+                <div className="flex cursor-pointer">Token Price <img className="w-[26px]" src={iconSort} alt="icon" /></div>
                 <div className="flex cursor-pointer">Deposit ($) <img className="w-[26px]" src={iconSort} alt="icon" /></div>
                 <div className="flex cursor-pointer">Your balance <img className="w-[26px]" src={iconSort} alt="icon" /></div>
             </div>
