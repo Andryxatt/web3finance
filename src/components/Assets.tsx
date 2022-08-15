@@ -2,8 +2,6 @@
 const Assets = () => {
     return (
         <div>
-            
-
         </div>
     )
 }

@@ -58,9 +58,13 @@ function ModalMultiDeposit(props:any) {
     return (
         <>
             <Button 
-            disabled={props.userBalance !== "0" ? false : true} 
-            onClick={() => {toggleModal(!modalShown)}} 
-            className={props.userBalance !== "0" ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md normal-case" :"mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md normal-case"}>Multi Deposits</Button>
+                disabled={props.userBalance !== "0" ? false : true} 
+                onClick={() => {toggleModal(!modalShown)}} 
+                className={props.userBalance !== "0" ? 
+                "mt-2 hover:bg-gray-600 h-[40px] px-0 py-0 bg-gray-500 text-white font-bold rounded-md normal-case" :
+                "mt-2 cursor-not-allowed h-[40px] px-0 py-0 bg-gray-400 text-white font-bold rounded-md normal-case"}>
+                Multi Deposits
+            </Button>
             <Modal shown={modalShown} close={() => { toggleModal(false) }}>
                 {
                     manualOrFiles ? <div className="px-5 py-5">

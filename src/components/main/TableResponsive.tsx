@@ -5,9 +5,7 @@ import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
-    const {
-        active,
-    } = useWeb3React();
+    const { active } = useWeb3React();
     const rinkebyTokens = require("../../tokens/rinkeby.json");
     const ethereumTokens = require("../../tokens/ethereum.json");
     const bscTokens = require("../../tokens/bsc.json");
@@ -62,6 +60,7 @@ const TableResponsive = () => {
             isSelected: false
         }
     ]);
+    const [sort, setSort] = useState("asc");
     const [currentNetwork, setCurrentNetwork] =  useState("Rinkeby Testnet");
     const [tokens, setTokens] = useState([]);
     const updateNetwork = (network: any) => {
@@ -103,12 +102,24 @@ const TableResponsive = () => {
         });
         setFilters(newState);
     };
+    const filteredTokens = () =>{
+      const res = [...tokens].sort((a:any, b:any) => {
+            if (sort === "asc") {
+                return a.name > b.name ? 1 : -1;
+            }
+            else {
+                return a.name < b.name ? 1 : -1;
+            }
+        });
+        setSort(sort === "asc" ? "desc" : "asc");
+        return res;
+    }
     useEffect(() => {
             setTokens(rinkebyTokens.Tokenization);
             if(active){
                 updateNetwork(currentNetwork);
             }
-    }, [])
+    }, [active, tokens])
 
     return (
         <div className="">
@@ -152,13 +163,12 @@ const TableResponsive = () => {
                     </label>
                 </div>
             </div>
-            <div className="px-5 py-2 flex justify-between border-gray-300">
-                <div className="flex cursor-pointer">Asset <img className="w-[26px]" src={iconSort} alt="icon" /></div>
-                <div className="flex cursor-pointer">Token Price <img className="w-[26px]" src={iconSort} alt="icon" /></div>
-                <div className="flex cursor-pointer">Deposit ($) <img className="w-[26px]" src={iconSort} alt="icon" /></div>
-                <div className="flex cursor-pointer">Your balance <img className="w-[26px]" src={iconSort} alt="icon" /></div>
+            <div className="px-5 py-2 justify-between flex flex-row border-gray-300">
+                <div onClick={filteredTokens} className="flex cursor-pointer justify-center w-[150px]">Asset <img className="w-[26px]" src={iconSort} alt="icon" /></div>
+                <div onClick={filteredTokens} className="flex cursor-pointer justify-center w-[150px]">Token Price <img className="w-[26px]" src={iconSort} alt="icon" /></div>
+                <div className="flex cursor-pointer justify-center w-[150px]">Deposit ($) <img className="w-[26px]" src={iconSort} alt="icon" /></div>
+                <div className="flex cursor-pointer justify-center w-[150px]">Your balance <img className="w-[26px]" src={iconSort} alt="icon" /></div>
             </div>
-           
             {
                tokens && tokens.map((token: any, index: any) => {
                     return (

@@ -9,6 +9,11 @@
             "name": "LINK",
             "decimal": 18,
             "address": "0x01BE23585060835E02B77ef475b0Cc51aA1e0709"
+        },
+        {
+            "name":"WETH",
+            "decimal": 18,
+            "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab"
         }
     ]
 }
