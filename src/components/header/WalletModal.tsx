@@ -24,7 +24,7 @@ const WalletModal = () => {
   const [modalShown, toggleModal] = React.useState(false);
   useEffect(()=>{
 
-  },[active])
+  },[active, account])
   return (
     <>
       <Button onClick={() => {

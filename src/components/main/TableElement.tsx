@@ -6,32 +6,32 @@ import sortDownIcon from '../../images/sort-down.png';
 import { Contract, ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import AnimatedDots from '../AnimatedDots';
-const contractsAddresses = require("../../contracts/AddressesContracts.json")
-const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
+
 const TableElement = (props: any) => {
+    const contractsAddresses = require("../../contracts/AddressesContracts.json")
+    const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
     const OracleAbi = require("../../contracts/oracle/Oracle.json");
     const FeeShareAbi = require("../../contracts/FeeShare.json");
     const RTokenAbi = require("../../contracts/RTokenAbi.json");
     const [isOpen, setIsOpen] = useState(false);
+    const [amountDeposit, setAmountDeposit] = useState<number>();
+    const [userBalance, setUserBalance] = useState("0");
+    const [tokenPrice, setTokenPrice] = useState("0");
+    const [userTokenBalance, setUserTokenBalance] = useState("0");
+    const { library, active, account, connector } = useWeb3React();
     const changeOpen = (e: any, isOpen: boolean) => {
         setIsOpen(!isOpen);
         e.stopPropagation();
         e.nativeEvent.stopImmediatePropagation();
-    }
-    const [amountDeposit, setAmountDeposit] = useState<number>();
-    const [userBalance, setUserBalance] = useState("0");
-    const [tokenPrice, setTokenPrice] = useState("0");
-    const [totalSuplay, setTotalSuplay] = useState("0");
-    const [userTokenBalance, setUserTokenBalance] = useState("0");
-    const { library, active, account, connector } = useWeb3React();
 
+    }
     const handleAmountChange = (event: any) => {
         const value = Math.max(0, Math.min(parseFloat(userBalance), Number(event.target.value)));
         setAmountDeposit(value);
     };
     const getPrice = async (decimal: any) => {
         if (active && props.network === "Rinkeby Testnet") {
-            const contract = new Contract(contractsAddresses.oracle, OracleAbi.abi, library?.getSigner())
+            const contract = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner())
             await contract.getAssetPrice(props.token.address).then((res: any) => {
                 setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
             });
@@ -46,23 +46,11 @@ const TableElement = (props: any) => {
             });
         }
     }
-    const tokenBalance = async (address: any, tokenName: any) => {
+    const tokenBalance = async () => {
         if (active && props.network === "Rinkeby Testnet") {
-            const balanceOf = new Contract(address, BalanceOfAbi, library.getSigner());
+            const balanceOf = new Contract(props.token.address, BalanceOfAbi, library.getSigner());
             const price = await balanceOf.balanceOf(account);
-            switch (tokenName) {
-                case "USDC":
-                    setUserBalance(ethers.utils.formatUnits(price._hex, 6));
-                    break;
-                case "LINK":
-                    setUserBalance(ethers.utils.formatUnits(price._hex));
-                    break;
-                case "WETH":
-                    setUserBalance(ethers.utils.formatUnits(price._hex));
-                    break;
-                default:
-                    break;
-            }
+            setUserBalance(ethers.utils.formatUnits(price._hex, props.token.decimal));
         }
     }
     const getPriceInUsd = () => {
@@ -74,46 +62,63 @@ const TableElement = (props: any) => {
     const setMaxPrice = () => {
         setAmountDeposit(parseFloat(userBalance));
     }
-    const depositAmount = async (name: string) => {
+    const depositAmount = async () => {
         let contract = new Contract(contractsAddresses[props.token.name], RTokenAbi, library?.getSigner());
         let checkAllowance = await contract.allowance(account, contractsAddresses.feeShare);
         let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        console.log(feeShare);
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, 6)) <= amountDeposit!) {
             await contract?.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((res: any) => {
                 res.wait().then(async (receipt: any) => {
                     await feeShare.deposit(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                         result.wait().then(async (recept: any) => {
                             getUserBalanceRToken();
-                            tokenBalance(props.token.address, props.token.name);
+                            tokenBalance();
                         })
                     });
                 })
             })
         }
         else {
-            await feeShare.deposit(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(),props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+            await feeShare.deposit(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     getUserBalanceRToken();
-                    tokenBalance(props.token.address, props.token.name);
+                    tokenBalance();
                 })
             });
         }
+
     }
     const witdrawDeposit = async () => {
         let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner())
-        await feeShare.withdraw(contractsAddresses[props.token.name], ethers.utils.parseUnits(userTokenBalance, props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+        await feeShare.withdraw(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
             result.wait().then(async (recept: any) => {
                 getUserBalanceRToken();
-                tokenBalance(props.token.address, props.token.name);
+                tokenBalance();
             })
         });
+    }
+    // const getTotalDepositBalance = async () => {
+    //     if (active) {
+    //         let contract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, library?.getSigner());
+    //         await contract.totalSupply().then((res: any) => {
+    //             setTotalSuplay(ethers.utils.formatUnits(res._hex, props.token.decimal));
+    //         })
+    //     }
+    // }
+    const orderByTokenPrice = () => {
+        
+    }
+    const orderByTokenDeposits = () => {
+        
+    }
+    const orderByUserDeposit = () =>{
+
     }
     useEffect(() => {
         getUserBalanceRToken();
         getPrice(props.token.decimal);
-        tokenBalance(props.token.address, props.token.name);
-    }, [userBalance, active]);
+        tokenBalance();
+    }, [active, account]);
     return (
         // TODO Fixe styles tailwind
         <div className={isOpen ? "flex flex-col bg-blue-100 rounded-lg mb-4 py-2" : "flex flex-col mb-4 py-2 hover:bg-blue-100 hover:rounded-lg cursor-pointer"}>
@@ -121,9 +126,9 @@ const TableElement = (props: any) => {
                 <div className='flex relative ml-10 font-bold w-[150px]'>
                     <button className=''><img className='absolute left-[-40px] top-[-3px]' src={isOpen ? sortUpIcon : sortDownIcon} /></button>{props.token.name}
                 </div>
-                <div className='mr-[-10px] flex font-bold w-[150px] justify-left'>{tokenPrice !== "0" ? tokenPrice.slice(0, 8) : <AnimatedDots />}</div>
-                <div className='w-[150px] flex justify-center'>{totalSuplay}</div>
-                <div className='w-[150px] flex justify-center'>{userTokenBalance}</div>
+                <div className='mr-[-10px] flex font-bold w-[150px] justify-left'>{props.token.tokenPrice !== "0" ? props.token.tokenPrice.slice(0, 8) : <AnimatedDots />}</div>
+                <div className='w-[150px] flex justify-center'>{props.token.deposits !== "0" ? props.token.deposits : <AnimatedDots />}</div>
+                <div className='w-[150px] flex justify-center'>{props.token.userBalance !== undefined ? props.token.userBalance : <AnimatedDots />}</div>
             </div>
             {/* //TODO Move this modal to components folder */}
             <div className={isOpen ? "transition-all ease-in-out duration-300 mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5" : "hidden"}>
@@ -150,7 +155,7 @@ const TableElement = (props: any) => {
                         </div>
                     </div>
                     <div className='flex flex-col w-[40%] ml-4'>
-                        <button onClick={() => depositAmount(props.token.name)} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
+                        <button onClick={() => depositAmount()} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
                         <ModalMultiDeposit userBalance={userBalance} />
                     </div>
                 </div>

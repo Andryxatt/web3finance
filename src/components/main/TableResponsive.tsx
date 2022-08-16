@@ -3,14 +3,22 @@ import iconSort from '../../images/sort_icon.svg';
 import { useWeb3React } from "@web3-react/core";
 import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
+import { Contract, ethers } from "ethers";
+import sortIcon from "../../images/sort.svg";
+import sortAscIcon from "../../images/asc.svg";
+import sortDescIcon from "../../images/desc.svg";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
-    const { active } = useWeb3React();
+    const { active, account, library } = useWeb3React();
     const rinkebyTokens = require("../../tokens/rinkeby.json");
     const ethereumTokens = require("../../tokens/ethereum.json");
     const bscTokens = require("../../tokens/bsc.json");
     const polygonTokens = require("../../tokens/polygon.json");
     const searchIcon = require("../../images/search.png");
+    const contractsAddresses = require("../../contracts/AddressesContracts.json");
+    const FeeShareAbi = require("../../contracts/FeeShare.json");
+    const RTokenAbi = require("../../contracts/RTokenAbi.json");
+    const OracleAbi = require("../../contracts/oracle/Oracle.json");
     // const sortedIcon = require("../../images/sort_icon.svg");
     const [filters, setFilters] = useState([
         {
@@ -60,9 +68,12 @@ const TableResponsive = () => {
             isSelected: false
         }
     ]);
-    const [sort, setSort] = useState("asc");
-    const [currentNetwork, setCurrentNetwork] =  useState("Rinkeby Testnet");
-    const [tokens, setTokens] = useState([]);
+    const [sortName, setSortName] = useState("");
+    const [sortPrice, setSortPrice] = useState("");
+    const [sortDeposits, setSortDeposits] = useState("");
+    const [sortUserDeposit, setSortUserDeposit] = useState("");
+    const [currentNetwork, setCurrentNetwork] = useState("Rinkeby Testnet");
+    const [tokens, setTokens] = useState(rinkebyTokens.Tokenization);
     const updateNetwork = (network: any) => {
         const newState = networks.map(obj => {
             if (obj.name === network.name) {
@@ -102,24 +113,86 @@ const TableResponsive = () => {
         });
         setFilters(newState);
     };
-    const filteredTokens = () =>{
-      const res = [...tokens].sort((a:any, b:any) => {
-            if (sort === "asc") {
+    const sortByName = () => {
+        const res = [...tokens].sort((a: any, b: any) => {
+            if (sortName === "asc") {
                 return a.name > b.name ? 1 : -1;
             }
             else {
                 return a.name < b.name ? 1 : -1;
             }
         });
-        setSort(sort === "asc" ? "desc" : "asc");
-        return res;
+        setSortPrice("");
+        setSortDeposits("");
+        setSortUserDeposit("");
+        setSortName(sortName === "asc" ? "desc" : "asc");
+        setTokens(res);
+    }
+    const sortByPrice = () => {
+        const res = [...tokens].sort((a: any, b: any) => {
+            if (sortPrice === "asc") {
+                return a.tokenPrice > b.tokenPrice ? 1 : -1;
+            }
+            else {
+                return a.tokenPrice < b.tokenPrice ? 1 : -1;
+            }
+        });
+        setSortName("");
+        setSortDeposits("");
+        setSortUserDeposit("");
+        setSortPrice(sortPrice === "asc" ? "desc" : "asc");
+        setTokens(res);
+    }
+    const sortByDeposits = () => {
+        const res = [...tokens].sort((a: any, b: any) => {
+            if (sortDeposits === "asc") {
+                return a.deposits > b.deposits ? 1 : -1;
+            }
+            else {
+                return a.deposits < b.deposits ? 1 : -1;
+            }
+        });
+        setSortPrice("");
+        setSortName("");
+        setSortUserDeposit("");
+        setSortDeposits(sortDeposits === "asc" ? "desc" : "asc");
+        setTokens(res);
+    }
+    const sortByUserDeposit = () => {
+        const res = [...tokens].sort((a: any, b: any) => {
+            if (sortUserDeposit === "asc") {
+                return a.userBalance > b.userBalance ? 1 : -1;
+            }
+            else {
+                return a.userBalance < b.userBalance ? 1 : -1;
+            }
+        });
+        setSortPrice("");
+        setSortName("");
+        setSortDeposits("");
+        setSortUserDeposit(sortUserDeposit === "asc" ? "desc" : "asc");
+        setTokens(res);
     }
     useEffect(() => {
-            setTokens(rinkebyTokens.Tokenization);
-            if(active){
-                updateNetwork(currentNetwork);
-            }
-    }, [active, tokens])
+        if (active) {
+            tokens.map((token: any) => {
+                const contract = new Contract(contractsAddresses["r" + token.name], RTokenAbi, library?.getSigner());
+                contract.totalSupply().then((res: any) => {
+                    token.deposits = ethers.utils.formatUnits(res._hex, token.decimal);
+                });
+                contract.balanceOf(account).then((res: any) => {
+                    token.userBalance = ethers.utils.formatUnits(res._hex, token.decimal);
+                });
+                const contractOracle = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner())
+                contractOracle.getAssetPrice(token.address).then((res: any) => {
+                    token.tokenPrice = ethers.utils.formatUnits(res._hex, 8)
+                });
+
+            });
+            console.log(tokens);
+            // updateNetwork(currentNetwork);
+        }
+    }, [account, active])
 
     return (
         <div className="">
@@ -164,18 +237,29 @@ const TableResponsive = () => {
                 </div>
             </div>
             <div className="px-5 py-2 justify-between flex flex-row border-gray-300">
-                <div onClick={filteredTokens} className="flex cursor-pointer justify-center w-[150px]">Asset <img className="w-[26px]" src={iconSort} alt="icon" /></div>
-                <div onClick={filteredTokens} className="flex cursor-pointer justify-center w-[150px]">Token Price <img className="w-[26px]" src={iconSort} alt="icon" /></div>
-                <div className="flex cursor-pointer justify-center w-[150px]">Deposit ($) <img className="w-[26px]" src={iconSort} alt="icon" /></div>
-                <div className="flex cursor-pointer justify-center w-[150px]">Your balance <img className="w-[26px]" src={iconSort} alt="icon" /></div>
+                <div onClick={() => sortByName()} className="flex cursor-pointer justify-center w-[150px] font-lg">Asset
+                    <img className="ml-2 w-[16px]" src={sortName === "" ? sortIcon : sortName === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
+                </div>
+                <div onClick={() => sortByPrice()} className="flex cursor-pointer justify-center w-[150px]">Token Price
+                    <img className="ml-2 w-[16px]" src={sortPrice === "" ? sortIcon : sortPrice === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
+                </div>
+                <div onClick={() => sortByDeposits()} className="flex cursor-pointer justify-center w-[150px]">Deposit ($)
+                    <img className="ml-2 w-[16px]" src={sortDeposits === "" ? sortIcon : sortDeposits === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
+                </div>
+                <div onClick={() => sortByUserDeposit()} className="flex cursor-pointer justify-center w-[150px]">Your balance
+                    <img className="ml-2 w-[16px]" src={sortUserDeposit === "" ? sortIcon : sortUserDeposit === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
+                </div>
             </div>
             {
-               tokens && tokens.map((token: any, index: any) => {
+                tokens && tokens.map((token: any, index: any) => {
                     return (
                         <TableElement token={token} key={index + currentNetwork} network={currentNetwork} />
                     )
                 })
             }
+            {/* {
+                <TokensList tokens={tokens}/>
+            } */}
         </div>
     );
 }

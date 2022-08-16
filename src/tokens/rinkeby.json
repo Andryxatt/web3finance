@@ -3,17 +3,26 @@
         {
             "name": "USDC",
             "decimal": 6,
-            "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926"
-        },
+            "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
+            "tokenPrice": "0.00",
+            "deposits": "0.00",
+            "userBalance": "0.00"
+        },  
         {
             "name": "LINK",
             "decimal": 18,
-            "address": "0x01BE23585060835E02B77ef475b0Cc51aA1e0709"
+            "address": "0x01BE23585060835E02B77ef475b0Cc51aA1e0709",
+            "tokenPrice": "0.00",
+            "deposits": "0.00",
+            "userBalance": "0.00"
         },
         {
             "name":"WETH",
             "decimal": 18,
-            "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab"
+            "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+            "tokenPrice": "0.00",
+            "deposits": "0.00",
+            "userBalance": "0.00"
         }
     ]
 }
