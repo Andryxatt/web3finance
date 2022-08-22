@@ -86,7 +86,6 @@ const TableElement = (props: any) => {
                 })
             });
         }
-
     }
     const witdrawDeposit = async () => {
         let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner())
@@ -105,15 +104,7 @@ const TableElement = (props: any) => {
     //         })
     //     }
     // }
-    const orderByTokenPrice = () => {
-        
-    }
-    const orderByTokenDeposits = () => {
-        
-    }
-    const orderByUserDeposit = () =>{
 
-    }
     useEffect(() => {
         getUserBalanceRToken();
         getPrice(props.token.decimal);

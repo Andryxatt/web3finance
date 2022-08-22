@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import iconSort from '../../images/sort_icon.svg';
 import { useWeb3React } from "@web3-react/core";
 import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
@@ -177,17 +176,17 @@ const TableResponsive = () => {
         if (active) {
             tokens.map((token: any) => {
                 const contract = new Contract(contractsAddresses["r" + token.name], RTokenAbi, library?.getSigner());
-                contract.totalSupply().then((res: any) => {
+                const contractOracle = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner())
+                 contract.totalSupply().then((res: any) => {
                     token.deposits = ethers.utils.formatUnits(res._hex, token.decimal);
                 });
-                contract.balanceOf(account).then((res: any) => {
-                    token.userBalance = ethers.utils.formatUnits(res._hex, token.decimal);
+                 contract.balanceOf(account).then((res: any) => {
+                    token.userBalance =  ethers.utils.formatUnits(res._hex, token.decimal);
                 });
-                const contractOracle = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner())
+               
                 contractOracle.getAssetPrice(token.address).then((res: any) => {
                     token.tokenPrice = ethers.utils.formatUnits(res._hex, 8)
                 });
-
             });
             console.log(tokens);
             // updateNetwork(currentNetwork);
@@ -257,9 +256,6 @@ const TableResponsive = () => {
                     )
                 })
             }
-            {/* {
-                <TokensList tokens={tokens}/>
-            } */}
         </div>
     );
 }

@@ -123,3 +123,26 @@ html {
   bottom: 0px;
   left: 0px;
 }
+#textarea {
+    -moz-appearance: textfield-multiline;
+    -webkit-appearance: textarea;
+    padding: 2px;
+    resize: both;
+    background:#fff;
+   
+}
+#textarea:focus-visible {
+    border: none;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    border: none;
+    background-color: transparent;
+    resize: none;
+    outline: none;
+}
+#textarea[contenteditable=true] {
+}
+.cm-line-error{
+  color: red;
+}
