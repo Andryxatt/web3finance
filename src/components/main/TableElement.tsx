@@ -96,19 +96,11 @@ const TableElement = (props: any) => {
             })
         });
     }
-    // const getTotalDepositBalance = async () => {
-    //     if (active) {
-    //         let contract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, library?.getSigner());
-    //         await contract.totalSupply().then((res: any) => {
-    //             setTotalSuplay(ethers.utils.formatUnits(res._hex, props.token.decimal));
-    //         })
-    //     }
-    // }
-
     useEffect(() => {
         getUserBalanceRToken();
         getPrice(props.token.decimal);
         tokenBalance();
+        console.log(props)
     }, [active, account]);
     return (
         // TODO Fixe styles tailwind
@@ -147,7 +139,7 @@ const TableElement = (props: any) => {
                     </div>
                     <div className='flex flex-col w-[40%] ml-4'>
                         <button onClick={() => depositAmount()} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
-                        <ModalMultiDeposit userBalance={userBalance} />
+                        <ModalMultiDeposit tokenInfo={props.token} userBalance={userBalance} />
                     </div>
                 </div>
                 <div className='mt-5 flex justify-between items-center'>
