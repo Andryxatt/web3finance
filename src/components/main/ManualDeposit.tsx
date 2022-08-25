@@ -1,8 +1,8 @@
 import CodeMirror, { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { useCallback, useEffect, useRef, useState } from 'react';
-const ManualDeposit = (props: any) => {
-    const [isValid, setIsValid] = useState(true);
+function ManualDeposit(props: any){
+    const [isValid, setIsValid] = useState<boolean>(true);
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
     const [element, setElement] = useState<string>();
     const onChange = useCallback((value: any, viewUpdate: any) => {
@@ -15,41 +15,52 @@ const ManualDeposit = (props: any) => {
         extensions: [javascript({ jsx: true })],
         value: element,
         height: "200px",
-        width: "100%",
+        width: "500px",
         placeholder: "Enter your deposit address and amount",
         onChange: onChange,
     });
     const deleteInvalidLines = () => {
         console.log(editor.current);
     }
-    const validateinputs = async () => {
-        const arrayOfElements = element!.split("\n");
-        const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
-        let cmlines = document.querySelectorAll(".cm-line");
-        arrayOfElements.forEach(async (element: any, index: number) => {
-            const newElement = {
-                address: element.split(",")[0],
-                amount: element.split(",")[1],
-                errorAddress: element.split(",")[0].length !== 42 ? "is not valid" : "",
-                errorAmount: isNaN(element.split(",")[1]) === true ? "is not valid" : "",
+    const nextModal = () =>{
+        if(element!==""){
+            validateinputs();
+        }
+        
+        console.log(isValid)
+        props.changeModalContent(isValid);
+    }
+    const validateinputs =  () => {
+        let amountsAddress = element?.split("\n");
+        let newAmountsAddress =  amountsAddress?.map((item, index) =>{
+            let newElement = {
+                address: item.split(",")[0],
+                amount: item.split(",")[1],
+                errorAddress: item.split(",")[0].length !== 42 ? "is not valid" : "",
+                errorAmount: isNaN(parseInt(item.split(",")[1])) === true ? "is not valid" : "",
                 row: index + 1
             }
-            if (newElement.errorAddress !== "" || newElement.errorAmount !== "") {
-                cmlines[index].classList.add("cm-line-error");
-                setIsValid(false);
-            }
-            arrayOfElementsWithoutEmpty.push(newElement);
+        
+            return newElement;
         })
-        setArrayOfAddrAmounts(arrayOfElementsWithoutEmpty);
-       
-       
+        for(let i = 0; i < newAmountsAddress!.length; i++){
+          if(newAmountsAddress![i].errorAddress !== "" || newAmountsAddress![i].errorAddress !== ""){
+            setIsValid(false);
+            continue;
+          }
+          setIsValid(true)
+        }
+        setArrayOfAddrAmounts(newAmountsAddress!);
+        
     }
     useEffect(() => {
+        
         if (editor.current) {
             setContainer(editor.current);
+            localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
         }
 
-        localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
+       
     }, [])
     return (
         <div className="px-5 py-5">
@@ -70,7 +81,7 @@ const ManualDeposit = (props: any) => {
                 </div>
             </div>
             <div className="mt-2 flex flex-row justify-between"><span>Separated by comma</span><span className="underline cursor-pointer">Show examples</span></div>
-            <div className={isValid ? "hidden" : ""}>
+            <div className={ isValid === true ? "hidden" : ""}>
                 <div className="flex flex-row justify-between">
                     <span className="text-red-500">The below addresses cannot be processed</span>
                     <button onClick={deleteInvalidLines} className="underline text-red-500">Delete them</button>
@@ -88,13 +99,8 @@ const ManualDeposit = (props: any) => {
                 </div>
 
             </div>
-            <button onClick={() => { validateinputs().then(()=>{
-                 if(isValid){
-            console.log(isValid)
-            props.changeModalContent(true);
-        }
-
-            }) }} className="text-white font-bold py-2 px-4 rounded-full bg-slate-500">Next</button>
+            <button onClick={() => {nextModal()
+            }} className="text-white font-bold py-2 px-4 rounded-full bg-slate-500">Next</button>
         </div>
     );
 }

@@ -32,6 +32,7 @@ function ModalMultiDeposit(props: any) {
         setArrayOfAddrAmounts(newarr);
     }
     const changeModalContent = (flag:boolean) =>{
+        console.log(flag)
         setNextModal(flag);
     }
     useEffect(() => {
@@ -49,7 +50,7 @@ function ModalMultiDeposit(props: any) {
             <Modal shown={modalShown} close={() => { toggleModal(false) }}>
                 {
                   nextModal ? <MultiDepoistPreview changeModalContent={changeModalContent}/> : 
-                  manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={switchDepoist}/> : <FilesDeposit switchDepoist={switchDepoist} />
+                  manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={()=>switchDepoist}/> : <FilesDeposit switchDepoist={()=>switchDepoist} />
                 }
 
             </Modal>
