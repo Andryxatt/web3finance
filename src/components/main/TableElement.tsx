@@ -18,7 +18,7 @@ const TableElement = (props: any) => {
     const [userBalance, setUserBalance] = useState("0");
     const [tokenPrice, setTokenPrice] = useState("0");
     const [userTokenBalance, setUserTokenBalance] = useState("0");
-    const { library, active, account, connector } = useWeb3React();
+    const { library, active, account } = useWeb3React();
     const changeOpen = (e: any, isOpen: boolean) => {
         setIsOpen(!isOpen);
         e.stopPropagation();
@@ -100,7 +100,6 @@ const TableElement = (props: any) => {
         getUserBalanceRToken();
         getPrice(props.token.decimal);
         tokenBalance();
-        console.log(props)
     }, [active, account]);
     return (
         // TODO Fixe styles tailwind
