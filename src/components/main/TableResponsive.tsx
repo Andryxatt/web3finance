@@ -15,7 +15,6 @@ const TableResponsive = () => {
     const polygonTokens = require("../../tokens/polygon.json");
     const searchIcon = require("../../images/search.png");
     const contractsAddresses = require("../../contracts/AddressesContracts.json");
-    const FeeShareAbi = require("../../contracts/FeeShare.json");
     const RTokenAbi = require("../../contracts/RTokenAbi.json");
     const OracleAbi = require("../../contracts/oracle/Oracle.json");
     // const sortedIcon = require("../../images/sort_icon.svg");
@@ -113,6 +112,7 @@ const TableResponsive = () => {
         setFilters(newState);
     };
     const sortByName = () => {
+        
         const res = [...tokens].sort((a: any, b: any) => {
             if (sortName === "asc") {
                 return a.name > b.name ? 1 : -1;
@@ -183,15 +183,14 @@ const TableResponsive = () => {
                  contract.balanceOf(account).then((res: any) => {
                     token.userBalance =  ethers.utils.formatUnits(res._hex, token.decimal);
                 });
-               
                 contractOracle.getAssetPrice(token.address).then((res: any) => {
-                    token.tokenPrice = ethers.utils.formatUnits(res._hex, 8)
+                    token.tokenPrice = ethers.utils.formatUnits(res._hex, 8);
                 });
             });
             console.log(tokens);
             // updateNetwork(currentNetwork);
         }
-    }, [account, active])
+    }, [account, active, tokens])
 
     return (
         <div className="">

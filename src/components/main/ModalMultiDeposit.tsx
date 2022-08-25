@@ -16,7 +16,7 @@ const fileTypes = ["CSV", "Excel", "Txt"];
 function ModalMultiDeposit(props: any) {
     const [modalShown, toggleModal] = React.useState(false);
     const [manualOrFiles, setManualOrFiles] = React.useState(true);
-    // drag state
+
     const switchDepoist = (manualOrFiles: boolean) => {
         console.log(manualOrFiles);
         setManualOrFiles(manualOrFiles);
@@ -31,17 +31,18 @@ function ModalMultiDeposit(props: any) {
         })
         setArrayOfAddrAmounts(newarr);
     }
-    const changeModalContent = (flag:boolean) =>{
-        console.log(flag)
+    const changeModalContent = (flag: boolean, array: []) => {
+        setArrayOfAddrAmounts(array)
         setNextModal(flag);
     }
     useEffect(() => {
+        console.log("multiPreviewToken", props)
     }, [arrayOfAddrAmounts])
     return (
         <>
             <Button
                 disabled={props.userBalance !== "0" ? false : true}
-                onClick={() => { toggleModal(!modalShown); localStorage.setItem("filteredLang", ""); }}
+                onClick={() => { toggleModal(!modalShown); }}
                 className={props.userBalance !== "0" ?
                     "mt-2 hover:bg-gray-600 h-[40px] px-0 py-0 bg-gray-500 text-white font-bold rounded-md normal-case" :
                     "mt-2 cursor-not-allowed h-[40px] px-0 py-0 bg-gray-400 text-white font-bold rounded-md normal-case"}>
@@ -49,8 +50,9 @@ function ModalMultiDeposit(props: any) {
             </Button>
             <Modal shown={modalShown} close={() => { toggleModal(false) }}>
                 {
-                  nextModal ? <MultiDepoistPreview changeModalContent={changeModalContent}/> : 
-                  manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={()=>switchDepoist}/> : <FilesDeposit switchDepoist={()=>switchDepoist} />
+                    nextModal ?
+                        <MultiDepoistPreview token={props.tokenInfo} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} /> :
+                        manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={switchDepoist} /> : <FilesDeposit switchDepoist={switchDepoist} />
                 }
 
             </Modal>
