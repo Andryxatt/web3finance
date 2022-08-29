@@ -1,4 +1,4 @@
-import CodeMirror, { useCodeMirror } from '@uiw/react-codemirror';
+import { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ethers } from 'ethers';

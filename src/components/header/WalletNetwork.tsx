@@ -1,18 +1,17 @@
 import { useWeb3React } from "@web3-react/core";
 import { toHex } from "../../helpers/utils";
+import { Web3State } from "../../Web3DataContext";
 
 function WalletNetwork({ name, icon }: any) {
   const {
-    library,
     active,
-    chainId
-  } = useWeb3React();
+    library,
+ } = Web3State();
   const switchNetwork = async (e: any) => {
     document.querySelectorAll(".network_wrapper").forEach((el: any) => {
       el.classList.remove("active-network");
     })
     e.currentTarget.className = "network_wrapper active-network";
-
     let newChainId = 0;
     switch (name) {
       case "Rinkeby Testnet":
@@ -32,7 +31,7 @@ function WalletNetwork({ name, icon }: any) {
         break;
     }
      if (active) {
-      await library.provider.request({
+      await library?.provider.request({
         method: "wallet_switchEthereumChain",
         params: [{ chainId: toHex(newChainId) }]
       });
