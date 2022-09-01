@@ -2,7 +2,13 @@ import { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ethers } from 'ethers';
+import { Web3State } from '../../Web3DataContext';
 function ManualDeposit(props: any){
+    const {
+        addressesFromFile,
+        setAddressesFromFile
+     } = Web3State();
+
     const [isValid, setIsValid] = useState<boolean>(true);
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
     const [element, setElement] = useState<string>();
@@ -11,6 +17,36 @@ function ManualDeposit(props: any){
         setElement(value);
 
     }, []);
+    const getListFromFile = () =>{
+        let newArr = [];
+        let newElems = "";
+        if(addressesFromFile.length > 0){
+            for (let index = 0; index < addressesFromFile.length; index++) {
+                if (index === addressesFromFile.length - 1) {
+                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1];
+                }
+                else {
+                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1] + "\n";
+                }
+                const newElement = {
+                    address: addressesFromFile[index][0],
+                    amount: addressesFromFile[index][1],
+                    errorAddress: !ethers.utils.isAddress(addressesFromFile[index][0]) ? "is not valid" : "",
+                    errorAmount: isNaN(addressesFromFile[index][1]) === true ? "is not valid" : "",
+                    row: index + 1
+                }
+                newArr.push(newElement);
+            }
+            console.log(newArr);
+            console.log(newElems);
+            localStorage.setItem("filteredLang", newElems);
+            setArrayOfAddrAmounts(newArr);
+            setElement(newElems);
+            setAddressesFromFile([]);
+        }
+        
+        // deleteInvalidLines();
+    }
     const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
     const { setContainer, view, state } = useCodeMirror({
         container: editor.current,
@@ -65,6 +101,7 @@ function ManualDeposit(props: any){
         setArrayOfAddrAmounts(arrayOfElementsWithoutEmpty);
     }
     useEffect(() => {
+        getListFromFile();
         localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
         if (editor.current) {
             setContainer(editor.current);
@@ -73,7 +110,7 @@ function ManualDeposit(props: any){
         if (element !== "" && element !== undefined) {
             validateinputs()
         }
-    }, [element])
+    }, [element, addressesFromFile])
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">

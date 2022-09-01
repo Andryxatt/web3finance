@@ -33,7 +33,6 @@ const MultiDepoistPreview = (props: any) => {
     }
     const sendTransaction = () => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-
     }
     const estimateGas = async () => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());

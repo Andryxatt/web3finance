@@ -3,6 +3,7 @@ import { Button } from "@material-tailwind/react";
 import ManualDeposit from "./ManualDeposit";
 import FilesDeposit from "./FilesDeposit";
 import MultiDepoistPreview from "./MultiDepoistPreview";
+import { SwitchTransition, CSSTransition } from "react-transition-group";
 function Modal({ children, shown, close }: any) {
     return shown ? (
         <div className="modal-backdrop" onClick={() => { close() }}>
@@ -18,10 +19,10 @@ function ModalMultiDeposit(props: any) {
     const [manualOrFiles, setManualOrFiles] = React.useState(true);
 
     const switchDepoist = (manualOrFiles: boolean) => {
-        console.log(manualOrFiles);
         setManualOrFiles(manualOrFiles);
     }
     const [nextModal, setNextModal] = useState(false);
+    const [mode, setMode] = React.useState("out-in");
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
     const deleteInvalidRows = () => {
         const newarr = arrayOfAddrAmounts.map((element: any, index: number) => {
@@ -36,24 +37,23 @@ function ModalMultiDeposit(props: any) {
         setNextModal(flag);
     }
     useEffect(() => {
-        console.log("multiPreviewToken", props)
     }, [arrayOfAddrAmounts])
     return (
         <>
-            <Button
+            <button
                 disabled={props.userBalance !== "0" ? false : true}
                 onClick={() => { toggleModal(!modalShown); }}
                 className={props.userBalance !== "0" ?
-                    "mt-2 hover:bg-gray-600 h-[40px] px-0 py-0 bg-gray-500 text-white font-bold rounded-md normal-case" :
-                    "mt-2 cursor-not-allowed h-[40px] px-0 py-0 bg-gray-400 text-white font-bold rounded-md normal-case"}>
+                    "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>
                 Multi Deposits
-            </Button>
+            </button>
             <Modal shown={modalShown} close={() => { toggleModal(false) }}>
-                {
-                    nextModal ?
-                        <MultiDepoistPreview token={props.tokenInfo} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} /> :
-                        manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={switchDepoist} /> : <FilesDeposit switchDepoist={switchDepoist} />
-                }
+                {nextModal ?
+                    <MultiDepoistPreview token={props.tokenInfo} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} />
+                    :
+                    manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={switchDepoist} />
+                        :
+                        <FilesDeposit switchDepoist={switchDepoist} />}
 
             </Modal>
         </>

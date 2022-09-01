@@ -174,20 +174,19 @@ const TableResponsive = () => {
     }
     useEffect(() => {
         if (active) {
-            tokens.map((token: any) => {
-                const contract = new Contract(contractsAddresses["r" + token.name], RTokenAbi, library?.getSigner());
-                const contractOracle = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner())
-                 contract.totalSupply().then((res: any) => {
-                    token.deposits = ethers.utils.formatUnits(res._hex, token.decimal);
-                });
-                 contract.balanceOf(account).then((res: any) => {
-                    token.userBalance =  ethers.utils.formatUnits(res._hex, token.decimal);
-                });
-                contractOracle.getAssetPrice(token.address).then((res: any) => {
-                    token.tokenPrice = ethers.utils.formatUnits(res._hex, 8);
-                });
-            });
-            console.log(tokens);
+            // tokens.map((token: any) => {
+            //     const contract = new Contract(contractsAddresses["r" + token.name], RTokenAbi, library?.getSigner());
+            //     const contractOracle = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner())
+            //      contract.totalSupply().then((res: any) => {
+            //         token.deposits = ethers.utils.formatUnits(res._hex, token.decimal);
+            //     });
+            //      contract.balanceOf(account).then((res: any) => {
+            //         token.userBalance =  ethers.utils.formatUnits(res._hex, token.decimal);
+            //     });
+            //     contractOracle.getAssetPrice(token.address).then((res: any) => {
+            //         token.tokenPrice = ethers.utils.formatUnits(res._hex, 8);
+            //     });
+            // });
             // updateNetwork(currentNetwork);
         }
     }, [account, active, tokens])

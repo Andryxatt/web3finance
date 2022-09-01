@@ -1,11 +1,18 @@
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
+import { Web3State } from "../../Web3DataContext";
 
 const FilesDeposit = (props: any) => {
     const uploadIcon = require("../../images/upload.png");
-    const [file, setFile] = useState<File>();
     const [dragActive, setDragActive] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const {
+        account,
+        active,
+        ConnectWallet,
+        addressesFromFile,
+        setAddressesFromFile
+     } = Web3State();
     // handle drag events
     const handleDrag = function (e: any) {
         e.preventDefault();
@@ -21,22 +28,25 @@ const FilesDeposit = (props: any) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            setFile(e.dataTransfer.files[0]);
-            const data = await file?.arrayBuffer();
-            const workBook = XLSX.read(data);
-            console.log(workBook);
-        }
     };
     // triggers when file is selected with click
     const handleChange = async (e: any) => {
         e.preventDefault();
-        if (e.target.files && e.target.files[0]) {
-            setFile(e.target.files[0]);
-            const data = await file?.arrayBuffer();
-            const workBook = XLSX.read(data);
-            console.log(workBook);
-        }
+        var files = e.target.files, f = files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var data = e.target!.result;
+            let readedData = XLSX.read(data, {type: 'binary'});
+            const wsname = readedData.SheetNames[0];
+            const ws = readedData.Sheets[wsname];
+    
+            /* Convert array to json*/
+            const dataParse = XLSX.utils.sheet_to_json(ws, {header:1});
+            dataParse.shift();
+            setAddressesFromFile(dataParse);
+        };
+        reader.readAsBinaryString(f)
+        props.switchDepoist(true);
     };
     const onButtonClick = () => {
         inputRef.current?.click();
