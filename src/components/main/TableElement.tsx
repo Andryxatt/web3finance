@@ -21,6 +21,8 @@ const TableElement = (props: any) => {
     const [userDepositBalance, setUserDepositBalance] = useState("0");
     const [totalDeposit, setTotalDeposit] = useState("0");
     const { library, active, account } = useWeb3React();
+
+    const [isWitdrawPriceValid, setIsWitdrawPriceValid] = useState( );
     const changeOpen = (e: any, isOpen: boolean) => {
         setIsOpen(!isOpen);
         e.stopPropagation();
@@ -37,13 +39,6 @@ const TableElement = (props: any) => {
         await contract.getAssetPrice(props.token.address).then((res: any) => {
             setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
         });
-        // setInterval(() => {
-        //     contract.getAssetPrice(props.token.address).then((res: any) => {
-        //         setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
-        //     });
-        // }, 10000)
-
-
     }
     const getUserDepositBalance = () => {
         const contract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, library?.getSigner());
@@ -109,13 +104,19 @@ const TableElement = (props: any) => {
         }
     }
     const witdrawDeposit = async () => {
-        let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner())
-        await feeShare.withdraw(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
-            result.wait().then(async (recept: any) => {
-                getUserBalanceRToken();
-                getTokenBalance();
-            })
-        });
+        let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        if(amountDeposit! > parseFloat(userDepositBalance) || amountDeposit! === undefined){
+            alert("You don't have enough tokens to withdraw");
+        }
+        else {
+            await feeShare.withdraw(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                result.wait().then(async (recept: any) => {
+                    getUserBalanceRToken();
+                    getTokenBalance();
+                })
+            });
+        }
+       
     }
     useEffect(() => {
         getPrice();
@@ -165,7 +166,7 @@ const TableElement = (props: any) => {
                     </div>
                     <div className='flex flex-col w-[40%] ml-4'>
                         <button onClick={() => depositAmount()} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
-                        <ModalMultiDeposit tokenInfo={props.token} userBalance={userBalanceToken} />
+                        <ModalMultiDeposit token={props.token} userBalance={userBalanceToken} />
                     </div>
                 </div>
                 <div className='mt-5 flex justify-between items-center'>

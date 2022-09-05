@@ -37,8 +37,6 @@ function ManualDeposit(props: any){
                 }
                 newArr.push(newElement);
             }
-            console.log(newArr);
-            console.log(newElems);
             localStorage.setItem("filteredLang", newElems);
             setArrayOfAddrAmounts(newArr);
             setElement(newElems);

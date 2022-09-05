@@ -32,6 +32,43 @@ const FilesDeposit = (props: any) => {
     // triggers when file is selected with click
     const handleChange = async (e: any) => {
         e.preventDefault();
+        
+        if(e.target.files[0].name.split('.')[1] === "xlsx"){
+            excelFileRead(e);
+        }
+        else if(e.target.files[0].type === "text/plain" || e.target.files[0].type === "text/csv"){
+            txtcsvFileRead(e);
+        }
+        else {
+
+        }
+       
+    };
+    const txtcsvFileRead = (e: any) => {
+        var files = e.target.files, f = files[0];
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            var data = e.target!.result?.toString();
+            var allTextLines = data!.split(/\r\n|\n/);
+            allTextLines.shift();
+            allTextLines.pop();
+           const res = allTextLines.reduce((acc: any, line: any) => {
+                const [address, amount] = line.split(',');
+                acc.push([address, amount]);
+                return acc;
+            },[]);
+            if(res.length >= 255){
+                alert("Maximum 255 addresses can be added at a time");
+            }
+            else {
+                setAddressesFromFile(res);
+                props.switchDepoist(true);
+            }
+          
+        };
+        reader.readAsText(f);
+    }
+    const excelFileRead = (e: any) => {
         var files = e.target.files, f = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -43,11 +80,16 @@ const FilesDeposit = (props: any) => {
             /* Convert array to json*/
             const dataParse = XLSX.utils.sheet_to_json(ws, {header:1});
             dataParse.shift();
-            setAddressesFromFile(dataParse);
+            if(dataParse.length >= 255){
+                alert("Maximum 255 addresses can be added at a time");
+            }
+            else {
+                setAddressesFromFile(dataParse);
+                props.switchDepoist(true);
+            }
         };
-        reader.readAsBinaryString(f)
-        props.switchDepoist(true);
-    };
+        reader.readAsBinaryString(f);
+    }
     const onButtonClick = () => {
         inputRef.current?.click();
     };

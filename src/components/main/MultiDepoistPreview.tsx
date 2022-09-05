@@ -9,8 +9,9 @@ const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
 const MultiDepoistPreview = (props: any) => {
     const { library, active, account, connector } = useWeb3React();
     const [addressesAndAmount, setAddressesAndAmount] = useState<any[]>([]);
-    const [feePerAccount, setFeePerAccount] = useState<string>("");
+    const [feePerAccount, setFeePerAccount] = useState(0);
     const [userBalance, setUserBalance] = useState("0");
+    const [estimateGas, setEstimateGas] = useState("0");
     const summAmunt = () => {
         let res = 0;
         addressesAndAmount.forEach((element: any) => {
@@ -20,10 +21,11 @@ const MultiDepoistPreview = (props: any) => {
     }
     const summAndFee = () => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        feeShareContract.calculateFee().then((res: any) => {
-            setFeePerAccount(ethers.utils.formatUnits(res._hex))
+        feeShareContract.calculateFee(props.token.address).then((res: any) => {
+            setFeePerAccount(parseFloat(ethers.utils.formatUnits(res._hex)))
         });
-        const totalPrice = addressesAndAmount.length * parseFloat(feePerAccount);
+        const totalPrice = addressesAndAmount.length * feePerAccount;
+        console.log(totalPrice, "totalPrice");
         return totalPrice;
     }
     const getUserBalance = async () => {
@@ -33,30 +35,36 @@ const MultiDepoistPreview = (props: any) => {
     }
     const sendTransaction = () => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+
     }
-    const estimateGas = async () => {
-        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        const addressesToSend = addressesAndAmount.map((element: any) => {
-            return element.address;
-        })
-        const amountToSend = addressesAndAmount.map((element: any) => {
-            return ethers.utils.parseUnits(element.amount);
-        })
-        addressesToSend.unshift(contractsAddresses.feeShare);
-        amountToSend.unshift(ethers.utils.parseUnits((summAndFee() + summAmunt()).toString()));
-        console.log(addressesToSend);
-        console.log(amountToSend);
-        const res = await feeShareContract.estimateGas.multiSend(addressesToSend, amountToSend);
-        console.log(res);
+    const getEstimateGas = async () => {
+        if(active){
+            const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+            const addressesToSend = addressesAndAmount.map((element: any) => {
+                return element.address;
+            })
+            const amountToSend = addressesAndAmount.map((element: any) => {
+                return ethers.utils.parseUnits(element.amount);
+            })
+            addressesToSend.unshift(contractsAddresses.feeShare);
+            amountToSend.unshift(ethers.utils.parseUnits((summAndFee()).toString()));
+            console.log(addressesToSend);
+            console.log(amountToSend);
+            // const res = await feeShareContract.estimateGas.multiSendFee(props.token.address, addressesToSend, amountToSend);
+            // console.log(res);
+            return 1;
+        }
+       return 0;
     }
     useEffect(() => {
         getUserBalance();
+        getEstimateGas();
         setAddressesAndAmount(props.addressesAmount)
     }, [addressesAndAmount])
     return (
         <div className="px-5 py-5">
             <div className="w-full">
-                <div>Network Speed (3.0091963 Gwei) </div>
+                <div>Network Speed ({estimateGas}) Gwei </div>
                 <input className="w-full" type="range"></input>
                 <div className="flex justify-between">
                     <span className="cursor-pointer">Slow</span>
@@ -103,7 +111,7 @@ const MultiDepoistPreview = (props: any) => {
             </div>
             <div className="mt-4">
                 <button className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3" onClick={() => props.changeModalContent(false)}>prev</button>
-                <button onClick={estimateGas} className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
+                <button className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
             </div>
         </div>
     )

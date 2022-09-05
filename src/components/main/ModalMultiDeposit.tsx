@@ -6,7 +6,7 @@ import MultiDepoistPreview from "./MultiDepoistPreview";
 import { SwitchTransition, CSSTransition } from "react-transition-group";
 function Modal({ children, shown, close }: any) {
     return shown ? (
-        <div className="modal-backdrop" onClick={() => { close() }}>
+        <div className="modal-backdrop" onClick={() => { close( localStorage.setItem("filteredLang", "")) }}>
             <div className="modal-content" onClick={e => { e.stopPropagation() }}>
                 {children}
             </div>
@@ -49,7 +49,7 @@ function ModalMultiDeposit(props: any) {
             </button>
             <Modal shown={modalShown} close={() => { toggleModal(false) }}>
                 {nextModal ?
-                    <MultiDepoistPreview token={props.tokenInfo} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} />
+                    <MultiDepoistPreview token={props.token} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} />
                     :
                     manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={switchDepoist} />
                         :
