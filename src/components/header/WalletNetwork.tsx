@@ -1,4 +1,3 @@
-import { useWeb3React } from "@web3-react/core";
 import { toHex } from "../../helpers/utils";
 import { Web3State } from "../../Web3DataContext";
 
@@ -39,7 +38,7 @@ function WalletNetwork({ name, icon }: any) {
   }
   return (
     <div className="network_wrapper" onClick={(e) => { switchNetwork(e) }}>
-      <img src={icon} />
+      <img src={icon} alt={name}/>
       <span>{name}</span>
     </div>
   )

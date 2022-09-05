@@ -1,9 +1,7 @@
-import React, { useCallback, useEffect, useState } from "react";
-import { Button } from "@material-tailwind/react";
+import React, { useEffect, useState } from "react";
 import ManualDeposit from "./ManualDeposit";
 import FilesDeposit from "./FilesDeposit";
 import MultiDepoistPreview from "./MultiDepoistPreview";
-import { SwitchTransition, CSSTransition } from "react-transition-group";
 function Modal({ children, shown, close }: any) {
     return shown ? (
         <div className="modal-backdrop" onClick={() => { close( localStorage.setItem("filteredLang", "")) }}>
@@ -22,16 +20,16 @@ function ModalMultiDeposit(props: any) {
         setManualOrFiles(manualOrFiles);
     }
     const [nextModal, setNextModal] = useState(false);
-    const [mode, setMode] = React.useState("out-in");
+    // const [mode, setMode] = React.useState("out-in");
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
-    const deleteInvalidRows = () => {
-        const newarr = arrayOfAddrAmounts.map((element: any, index: number) => {
-            if (element.errorAddress === "" && element.errorAmount === "") {
-                return element;
-            }
-        })
-        setArrayOfAddrAmounts(newarr);
-    }
+    // const deleteInvalidRows = () => {
+    //     const newarr = arrayOfAddrAmounts.map((element: any, index: number) => {
+    //         if (element.errorAddress === "" && element.errorAmount === "") {
+    //             return element;
+    //         }
+    //     })
+    //     setArrayOfAddrAmounts(newarr);
+    // }
     const changeModalContent = (flag: boolean, array: []) => {
         setArrayOfAddrAmounts(array)
         setNextModal(flag);

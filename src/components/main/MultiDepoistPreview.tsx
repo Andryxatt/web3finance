@@ -8,23 +8,24 @@ const contractsAddresses = require("../../contracts/AddressesContracts.json");
 const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
 const MultiDepoistPreview = (props: any) => {
     const { library, active, account, connector } = useWeb3React();
-    const [addressesAndAmount, setAddressesAndAmount] = useState<any[]>([]);
     const [feePerAccount, setFeePerAccount] = useState(0);
     const [userBalance, setUserBalance] = useState("0");
     const [estimateGas, setEstimateGas] = useState("0");
     const summAmunt = () => {
+        console.log(props.addressesAmount);
         let res = 0;
-        addressesAndAmount.forEach((element: any) => {
+        props.addressesAmount.forEach((element: any) => {
             res += parseFloat(element?.amount);
         })
         return res;
     }
     const summAndFee = () => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        feeShareContract.calculateFee(props.token.address).then((res: any) => {
+        feeShareContract.calculateFee().then((res: any) => {
+            console.log(res);
             setFeePerAccount(parseFloat(ethers.utils.formatUnits(res._hex)))
         });
-        const totalPrice = addressesAndAmount.length * feePerAccount;
+        const totalPrice = props.addressesAmount.length * feePerAccount;
         console.log(totalPrice, "totalPrice");
         return totalPrice;
     }
@@ -40,10 +41,10 @@ const MultiDepoistPreview = (props: any) => {
     const getEstimateGas = async () => {
         if(active){
             const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-            const addressesToSend = addressesAndAmount.map((element: any) => {
+            const addressesToSend = props.addressesAmount.map((element: any) => {
                 return element.address;
             })
-            const amountToSend = addressesAndAmount.map((element: any) => {
+            const amountToSend = props.addressesAmount.map((element: any) => {
                 return ethers.utils.parseUnits(element.amount);
             })
             addressesToSend.unshift(contractsAddresses.feeShare);
@@ -58,13 +59,12 @@ const MultiDepoistPreview = (props: any) => {
     }
     useEffect(() => {
         getUserBalance();
-        getEstimateGas();
-        setAddressesAndAmount(props.addressesAmount)
-    }, [addressesAndAmount])
+        // getEstimateGas();
+    }, [])
     return (
         <div className="px-5 py-5">
             <div className="w-full">
-                <div>Network Speed ({estimateGas}) Gwei </div>
+                <div>Network Speed  Gwei </div>
                 <input className="w-full" type="range"></input>
                 <div className="flex justify-between">
                     <span className="cursor-pointer">Slow</span>
@@ -77,7 +77,7 @@ const MultiDepoistPreview = (props: any) => {
                 <div className="bg-white flex flex-row w-full rounded-md">
                     <div className="flex flex-col w-full">
                         <div className="px-8 py-8 flex flex-col border-b-2">
-                            <span className="text-xl text-blue-900 font-bold">{addressesAndAmount.length}</span>
+                            <span className="text-xl text-blue-900 font-bold">{props.addressesAmount.length}</span>
                             <span className="text-xs text-gray-400">Total number of addresses </span>
                         </div>
                         <div className="px-8 py-8 flex flex-col border-b-2">
@@ -85,13 +85,13 @@ const MultiDepoistPreview = (props: any) => {
                             <span className="text-xs text-gray-400">Total number of transactions needed </span>
                         </div>
                         <div className="px-8 py-8 flex flex-col">
-                            <span className="text-xl text-blue-900 font-bold">{summAndFee().toFixed(4)} {props.token.name} </span>
+                            <span className="text-xl text-blue-900 font-bold">{/*TODO veriable for summAmunt */} {props.token.name} </span>
                             <span className="text-xs text-gray-400">Approximate cost of operation </span>
                         </div>
                     </div>
                     <div className="flex flex-col border-l-2 w-full">
                         <div className="px-8 py-8 flex flex-col border-b-2">
-                            <span className="text-xl text-blue-900 font-bold">{summAmunt().toFixed(4)} {props.token.name} </span>
+                            <span className="text-xl text-blue-900 font-bold">{/*TODO veriable for sumAndFee*/} {props.token.name} </span>
                             <span className="text-xs text-gray-400">Total number of tokens to be sent </span>
                         </div>
                         <div className="px-8 py-8 flex flex-col border-b-2">
@@ -104,7 +104,8 @@ const MultiDepoistPreview = (props: any) => {
                         </div>
                     </div>
                 </div>
-                {parseFloat(userBalance) < summAndFee() + summAmunt() ? <div className="border-red-600 rounded-lg bg-white mt-3 text-red-500 px-5 py-5">
+                /*TODO add check total price with userBalance*/
+                {parseFloat(userBalance) < 0 ? <div className="border-red-600 rounded-lg bg-white mt-3 text-red-500 px-5 py-5">
                     Insufficient ether balance on your account
                 </div> : ""}
 

@@ -22,7 +22,6 @@ const TableElement = (props: any) => {
     const [totalDeposit, setTotalDeposit] = useState("0");
     const { library, active, account } = useWeb3React();
 
-    const [isWitdrawPriceValid, setIsWitdrawPriceValid] = useState( );
     const changeOpen = (e: any, isOpen: boolean) => {
         setIsOpen(!isOpen);
         e.stopPropagation();
@@ -154,7 +153,7 @@ const TableElement = (props: any) => {
                                 disabled={userBalanceToken !== "0" ? false : true}
                                 step={"0.01"}
                                 type="number"
-                                className={userBalanceToken !== "0" ? "rounded-lg py-1 text-[20px] disabled:opacity-75 border-2 pr-[60px] border-gray-400 w-[100%]" : "cursor-not-allowed w-[100%] rounded-lg px-1 py-1 text-[20px] disabled:opacity-75 border-2 border-gray-400"}
+                                className={userBalanceToken !== "0" ? "rounded-lg py-1 text-[20px] disabled:opacity-75 border-2 pr-[60px] border-gray-400 w-[100%]" : "cursor-not-allowed w-[100%] rounded-lg px-3 py-3 text-[20px] disabled:opacity-75 border-2 border-gray-400"}
                             ></input>
                             <button
                                 disabled={userBalanceToken !== "0" ? false : true}
