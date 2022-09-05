@@ -50,7 +50,7 @@ function ModalMultiDeposit(props: any) {
                     <MultiDepoistPreview token={props.token} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} />
                     :
                     manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={switchDepoist} />
-                        :
+                    :
                         <FilesDeposit switchDepoist={switchDepoist} />}
 
             </Modal>
