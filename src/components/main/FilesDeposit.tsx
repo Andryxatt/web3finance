@@ -7,10 +7,6 @@ const FilesDeposit = (props: any) => {
     const [dragActive, setDragActive] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const {
-        account,
-        active,
-        ConnectWallet,
-        addressesFromFile,
         setAddressesFromFile
      } = Web3State();
     // handle drag events
@@ -25,27 +21,31 @@ const FilesDeposit = (props: any) => {
     };
     // triggers when file is dropped
     const handleDrop = async (e: any) => {
+       
         e.preventDefault();
         e.stopPropagation();
-        setDragActive(false);
+        console.log(e)
+        if(e.dataTransfer.files[0].name.split('.')[1] === "xlsx"){
+            excelFileRead(e.dataTransfer.files);
+        }
+        else if(e.dataTransfer.files[0].type === "text/plain" || e.dataTransfer.files[0].name.split('.')[1] === "csv"){
+            console.log(e.dataTransfer.files);
+            txtcsvFileRead(e.dataTransfer.files);
+        }
     };
     // triggers when file is selected with click
     const handleChange = async (e: any) => {
         e.preventDefault();
-        
+        console.log(e)
         if(e.target.files[0].name.split('.')[1] === "xlsx"){
-            excelFileRead(e);
+            excelFileRead(e.target.files);
         }
         else if(e.target.files[0].type === "text/plain" || e.target.files[0].type === "text/csv"){
-            txtcsvFileRead(e);
+            txtcsvFileRead(e.target.files);
         }
-        else {
-
-        }
-       
     };
-    const txtcsvFileRead = (e: any) => {
-        var files = e.target.files, f = files[0];
+    const txtcsvFileRead = (filesFromEvent: any) => {
+        var files = filesFromEvent, f = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
             var data = e.target!.result?.toString();
@@ -68,8 +68,8 @@ const FilesDeposit = (props: any) => {
         };
         reader.readAsText(f);
     }
-    const excelFileRead = (e: any) => {
-        var files = e.target.files, f = files[0];
+    const excelFileRead = (filesFromEvent: any) => {
+        var files = filesFromEvent, f = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
             var data = e.target!.result;
@@ -115,6 +115,3 @@ const FilesDeposit = (props: any) => {
 }
 export default FilesDeposit;
 
-function setDragActive(arg0: boolean) {
-    throw new Error("Function not implemented.");
-}

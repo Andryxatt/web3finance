@@ -1,24 +1,26 @@
 import { useWeb3React } from "@web3-react/core";
 import { Contract, ethers } from "ethers";
 import { useEffect, useState } from "react";
+import { Web3State } from "../../Web3DataContext";
 const OracleAbi = require("../../contracts/oracle/Oracle.json");
 const FeeShareAbi = require("../../contracts/FeeShare.json");
 const RTokenAbi = require("../../contracts/RTokenAbi.json");
 const contractsAddresses = require("../../contracts/AddressesContracts.json");
 const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
+
 const MultiDepoistPreview = (props: any) => {
     const { library, active, account, connector } = useWeb3React();
     const [feePerAccount, setFeePerAccount] = useState(0);
     const [userBalance, setUserBalance] = useState("0");
     const [estimateGas, setEstimateGas] = useState("0");
     const summAmunt = () => {
-        console.log(props.addressesAmount);
         let res = 0;
         props.addressesAmount.forEach((element: any) => {
             res += parseFloat(element?.amount);
         })
         return res;
     }
+    const {getAssetFeePerAddress} = Web3State();
     const summAndFee = () => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
         feeShareContract.calculateFee().then((res: any) => {
@@ -34,28 +36,36 @@ const MultiDepoistPreview = (props: any) => {
         const price = await balanceOf.balanceOf(account);
         setUserBalance(ethers.utils.formatUnits(price._hex, props.token.decimal));
     }
-    const sendTransaction = () => {
+    const sendTransaction = async () => {
+        //calculate fee method and get rToken address
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-
+        console.log(feeShareContract, "feeShareContract");
+        const isAssetRToken = await feeShareContract.getRTokenAddress(props.token.address);
+        console.log(isAssetRToken, "isAssetRToken");
+        //approve to summ all amount per addresses
+        const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
+        console.log(rTokenContract, "rTokenContract");
+        const approve = await rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toString(), props.token.decimal));
+        console.log(approve, "approve");
+        //multysend
+        const oracleContract = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner());
+        console.log(oracleContract, "oracleContract");
+        const msgValue = isAssetRToken === 0 ?  getAssetFeePerAddress() * parseFloat(ethers.utils.formatUnits('200000000000000000', "wei")) : getAssetFeePerAddress();
+        console.log(props.addressesAmount, "msgValue");
+        const arrayOfAmounts = props.addressesAmount.map((item: any) => {return item.amount});
+       const addresses = props.addressesAmount.map((item: any) => {return item.address});
+        const multiSendUnsigned = await feeShareContract.multiSendFee(props.token.address, addresses, arrayOfAmounts);
+    
+        const multiSendReceipt = await multiSendUnsigned.wait();
+        console.log(multiSendReceipt, "multiSendReceipt");
+        if (multiSendReceipt.status === 0)
+            throw new Error("Approve transaction failed");
+            
     }
     const getEstimateGas = async () => {
         if(active){
-            const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-            const addressesToSend = props.addressesAmount.map((element: any) => {
-                return element.address;
-            })
-            const amountToSend = props.addressesAmount.map((element: any) => {
-                return ethers.utils.parseUnits(element.amount);
-            })
-            addressesToSend.unshift(contractsAddresses.feeShare);
-            amountToSend.unshift(ethers.utils.parseUnits((summAndFee()).toString()));
-            console.log(addressesToSend);
-            console.log(amountToSend);
-            // const res = await feeShareContract.estimateGas.multiSendFee(props.token.address, addressesToSend, amountToSend);
-            // console.log(res);
-            return 1;
+          
         }
-       return 0;
     }
     useEffect(() => {
         getUserBalance();
@@ -85,13 +95,13 @@ const MultiDepoistPreview = (props: any) => {
                             <span className="text-xs text-gray-400">Total number of transactions needed </span>
                         </div>
                         <div className="px-8 py-8 flex flex-col">
-                            <span className="text-xl text-blue-900 font-bold">{/*TODO veriable for summAmunt */} {props.token.name} </span>
+                            <span className="text-xl text-blue-900 font-bold">{} {props.token.name} </span>
                             <span className="text-xs text-gray-400">Approximate cost of operation </span>
                         </div>
                     </div>
                     <div className="flex flex-col border-l-2 w-full">
                         <div className="px-8 py-8 flex flex-col border-b-2">
-                            <span className="text-xl text-blue-900 font-bold">{/*TODO veriable for sumAndFee*/} {props.token.name} </span>
+                            <span className="text-xl text-blue-900 font-bold">{summAmunt()} {props.token.name} </span>
                             <span className="text-xs text-gray-400">Total number of tokens to be sent </span>
                         </div>
                         <div className="px-8 py-8 flex flex-col border-b-2">
@@ -112,7 +122,7 @@ const MultiDepoistPreview = (props: any) => {
             </div>
             <div className="mt-4">
                 <button className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3" onClick={() => props.changeModalContent(false)}>prev</button>
-                <button className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
+                <button onClick={()=>{sendTransaction()}} className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
             </div>
         </div>
     )
