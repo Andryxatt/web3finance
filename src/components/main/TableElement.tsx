@@ -130,8 +130,10 @@ const TableElement = (props: any) => {
     }, [active, account, tokenPrice, userBalanceToken, userTokenBalance]);
     return (
         // TODO Fixe styles tailwind
-        <div className={isOpen ? "flex flex-col  bg-blue-100 rounded-lg mb-4 py-2" : "flex flex-col mb-4 py-2 hover:bg-blue-100 hover:rounded-lg cursor-pointer"}>
-            <div onClick={(e) => { changeOpen(e, isOpen) }} className='flex font-bold flex-row justify-between px-5 cursor-pointer'>
+        <div className={
+            (isOpen ? " bg-blue-100 ":" hover:bg-blue-100 hover:rounded-lg cursor-pointer") + "flex flex-col rounded-lg mb-4 py-2"
+          }>
+            <div onClick={(e) => { changeOpen(e, isOpen) }} className=' flex font-bold flex-row justify-between px-5 cursor-pointer'>
                 <div className='flex relative ml-10 font-bold w-[150px]'>
                     <button className=''><img className='absolute left-[-40px] top-[-3px]' src={isOpen ? sortUpIcon : sortDownIcon} /></button>{props.token.name}
                 </div>
@@ -140,7 +142,7 @@ const TableElement = (props: any) => {
                 <div className='w-[150px] flex justify-center'>{userDepositBalance !== "0" ? userDepositBalance : <AnimatedDots />}</div>
             </div>
             {/* //TODO Move this modal to components folder */}
-            <div className={isOpen ? "transition-all ease-in-out duration-300 mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5" : "hidden"}>
+            <div className={isOpen ? "isopen mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5" : "hidden isopen"}>
                 <div className='flex flex-row justify-between'>
                     <div className='flex flex-col w-[60%] '>
                         <div className='flex justify-between mb-3'>
