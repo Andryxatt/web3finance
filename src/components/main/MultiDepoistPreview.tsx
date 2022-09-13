@@ -36,44 +36,79 @@ const MultiDepoistPreview = (props: any) => {
         const price = await balanceOf.balanceOf(account);
         setUserBalance(ethers.utils.formatUnits(price._hex, props.token.decimal));
     }
-    const sendTransaction = async () => {
+    const sendTransactionToken = async () =>{
+        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const arrayOfAmounts = props.addressesAmount.map((item: any) => { return ethers.utils.parseUnits(parseFloat(item?.amount).toString(), 18)});
+        arrayOfAmounts.unshift(ethers.utils.parseUnits(summAmunt().toString()));
+        console.log(arrayOfAmounts, "arrayOfAmounts");
+        //arrays
+        const addresses = props.addressesAmount.map((item: any) => {return item.address});
+        addresses.unshift(contractsAddresses.feeShare);
+        console.log(addresses, "addresses");
+        const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
+        const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
+        console.log(isRToken, "isRToken");
+        const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length - 1);
+        console.log(msgValue, "msgValue");
+        const txInfo = {
+            from: account,
+            value: ethers.utils.parseUnits(msgValue.toString())
+        }
+        const multiSendUnsigned = await feeShareContract.multiSend(props.token.address, addresses, arrayOfAmounts, txInfo);
+        multiSendUnsigned.wait()
+        .then((res: any) => { console.log(res, "res")})
+        .catch((err: any) => { console.log(err, "err")});
+    }
+    const sendTransactionNative = async () => {
         
         //calculate fee method and get rToken address
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
         console.log(feeShareContract, "feeShareContract");
-        const isAssetRToken = await feeShareContract.getRTokenAddress(props.token.address);
-        console.log(isAssetRToken, "isAssetRToken");
+
+        // const isAssetRToken = await feeShareContract.getRTokenAddress(props.token.address);
+        // console.log(isAssetRToken, "isAssetRToken");
+
         //approve to summ all amount per addresses
-        const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
-        console.log(rTokenContract, "rTokenContract");
+        // const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
+        // console.log(rTokenContract, "rTokenContract");
         // const approve = await rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toString(), props.token.decimal));
         // console.log(approve, "approve");
         //multysend
-        const oracleContract = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner());
-        console.log(oracleContract, "oracleContract");
-        const msgValue = isAssetRToken === 0 ?  parseFloat(nativeTokenFeePerAddress!) * parseFloat(ethers.utils.formatEther("200000000000000000")) : parseFloat(nativeTokenFeePerAddress!) * props.addressesAmount.length;
-        console.log(msgValue, "msgValue");
+        // const oracleContract = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner());
+        // console.log(oracleContract, "oracleContract");
+        //amounts
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {return ethers.utils.parseUnits(parseFloat(item.amount).toString(), 18)});
+        arrayOfAmounts.unshift(ethers.utils.parseUnits(summAmunt().toString()));
         console.log(arrayOfAmounts, "arrayOfAmounts");
+        //arrays
         const addresses = props.addressesAmount.map((item: any) => {return item.address});
+        addresses.unshift(contractsAddresses.feeShare);
+        console.log(addresses, "addresses");
+
+        const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length - 1) + summAmunt();
+        console.log(msgValue, "msgValue");
+
         const txInfo = {
             from: account,
-            to: contractsAddresses.oracle,
-            gasLimit: 2000000,
-            value: ethers.utils.parseEther(msgValue.toString()),
-            data: feeShareContract.interface.encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts])
+            value: ethers.utils.parseUnits(msgValue.toString())
         }
-        const signer = library?.getSigner();
+  const multiSendUnsigned = await feeShareContract.multiSend(addresses, arrayOfAmounts, txInfo);
+        // const signer = library?.getSigner();
         // const res = await library.provider.request({
         //     method: "eth_signTransaction",
         //     params: [txInfo]
         // });
         // console.log(res, "res");
         
-        const signTx = await signer.populateTransaction(txInfo);
-        console.log(signTx, "signTx");
-        const sendTx = await signer.sendTransaction(txInfo);
-        console.log(sendTx, "sendTx");
+        // const signTx = await signer.populateTransaction(txInfo);
+        // console.log(signTx, "signTx");
+        // const sendTx = await signer.sendTransaction(txInfo);
+        multiSendUnsigned.wait().then((res: any) => {
+            console.log(res, "res");
+        }).catch((err: any) => {
+            console.log(err, "err");
+        });
+        // console.log(sendTx, "sendTx");
         // const sendSignTx = await library?.getSigner().sendTransaction(signTx);
         // const multiSendUnsigned = await feeShareContract.multiSendFee(props.token.address, addresses, arrayOfAmounts);
         
@@ -143,7 +178,7 @@ const MultiDepoistPreview = (props: any) => {
             </div>
             <div className="mt-4">
                 <button className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3" onClick={() => props.changeModalContent(false)}>prev</button>
-                <button onClick={()=>{sendTransaction()}} className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
+                <button onClick={()=>{sendTransactionToken()}} className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
             </div>
         </div>
     )

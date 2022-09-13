@@ -30,12 +30,11 @@ const Web3DataContext = ({ children }: any) => {
     const [nativeTokenFeePerAddress, setNativeTokenFeePerAddress] = useState("");
 
     const getAssetFeePerAddress = async () => {
-        const oracleContract = new Contract(ContractsAdresses.oracle, OracleAbi, library.getSigner());
         const feeShareContract = new Contract(ContractsAdresses.feeShare, FeeShareAbi, library.getSigner());
         console.log(feeShareContract);
-        console.log("oracleContract", oracleContract);
         const res = await feeShareContract.calculateFee();
-        setNativeTokenFeePerAddress(ethers.utils.formatUnits(res, 18));
+        console.log(res.toString())
+        setNativeTokenFeePerAddress(res.toString());
     }
     const getUserBalanceToken = async (address:string, decimal:number) =>{
         const balanceOf = new Contract(address, BalanceOfAbi, library?.getSigner());
