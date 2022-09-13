@@ -7,10 +7,6 @@ const FilesDeposit = (props: any) => {
     const [dragActive, setDragActive] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
     const {
-        account,
-        active,
-        ConnectWallet,
-        addressesFromFile,
         setAddressesFromFile
      } = Web3State();
     // handle drag events
@@ -27,6 +23,7 @@ const FilesDeposit = (props: any) => {
     const handleDrop = async (e: any) => {
         e.preventDefault();
         e.stopPropagation();
+        console.log("dropped", e);
         setDragActive(false);
     };
     // triggers when file is selected with click
@@ -39,10 +36,6 @@ const FilesDeposit = (props: any) => {
         else if(e.target.files[0].type === "text/plain" || e.target.files[0].type === "text/csv"){
             txtcsvFileRead(e);
         }
-        else {
-
-        }
-       
     };
     const txtcsvFileRead = (e: any) => {
         var files = e.target.files, f = files[0];
