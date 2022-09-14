@@ -24,18 +24,17 @@ const Web3Ctx = createContext<Partial<ContextProps>>({});
 
 const Web3DataContext = ({ children }: any) => {
     const BalanceOfAbi = require("./contracts/balanceOfAbi.json");
-    
     const { activate, active, account, deactivate, library, chainId } = useWeb3React();
     const [addressesFromFile, setAddressesFromFile] = useState<any[]>([]);
     const [nativeTokenFeePerAddress, setNativeTokenFeePerAddress] = useState("");
-
     const getAssetFeePerAddress = async () => {
         const feeShareContract = new Contract(ContractsAdresses.feeShare, FeeShareAbi, library.getSigner());
         console.log(feeShareContract);
-        const res = await feeShareContract.calculateFee();
+        const res = await feeShareContract["calculateFee()"]();
         console.log(ethers.utils.formatUnits(res.toString()))
         setNativeTokenFeePerAddress(ethers.utils.formatUnits(res.toString()));
     }
+
     const getUserBalanceToken = async (address:string, decimal:number) =>{
         const balanceOf = new Contract(address, BalanceOfAbi, library?.getSigner());
         const price = await balanceOf.balanceOf(account);
@@ -74,7 +73,8 @@ const Web3DataContext = ({ children }: any) => {
             setAddressesFromFile,
             getUserBalanceToken,
             getAssetFeePerAddress,
-            nativeTokenFeePerAddress
+            nativeTokenFeePerAddress,
+         
         }}>
             {children}
         </Web3Ctx.Provider>

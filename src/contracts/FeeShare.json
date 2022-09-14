@@ -77,6 +77,11 @@
 	{
 		"inputs": [
 			{
+				"internalType": "address",
+				"name": "asset",
+				"type": "address"
+			},
+			{
 				"internalType": "address[]",
 				"name": "to",
 				"type": "address[]"
@@ -92,7 +97,24 @@
 		"stateMutability": "payable",
 		"type": "function"
 	},
-
+	{
+		"inputs": [
+			{
+				"internalType": "address payable[]",
+				"name": "to",
+				"type": "address[]"
+			},
+			{
+				"internalType": "uint256[]",
+				"name": "amount",
+				"type": "uint256[]"
+			}
+		],
+		"name": "multiSend",
+		"outputs": [],
+		"stateMutability": "payable",
+		"type": "function"
+	},
 	{
 		"inputs": [
 			{
@@ -231,7 +253,25 @@
 		"stateMutability": "view",
 		"type": "function"
 	},
-	
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "asset",
+				"type": "address"
+			}
+		],
+		"name": "calculateFee",
+		"outputs": [
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
 	{
 		"inputs": [],
 		"name": "calculateFee",

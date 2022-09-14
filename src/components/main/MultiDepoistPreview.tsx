@@ -7,12 +7,14 @@ const FeeShareAbi = require("../../contracts/FeeShare.json");
 const RTokenAbi = require("../../contracts/RTokenAbi.json");
 const contractsAddresses = require("../../contracts/AddressesContracts.json");
 const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
-
+// 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720, 1
+// 0xa0Ee7A142d267C1f36714E4a8F75612F20a79720, 1
 const MultiDepoistPreview = (props: any) => {
     const { library, active, account, connector } = useWeb3React();
     const [feePerAccount, setFeePerAccount] = useState(0);
     const [userBalance, setUserBalance] = useState("0");
     const [estimateGas, setEstimateGas] = useState("0");
+    const [rTokenFee, setRTokenFee] = useState("0");
     const summAmunt = () => {
         let res = 0;
         props.addressesAmount.forEach((element: any) => {
@@ -31,6 +33,12 @@ const MultiDepoistPreview = (props: any) => {
         console.log(totalPrice, "totalPrice");
         return totalPrice;
     }
+    const getRTokenFeePerAddress = async (address: string) => {
+        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library.getSigner());
+        const res = await feeShareContract["calculateFee(address)"](address);
+        console.log(ethers.utils.formatUnits(res.toString()))
+        setRTokenFee(res.toString());
+    }
     const getUserBalance = async () => {
         const balanceOf = new Contract(props.token.address, BalanceOfAbi, library.getSigner());
         const price = await balanceOf.balanceOf(account);
@@ -38,28 +46,32 @@ const MultiDepoistPreview = (props: any) => {
     }
     const sendTransactionToken = async () =>{
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        const arrayOfAmounts = props.addressesAmount.map((item: any) => { return ethers.utils.parseUnits(parseFloat(item?.amount).toString(), 18)});
-        arrayOfAmounts.unshift(ethers.utils.parseUnits(summAmunt().toString()));
-        console.log(arrayOfAmounts, "arrayOfAmounts");
-        //arrays
+        const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+            return item.amount.toString().trim();
+        });
         const addresses = props.addressesAmount.map((item: any) => {return item.address});
-        addresses.unshift(contractsAddresses.feeShare);
-        console.log(addresses, "addresses");
-
+      console.log(feeShareContract, "feeShareContract");
         const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
+        // rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toString().trim(), props.token.decimal)).then((res: any) => {});
         const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-        console.log(isRToken, "isRToken");
-
-        const msgValue = parseFloat(summAmunt().toString()) + parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length - 1) + parseFloat("0.00000000001");
+        console.log(props.addressesAmount.length, "props.addressesAmount.length");
+        console.log(rTokenFee, "rTokenFee");
+        const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
         console.log(msgValue, "msgValue");
+        console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
         const txInfo = {
-            from: account,
-            value: ethers.utils.parseUnits(msgValue.toString())
+            value:  ethers.utils.parseEther(msgValue.toString())
         }
-        const multiSendUnsigned = await feeShareContract.multiSend(props.token.address, addresses, arrayOfAmounts, txInfo);
-        multiSendUnsigned.wait()
-        .then((res: any) => { console.log(res, "res")})
-        .catch((err: any) => { console.log(err, "err")});
+        console.log(msgValue, "msgValue");
+        const finalAmount = arrayOfAmounts.map((item: any) => {
+            return ethers.utils.parseUnits(item, props.token.decimal);
+        });
+        const multiSendUnsigned = await feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo);
+        multiSendUnsigned.wait().then((res: any) => {
+            console.log(res, "res");
+        }).catch((err: any) => {
+            console.log(err, "err");
+        });
     }
     const sendTransactionNative = async () => {
         //calculate fee method and get rToken address
@@ -93,6 +105,7 @@ const MultiDepoistPreview = (props: any) => {
     }
     useEffect(() => {
         getUserBalance();
+        getRTokenFeePerAddress(props.token.address);
         // getEstimateGas();
     }, [])
     return (
@@ -146,7 +159,7 @@ const MultiDepoistPreview = (props: any) => {
             </div>
             <div className="mt-4">
                 <button className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mr-3" onClick={() => props.changeModalContent(false)}>prev</button>
-                <button onClick={()=>{sendTransactionNative()}} className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
+                <button onClick={()=>{sendTransactionToken()}} className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
             </div>
         </div>
     )
