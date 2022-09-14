@@ -29,7 +29,9 @@ const WalletModal = () => {
 } = Web3State();
 
   const [modalShown, toggleModal] = React.useState(false);
- 
+  useEffect(() => {
+
+  },[account])
   return (
     <>
       <Button onClick={() => {

@@ -33,8 +33,8 @@ const Web3DataContext = ({ children }: any) => {
         const feeShareContract = new Contract(ContractsAdresses.feeShare, FeeShareAbi, library.getSigner());
         console.log(feeShareContract);
         const res = await feeShareContract.calculateFee();
-        console.log(res.toString())
-        setNativeTokenFeePerAddress(res.toString());
+        console.log(ethers.utils.formatUnits(res.toString()))
+        setNativeTokenFeePerAddress(ethers.utils.formatUnits(res.toString()));
     }
     const getUserBalanceToken = async (address:string, decimal:number) =>{
         const balanceOf = new Contract(address, BalanceOfAbi, library?.getSigner());
@@ -42,9 +42,15 @@ const Web3DataContext = ({ children }: any) => {
        return ethers.utils.formatUnits(price._hex, decimal);
     }
     const ConnectWallet = async (connectorName: string) => {
-       
         activate(connectors[connectorName]);
-        
+        if(active){
+            if(chainId !== 4){
+                library.provider.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x4' }], // chainId must be in hexadecimal numbers
+                })
+            }
+        }
     }
     useEffect(() => {
         if(active){
@@ -55,7 +61,7 @@ const Web3DataContext = ({ children }: any) => {
                params: [{ chainId: toHex(4) }]
              });
        }
-    }, [active, chainId]);
+    }, [active, account, chainId]);
     
     return (
         <Web3Ctx.Provider value={{

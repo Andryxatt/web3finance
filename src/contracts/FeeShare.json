@@ -77,11 +77,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "address",
-				"name": "asset",
-				"type": "address"
-			},
-			{
 				"internalType": "address[]",
 				"name": "to",
 				"type": "address[]"
