@@ -13,7 +13,7 @@ const MultiDepoistPreview = (props: any) => {
     const { library, active, account, connector } = useWeb3React();
     const [feePerAccount, setFeePerAccount] = useState(0);
     const [userBalance, setUserBalance] = useState("0");
-    const [estimateGas, setEstimateGas] = useState("0");
+    const [estimateGas, setEstimateGas] = useState(0);
     const [rTokenFee, setRTokenFee] = useState("0");
     const summAmunt = () => {
         let res = 0;
@@ -36,7 +36,6 @@ const MultiDepoistPreview = (props: any) => {
     const getRTokenFeePerAddress = async (address: string) => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library.getSigner());
         const res = await feeShareContract["calculateFee(address)"](address);
-        console.log(ethers.utils.formatUnits(res.toString()))
         setRTokenFee(res.toString());
     }
     const getUserBalance = async () => {
@@ -46,32 +45,55 @@ const MultiDepoistPreview = (props: any) => {
     }
     const sendTransactionToken = async () =>{
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
         });
         const addresses = props.addressesAmount.map((item: any) => {return item.address});
-      console.log(feeShareContract, "feeShareContract");
-        const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
-        // rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toString().trim(), props.token.decimal)).then((res: any) => {});
+   
         const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-        console.log(props.addressesAmount.length, "props.addressesAmount.length");
-        console.log(rTokenFee, "rTokenFee");
-        const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
-        console.log(msgValue, "msgValue");
-        console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
+        
+        const msgValue = isRToken === null || undefined ?
+            parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
+            parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
+
         const txInfo = {
             value:  ethers.utils.parseEther(msgValue.toString())
         }
-        console.log(msgValue, "msgValue");
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item, props.token.decimal);
         });
-        const multiSendUnsigned = await feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo);
-        multiSendUnsigned.wait().then((res: any) => {
-            console.log(res, "res");
-        }).catch((err: any) => {
-            console.log(err, "err");
-        });
+
+        const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
+        const allowance = await rTokenContract.allowance(account, contractsAddresses.feeShare);
+       const feeData = await library.getFeeData();
+       console.log(feeData, "feeData");
+       const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
+       console.log( feeData.gasPrice * parseFloat(ethers.utils.formatUnits(units)))
+       setEstimateGas(feeData.gasPrice * parseFloat(ethers.utils.formatUnits(units)));
+        if(parseFloat(ethers.utils.formatUnits(allowance, props.token.decimal)) >= msgValue)
+        {
+            feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
+            .then((res:any)=>{
+                res.wait().then((res:any)=>{
+                    console.log(res)
+                })
+            }).catch((err:any) =>{
+                console.log(err);
+            })
+        }
+        else {
+            rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toString().trim(), props.token.decimal))
+            .then((res: any) => {
+                res.wait().then((res:any)=>{
+                    feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo).then((res:any)=>{
+                        res.wait().then((res:any)=>{
+                            console.log(res)
+                        })
+                    })
+                })
+            });
+        }
     }
     const sendTransactionNative = async () => {
         //calculate fee method and get rToken address
@@ -107,11 +129,11 @@ const MultiDepoistPreview = (props: any) => {
         getUserBalance();
         getRTokenFeePerAddress(props.token.address);
         // getEstimateGas();
-    }, [])
+    }, [account])
     return (
         <div className="px-5 py-5">
             <div className="w-full">
-                <div>Network Speed  Gwei </div>
+                <div>Network Speed { ethers.utils.formatUnits(ethers.utils.parseUnits(estimateGas.toString()), "wei")} Gwei </div>
                 <input className="w-full" type="range"></input>
                 <div className="flex justify-between">
                     <span className="cursor-pointer">Slow</span>

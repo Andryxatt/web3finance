@@ -125,7 +125,7 @@ const TableElement = (props: any) => {
             getUserDepositBalance();
             getPrice();
             getTokenBalance();
-
+            
         }
     }, [active, account, tokenPrice, userBalanceToken, userTokenBalance]);
     return (
