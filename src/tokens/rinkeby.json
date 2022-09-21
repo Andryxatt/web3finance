@@ -7,7 +7,8 @@
             "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00",
-            "userBalanceDeposit": "0.00"
+            "userBalanceDeposit": "0.00",
+            "isNative": false
         },  
         {
             "name": "LINK",
@@ -16,7 +17,8 @@
             "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00",
-            "userBalanceDeposit": "0.00"
+            "userBalanceDeposit": "0.00",
+            "isNative": false
         },
         {
             "name":"WETH",
@@ -25,7 +27,18 @@
             "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00",
-            "userBalanceDeposit": "0.00"
+            "userBalanceDeposit": "0.00",
+            "isNative": false
+        },
+        {
+            "name":"RETH",
+            "decimal": 18,
+            "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+            "tokenPrice": "0.00",
+            "deposits": "0.00",
+            "userBalance": "0.00",
+            "userBalanceDeposit": "0.00",
+            "isNative": true
         }
     ]
 }

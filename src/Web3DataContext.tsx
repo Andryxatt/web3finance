@@ -18,7 +18,8 @@ type ContextProps = {
     setAddressesFromFile: any,
     getUserBalanceToken: any,
     getAssetFeePerAddress: any,
-    nativeTokenFeePerAddress: string
+    nativeTokenFeePerAddress: string,
+    userTokenBalance: any,
 };
 const Web3Ctx = createContext<Partial<ContextProps>>({});
 
@@ -29,9 +30,7 @@ const Web3DataContext = ({ children }: any) => {
     const [nativeTokenFeePerAddress, setNativeTokenFeePerAddress] = useState("");
     const getAssetFeePerAddress = async () => {
         const feeShareContract = new Contract(ContractsAdresses.feeShare, FeeShareAbi, library.getSigner());
-        console.log(feeShareContract);
         const res = await feeShareContract["calculateFee()"]();
-        console.log(ethers.utils.formatUnits(res.toString()))
         setNativeTokenFeePerAddress(ethers.utils.formatUnits(res.toString()));
     }
 
@@ -42,23 +41,17 @@ const Web3DataContext = ({ children }: any) => {
     }
     const ConnectWallet = async (connectorName: string) => {
         activate(connectors[connectorName]);
-        if(active){
-            if(chainId !== 4){
-                library.provider.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x4' }], // chainId must be in hexadecimal numbers
-                })
-            }
-        }
     }
     useEffect(() => {
         if(active){
             getAssetFeePerAddress();
-            console.log("chainId", chainId);
-            library?.provider.request({
-               method: "wallet_switchEthereumChain",
-               params: [{ chainId: toHex(4) }]
-             });
+            // if(chainId !== 4){
+            //     library?.provider.request({
+            //         method: "wallet_switchEthereumChain",
+            //         params: [{ chainId: toHex(4) }]
+            //       });
+            // }
+           
        }
     }, [active, account, chainId]);
     
@@ -74,6 +67,7 @@ const Web3DataContext = ({ children }: any) => {
             getUserBalanceToken,
             getAssetFeePerAddress,
             nativeTokenFeePerAddress,
+            userTokenBalance: getUserBalanceToken,
          
         }}>
             {children}
