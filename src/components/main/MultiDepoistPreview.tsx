@@ -94,10 +94,11 @@ const MultiDepoistPreview = (props: any) => {
         else {
             const units = await rTokenContract.estimateGas.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toString().trim(), props.token.decimal));
             const txFee = gasPrice.mul(units);
-            console.log(ethers.utils.formatUnits(txFee, 'wei'), "txFee");
+            console.log(ethers.utils.formatUnits(txFee, 'gwei'), "txFee");
             setEstimateGas(ethers.utils.formatEther(txFee));
             setTxCount(parseFloat((2 + count).toString()).toFixed());
         }
+
     }
     const calculateTxCostNative = () => {
 
