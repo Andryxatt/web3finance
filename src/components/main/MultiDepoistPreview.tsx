@@ -16,8 +16,10 @@ const MultiDepoistPreview = (props: any) => {
     const [userBalanceToken, setUserBalanceToken] = useState("0");
     const [userBalanceRETH, setUserBalanceRETH] = useState("0");
     const [estimateGas, setEstimateGas] = useState("0");
+    const [networkSpeed, setNetworkSpeed] = useState("0");
     const [txCount, setTxCount] = useState("0");
     const [rTokenFee, setRTokenFee] = useState("0");
+    const [approximateCost, setApproximateCost] = useState(0);
     const summAmunt = () => {
         let res = 0;
         props.addressesAmount.forEach((element: any) => {
@@ -62,29 +64,32 @@ const MultiDepoistPreview = (props: any) => {
 
     }
     const calculateTxCostToken = async () => {
+        
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
+
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
         });
         const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
+     
         const msgValue = isRToken === null || undefined ?
             parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
             parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
+          
         const txInfo = {
             value: ethers.utils.parseEther(msgValue.toString())
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item, props.token.decimal);
         });
+        setApproximateCost(msgValue);
         const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
         const allowance = await rTokenContract.allowance(account, contractsAddresses.feeShare);
         const feeData = await library.getFeeData();
+        setNetworkSpeed(ethers.utils.formatUnits(feeData.maxPriorityFeePerGas, "gwei"));
         const gasPrice = await library.getGasPrice();
-        console.log(gasPrice, "gasPrice");
-        console.log(ethers.utils.formatUnits(gasPrice), "gasPrice");
         const count = props.addressesAmount.length / 255;
-        console.log( "allowance");
         if (parseFloat(ethers.utils.formatUnits(allowance.toString(), props.token.decimal)) >= summAmunt()) {
             const multiSend = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo);
             const txFee = feeData.gasPrice.mul(multiSend);
@@ -100,8 +105,37 @@ const MultiDepoistPreview = (props: any) => {
         }
 
     }
-    const calculateTxCostNative = () => {
+    const calculateTxCostNative = async () => {
+        console.log("calculateTxCostNative");
+        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+            return item.amount.toString().trim();
+        });
+        arrayOfAmounts.unshift(summAmunt().toString().trim());
+        const addresses = props.addressesAmount.map((item: any) => { return item.address });
+        addresses.unshift(contractsAddresses.feeShare);
 
+        console.log(nativeTokenFeePerAddress, "nativeTokenFeePerAddress");
+        console.log(parseFloat(summAmunt().toString()));
+        const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
+        console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
+        setApproximateCost(msgValue);
+        const txInfo = {
+            value: ethers.utils.parseEther(msgValue.toString())
+        }
+        const finalAmount = arrayOfAmounts.map((item: any) => {
+            return ethers.utils.parseUnits(item);
+        });
+        const feeData = await library.getFeeData();
+        setNetworkSpeed(ethers.utils.formatUnits(feeData.maxPriorityFeePerGas, "gwei"));
+        // console.log(ethers.utils.formatUnits(feeData.maxPriorityFeePerGas, "gwei"), "feeData");
+        const gasPrice = await library.getGasPrice();
+        const count = props.addressesAmount.length / 255;
+        const units = await feeShareContract.estimateGas["multiSend(address[],uint256[])"]( addresses, finalAmount, txInfo);
+        const txFee = gasPrice.mul(units);
+        console.log(ethers.utils.formatUnits(txFee, 'gwei'), "txFee");
+        setEstimateGas(ethers.utils.formatEther(txFee));
+        setTxCount(parseFloat((1 + count).toString()).toFixed());
     }
     const sendTransactionToken = async () => {
 
@@ -189,7 +223,7 @@ const MultiDepoistPreview = (props: any) => {
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item);
         });
-        const multiSendUnsigned = await feeShareContract.multiSend(addresses, finalAmount, txInfo);
+        const multiSendUnsigned = await feeShareContract['multiSend(address[],uint256[])'](addresses, finalAmount, txInfo);
         multiSendUnsigned.wait().then((res: any) => {
             console.log(res, "res");
         }).catch((err: any) => {
@@ -207,6 +241,9 @@ const MultiDepoistPreview = (props: any) => {
 
             calculateTxCostToken();
         }
+        else {
+            calculateTxCostNative();
+        }
         // getEstimateGas();
     }, [active, account])
     return (
@@ -214,8 +251,8 @@ const MultiDepoistPreview = (props: any) => {
         <div className="px-5 py-5">
             <div className="w-full">
             <ToastContainer autoClose={2000} />
-                <div>Network Speed {ethers.utils.formatUnits(ethers.utils.parseUnits(estimateGas.toString()), "wei")} Gwei </div>
-                <input className="w-full" type="range"></input>
+                <div>Network Speed {networkSpeed} Gwei </div>
+                <input className="w-full" type="range" onChange={(e)=>{setNetworkSpeed(e.target.value)}} defaultValue={3.0} min="1.0" step={0.1} max="5.0"></input>
                 <div className="flex justify-between">
                     <span className="cursor-pointer">Slow</span>
                     <span className="cursor-pointer">Fast</span>
@@ -235,7 +272,7 @@ const MultiDepoistPreview = (props: any) => {
                             <span className="text-xs text-gray-400">Total number of transactions needed </span>
                         </div>
                         <div className="px-8 py-8 flex flex-col">
-                            <span className="text-xl text-blue-900 font-bold">{ } RETH </span>
+                            <span className="text-xl text-blue-900 font-bold">{ approximateCost.toFixed(5)} RETH </span>
                             <span className="text-xs text-gray-400">Approximate cost of operation </span>
                         </div>
                     </div>
