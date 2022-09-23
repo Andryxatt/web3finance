@@ -18,7 +18,9 @@ type ContextProps = {
     setAddressesFromFile: any,
     getUserBalanceToken: any,
     getAssetFeePerAddress: any,
-    nativeTokenFeePerAddress: string
+    nativeTokenFeePerAddress: string,
+    isFeeInToken: boolean,
+    setIsFeeInToken: any
 };
 const Web3Ctx = createContext<Partial<ContextProps>>({});
 
@@ -27,6 +29,7 @@ const Web3DataContext = ({ children }: any) => {
     const { activate, active, account, deactivate, library, chainId } = useWeb3React();
     const [addressesFromFile, setAddressesFromFile] = useState<any[]>([]);
     const [nativeTokenFeePerAddress, setNativeTokenFeePerAddress] = useState("");
+    const [isFeeInToken, setIsFeeInToken] = useState<boolean>(false);
     const getAssetFeePerAddress = async () => {
         const feeShareContract = new Contract(ContractsAdresses.feeShare, FeeShareAbi, library.getSigner());
         console.log(feeShareContract);
@@ -74,7 +77,8 @@ const Web3DataContext = ({ children }: any) => {
             getUserBalanceToken,
             getAssetFeePerAddress,
             nativeTokenFeePerAddress,
-         
+            isFeeInToken,
+            setIsFeeInToken
         }}>
             {children}
         </Web3Ctx.Provider>
