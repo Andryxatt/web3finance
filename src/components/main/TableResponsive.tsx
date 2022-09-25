@@ -6,6 +6,7 @@ import { Contract, ethers } from "ethers";
 import sortIcon from "../../images/sort.svg";
 import sortAscIcon from "../../images/asc.svg";
 import sortDescIcon from "../../images/desc.svg";
+import { ToastContainer } from "react-toastify";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
     const { active, account, library } = useWeb3React();
@@ -193,6 +194,7 @@ const TableResponsive = () => {
 
     return (
         <div className="">
+         
             <div className="flex justify-between items-center border-b-[1px] border-gray-300">
                 {
                     networks.map((network, index) => {
@@ -254,6 +256,7 @@ const TableResponsive = () => {
                     )
                 })
             }
+          
         </div>
     );
 }

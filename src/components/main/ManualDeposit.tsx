@@ -3,6 +3,7 @@ import { javascript } from '@codemirror/lang-javascript';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { Web3State } from '../../Web3DataContext';
+import ExampleManual from './ExampleManual';
 function ManualDeposit(props: any){
     const {
         addressesFromFile,
@@ -10,6 +11,7 @@ function ManualDeposit(props: any){
      } = Web3State();
 
     const [isValid, setIsValid] = useState<boolean>(true);
+    const [showExampleManual, setShowExampleManual] = useState<boolean>(false);
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
     const [element, setElement] = useState<string>();
     const onChange = useCallback((value: any, viewUpdate: any) => {
@@ -72,6 +74,10 @@ function ManualDeposit(props: any){
         })
         setElement(newElems)
     }
+    const showExample = ()=>{
+        console.log("showExample")
+        setShowExampleManual(!showExampleManual);
+    }
     const validateinputs = async () => {
         const arrayOfElements = element!.split("\n");
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
@@ -108,7 +114,7 @@ function ManualDeposit(props: any){
         if (element !== "" && element !== undefined) {
             validateinputs()
         }
-    }, [element, addressesFromFile])
+    }, [element, addressesFromFile,showExampleManual])
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">
@@ -119,7 +125,11 @@ function ManualDeposit(props: any){
                     <div className='w-full' ref={editor}></div>
                 </div>
             </div>
-            <div className="mt-2 flex flex-row justify-between"><span>Separated by comma</span><span className="underline cursor-pointer">Show examples</span></div>
+            <div className="mt-2 flex flex-row justify-between"><span>Separated by comma</span>
+                <button className="underline cursor-pointer" onClick={showExample}>Show examples</button>
+                <ExampleManual hidden={showExampleManual}/>
+                
+            </div>
             <div className={ isValid === true ? "hidden" : ""}>
                 <div className="flex flex-row justify-between">
                     <span className="text-red-500">The below addresses cannot be processed</span>
