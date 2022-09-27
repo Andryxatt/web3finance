@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { Web3State } from '../../Web3DataContext';
 import ExampleManual from './ExampleManual';
+import Modal from '../ui/Modal';
+import React from 'react';
 function ManualDeposit(props: any){
     const {
         addressesFromFile,
@@ -11,7 +13,7 @@ function ManualDeposit(props: any){
      } = Web3State();
 
     const [isValid, setIsValid] = useState<boolean>(true);
-    const [showExampleManual, setShowExampleManual] = useState<boolean>(false);
+    const [modalShown, toggleModal] = React.useState(false);
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
     const [element, setElement] = useState<string>();
     const onChange = useCallback((value: any, viewUpdate: any) => {
@@ -75,9 +77,30 @@ function ManualDeposit(props: any){
         setElement(newElems)
     }
     const showExample = ()=>{
-        console.log("showExample")
-        setShowExampleManual(!showExampleManual);
+        console.log("show example")
+        const example = [
+            {
+                'address':'0xa0Ee7A142d267C1f36714E4a8F75612F20a79720','amount':'0.001'
+            },
+            {
+                'address':'0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266','amount':'1.01'
+            },
+            {
+                'address':'0x5E8aC7D1BC6214e4CF2bE9dA175b9b9Ec1B94102','amount':'0.2'
+            },
+        ]
+        let newElems = "";
+        example.forEach((element: any, index: number) => {
+            if (index === example.length - 1) {
+                newElems += element.address + "," + element.amount;
+            }
+            else {
+                newElems += element.address + "," + element.amount + "\n";
+            }
+        })
+        setElement(newElems)
     }
+
     const validateinputs = async () => {
         const arrayOfElements = element!.split("\n");
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
@@ -114,7 +137,7 @@ function ManualDeposit(props: any){
         if (element !== "" && element !== undefined) {
             validateinputs()
         }
-    }, [element, addressesFromFile,showExampleManual])
+    }, [element, addressesFromFile])
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">
@@ -126,10 +149,13 @@ function ManualDeposit(props: any){
                 </div>
             </div>
             <div className="mt-2 flex flex-row justify-between"><span>Separated by comma</span>
-                <button className="underline cursor-pointer" onClick={showExample}>Show examples</button>
-                <ExampleManual hidden={showExampleManual}/>
-                
+                <button className="underline cursor-pointer" onClick={() => { toggleModal(!modalShown);showExample(); }}>Show examples</button>
+               
+             
             </div>
+            <Modal shown={modalShown} close={() => { toggleModal(false);  }}>
+                    <ExampleManual close={() => { toggleModal(false) }}/>
+            </Modal>
             <div className={ isValid === true ? "hidden" : ""}>
                 <div className="flex flex-row justify-between">
                     <span className="text-red-500">The below addresses cannot be processed</span>

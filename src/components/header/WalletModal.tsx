@@ -11,17 +11,9 @@ import polyhonIcon from "../../images/polygon-modal.svg"
 import binanceIcon from "../../images/binance.png"
 import ethereum from "../../images/ethereum.png"
 import walletConnectIcon from "../../images/wallet-connect-modal.png"
+import Modal from "../ui/Modal"
 window.Buffer = window.Buffer || require("buffer").Buffer
 
-function Modal({ children, shown, close }: any) {
-  return shown ? (
-    <div className="modal-backdrop" onClick={() => { close() }}>
-      <div className="modal-content" onClick={e => { e.stopPropagation() }}>
-        {children}
-      </div>
-    </div>
-  ) : null;
-}
 const WalletModal = () => {
   const {
    account,

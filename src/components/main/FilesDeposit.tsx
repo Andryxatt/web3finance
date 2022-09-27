@@ -1,11 +1,15 @@
+import React from "react";
 import { useRef, useState } from "react";
 import * as XLSX from "xlsx";
 import { Web3State } from "../../Web3DataContext";
+import Modal from "../ui/Modal";
+import ExampleFiles from "./ExampleFiles";
 
 const FilesDeposit = (props: any) => {
     const uploadIcon = require("../../images/upload.png");
     const [dragActive, setDragActive] = useState(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [modalShown, toggleModal] = React.useState(false);
     const {
         setAddressesFromFile
      } = Web3State();
@@ -93,6 +97,7 @@ const FilesDeposit = (props: any) => {
     const onButtonClick = () => {
         inputRef.current?.click();
     };
+ 
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">
@@ -109,7 +114,12 @@ const FilesDeposit = (props: any) => {
                 </label>
                 {dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
             </form>
-            <div className="mt-2 flex flex-row justify-between"><span>Accepted: CSV / Excel / Txt</span><span className="underline cursor-pointer">Example files</span></div>
+            <div className="mt-2 flex flex-row justify-between"><span>Accepted: CSV / Excel / Txt</span><span onClick={()=>toggleModal(!modalShown)} className="underline cursor-pointer">Example files</span>
+            <Modal shown={modalShown} close={() => { toggleModal(false);  }}>
+                    <ExampleFiles close={() => { toggleModal(false) }}/>
+            </Modal>
+           
+            </div>
         </div>
     )
 }

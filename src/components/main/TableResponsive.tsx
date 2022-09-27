@@ -126,7 +126,7 @@ const TableResponsive = () => {
         setSortDeposits("");
         setSortUserDeposit("");
         setSortName(sortName === "asc" ? "desc" : "asc");
-        setTokens(res);
+        setTokens(tokens => res);
     }
     const sortByPrice = () => {
         const res = [...tokens].sort((a: any, b: any) => {

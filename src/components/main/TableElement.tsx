@@ -30,7 +30,7 @@ const TableElement = (props: any) => {
 
     }
     const { isFeeInToken,
-        setIsFeeInToken} = Web3State();
+        setIsFeeInToken } = Web3State();
     const handleAmountChange = (event: any) => {
         const value = Math.max(0, Math.min(parseFloat(userBalanceToken), Number(event.target.value)));
         setAmountDeposit(value);
@@ -77,7 +77,7 @@ const TableElement = (props: any) => {
         const provider = new ethers.providers.JsonRpcProvider("https://rinkeby.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
         const contract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, provider);
         contract.totalSupply().then((res: any) => {
-            setTotalDeposit( (parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
+            setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
         });
     }
     const depositAmount = async () => {
@@ -107,7 +107,7 @@ const TableElement = (props: any) => {
     }
     const witdrawDeposit = async () => {
         let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        if(amountDeposit! > parseFloat(userDepositBalance) || amountDeposit! === undefined){
+        if (amountDeposit! > parseFloat(userDepositBalance) || amountDeposit! === undefined) {
             alert("You don't have enough tokens to withdraw");
         }
         else {
@@ -118,9 +118,9 @@ const TableElement = (props: any) => {
                 })
             });
         }
-       
+
     }
-    const changeFeeType = () =>{
+    const changeFeeType = () => {
         console.log(isFeeInToken);
         setIsFeeInToken(!isFeeInToken);
     }
@@ -132,20 +132,20 @@ const TableElement = (props: any) => {
             getUserDepositBalance();
             getPrice();
             getTokenBalance();
-            
+
         }
     }, [active, account, tokenPrice, userBalanceToken, userTokenBalance, chainId]);
     return (
         // TODO Fixe styles tailwind
         <div className={
-            (isOpen ? " bg-blue-100 ":" hover:bg-blue-100 hover:rounded-lg cursor-pointer") + "flex flex-col rounded-lg mb-4 py-2"
-          }>
+            (isOpen ? " bg-blue-100 " : " hover:bg-blue-100 hover:rounded-lg cursor-pointer") + "flex flex-col rounded-lg mb-4 py-2"
+        }>
             <div onClick={(e) => { changeOpen(e, isOpen) }} className=' flex font-bold flex-row justify-between px-5 cursor-pointer'>
                 <div className='flex relative ml-10 font-bold w-[150px]'>
                     <button className=''><img className='absolute left-[-40px] top-[-3px]' src={isOpen ? sortUpIcon : sortDownIcon} /></button>{props.token.name}
                 </div>
                 <div className='mr-[-10px] flex font-bold w-[150px] justify-left'>{tokenPrice !== "0" ? tokenPrice.slice(0, 8) : <AnimatedDots />}</div>
-                <div className='w-[150px] flex justify-center'>{totalDeposit !== "0" ? totalDeposit  : <AnimatedDots />} $</div>
+                <div className='w-[150px] flex justify-center'>{totalDeposit !== "0" ? totalDeposit : <AnimatedDots />} $</div>
                 <div className='w-[150px] flex justify-center'>{userDepositBalance !== "0" ? userDepositBalance : <AnimatedDots />}</div>
             </div>
             {/* //TODO Move this modal to components folder */}
@@ -174,17 +174,21 @@ const TableElement = (props: any) => {
                     </div>
                     <div className='flex flex-col w-[40%] ml-4'>
                         <button onClick={() => depositAmount()} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
-                        
-                                                <ModalMultiDeposit token={props.token} userBalance={userBalanceToken} />
+
+                        <ModalMultiDeposit token={props.token} userBalance={userBalanceToken} />
                     </div>
                 </div>
                 <div className='mt-5 flex justify-between items-center'>
                     <span>Vault Details</span>
-                    <label className="inline-flex mt-3 relative items-center cursor-pointer">
-  <input type="checkbox" onChange={changeFeeType} value={isFeeInToken.toString()} id="default-toggle" className="sr-only peer"/>
-  <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-  <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Pay fee in token</span>
-</label>
+                    {
+                        props.token.isNative ? "" :
+
+                            <label className="inline-flex mt-3 relative items-center cursor-pointer">
+                                <input type="checkbox" onChange={changeFeeType} value={isFeeInToken.toString()} id="default-toggle" className="sr-only peer" />
+                                <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                                <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Pay fee in token</span>
+                            </label>
+                    }
                     <button
                         onClick={witdrawDeposit}
                         disabled={parseInt(userTokenBalance) !== 0 ? false : true}

@@ -1,5 +1,5 @@
 import { useWeb3React } from "@web3-react/core";
-import {  Contract, ethers } from "ethers";
+import {  Contract, ethers, Wallet } from "ethers";
 import { useEffect, useState } from "react";
 import { Web3State } from "../../Web3DataContext";
 import { ToastContainer, toast } from 'react-toastify';
@@ -19,7 +19,7 @@ const MultiDepoistPreview = (props: any) => {
     const [networkSpeed, setNetworkSpeed] = useState("0");
     const [txCount, setTxCount] = useState("0");
     const [rTokenFee, setRTokenFee] = useState("0");
-    const [approximateCost, setApproximateCost] = useState(0);
+    const [approximateCost, setApproximateCost] = useState("0");
     const { isFeeInToken,
         setIsFeeInToken,
         chainId
@@ -71,7 +71,6 @@ const MultiDepoistPreview = (props: any) => {
         
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
         const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
         });
@@ -87,7 +86,15 @@ const MultiDepoistPreview = (props: any) => {
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item, props.token.decimal);
         });
-        setApproximateCost(msgValue);
+        if(isFeeInToken){
+            const txCostFeeToken = await feeShareContract.calculateTxfeeToken(props.token.address, ethers.utils.parseUnits(summAmunt().toString()));
+        console.log(ethers.utils.formatUnits(txCostFeeToken.toString(), props.token.decimal) , "rTxFeeTokenes")
+        setApproximateCost(txCostFeeToken.toString());
+        }
+        else {
+            setApproximateCost(msgValue.toString());
+        }
+        // setApproximateCost(msgValue);
         const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
         const allowance = await rTokenContract.allowance(account, contractsAddresses.feeShare);
         const feeData = await library.getFeeData();
@@ -101,13 +108,12 @@ const MultiDepoistPreview = (props: any) => {
             setTxCount(parseFloat((1 + count).toString()).toFixed());
         }
         else {
-            const units = await rTokenContract.estimateGas.approve(contractsAddresses.feeShare, ethers.utils.parseEther(summAmunt().toString()));
+             const units = await rTokenContract.estimateGas.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal));
             const txFee = gasPrice.mul(units);
             console.log(ethers.utils.formatUnits(txFee, 'gwei'), "txFee");
             setEstimateGas(ethers.utils.formatEther(txFee));
             setTxCount(parseFloat((2 + count).toString()).toFixed());
         }
-
     }
     const calculateTxCostNative = async () => {
         console.log("calculateTxCostNative");
@@ -123,7 +129,7 @@ const MultiDepoistPreview = (props: any) => {
         console.log(parseFloat(summAmunt().toString()));
         const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
         console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
-        setApproximateCost(msgValue);
+        setApproximateCost(msgValue.toString());
         const txInfo = {
             value: ethers.utils.parseEther(msgValue.toString())
         }
@@ -132,7 +138,6 @@ const MultiDepoistPreview = (props: any) => {
         });
         const feeData = await library.getFeeData();
         setNetworkSpeed(ethers.utils.formatUnits(feeData.maxPriorityFeePerGas, "gwei"));
-        // console.log(ethers.utils.formatUnits(feeData.maxPriorityFeePerGas, "gwei"), "feeData");
         const gasPrice = await library.getGasPrice();
         const count = props.addressesAmount.length / 255;
         const units = await feeShareContract.estimateGas["multiSend(address[],uint256[])"]( addresses, finalAmount, txInfo);
@@ -149,9 +154,7 @@ const MultiDepoistPreview = (props: any) => {
             return item.amount.toString().trim();
         });
         const addresses = props.addressesAmount.map((item: any) => { return item.address });
-
         const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-
         const msgValue = isRToken === null || undefined ?
             parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
             parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
@@ -191,7 +194,7 @@ const MultiDepoistPreview = (props: any) => {
         }
         else {
             const idToast = toast.loading("Please wait...")
-            rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseEther(summAmunt().toString()))
+            rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal))
                 .then((res: any) => {
                     res.wait().then(async(res: any) => {
                         toast.update(idToast, { render: "All is good", type: "success",autoClose:2000, isLoading: false, position:toast.POSITION.TOP_CENTER });
@@ -282,54 +285,60 @@ const MultiDepoistPreview = (props: any) => {
     const sendTransactionAndPayFeeInToken = async () =>{
         // sendSignedTransaction();
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        console.log(feeShareContract, "feeShareContract");
-        const res = await feeShareContract.calculateTxfeeToken(props.token.address, ethers.utils.parseUnits(summAmunt().toString()));
-        console.log(ethers.utils.formatUnits(res.toString(), props.token.decimal) , "rTxFeeTokenes")
+        
         const minimalForwarderContract = new Contract(contractsAddresses.minimalForwarder, MinimalForwarderAbi, library?.getSigner());
         console.log(minimalForwarderContract, "minimalForwarder");
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
-            return ethers.utils.parseUnits(item.amount.toString().trim(), props.token.decimal);
+            return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
         });
          const addresses = props.addressesAmount.map((item: any) => { return item.address });
          const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-
+         feeShareContract.on("feeDetails", function(from, to, amount, event) {
+            console.log(from, to, amount, event, "event")
+         });
          const msgValue = parseFloat(rTokenFee!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
-        console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
-        const txInfo = {
-            value: ethers.utils.parseEther(msgValue.toString())
-        }
-        const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts, res]);
+        // console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
+        // const txInfo = {
+        //     value: ethers.utils.parseEther(msgValue.toString())
+        // }
+        console.log(arrayOfAmounts, "arrayOfAmounts");
+        const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts]);
         console.log(dataMessage, "dataMessage");
+        const decoded = new ethers.utils.Interface(FeeShareAbi).decodeFunctionData("multiSendFee", dataMessage);
+        console.log(decoded, "decoded");
         const nonce = await minimalForwarderContract.getNonce(account);
         console.log(nonce, "nonce");
         const values = {
             from: account,
             to: contractsAddresses.feeShare,
             value: 0,
-            gas: '100000',
+            gas: "10000000",
             nonce: nonce.toString(),
             data: dataMessage,
         }
         const signature = await signMetaTx(values)
         const dataBuffer = {  'request': values, 'signature': signature }
         localStorage.setItem('transaction', JSON.stringify(dataBuffer));
-       
+        sendSignedTransaction();
     }
     const sendSignedTransaction = async () => {
-       
+       const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
+       const provider = new ethers.providers.JsonRpcProvider("https://rinkeby.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
+       let walletSigner = walletPrivateKey.connect(provider)
         const contractForwarder = new ethers.Contract(
             contractsAddresses.minimalForwarder,
             MinimalForwarderAbi,
-            library.getSigner()
+            walletSigner
         );
-        console.log(localStorage.getItem('transaction'))
+        // console.log(contractForwarder)
+        // console.log(localStorage.getItem('transaction'))
         const values = JSON.parse(localStorage.getItem('transaction')).request
         const signature = JSON.parse(localStorage.getItem('transaction')).signature
-        console.log(values)
-        console.log(signature)
+        // console.log(values)
+        // console.log(signature)
        
         const result = await contractForwarder.execute(values, signature);
-        console.log(result, "result");
+        console.log(result, "result"); 
         localStorage.clear();
     }
     useEffect(() => {
@@ -338,7 +347,6 @@ const MultiDepoistPreview = (props: any) => {
         getUserBalanceETH();
 
         if (!props.token.isNative) {
-
             calculateTxCostToken();
         }
         else {
@@ -372,7 +380,7 @@ const MultiDepoistPreview = (props: any) => {
                             <span className="text-xs text-gray-400">Total number of transactions needed </span>
                         </div>
                         <div className="px-8 py-8 flex flex-col">
-                            <span className="text-xl text-blue-900 font-bold">{ approximateCost.toFixed(5)} RETH </span>
+                            <span className="text-xl text-blue-900 font-bold">{ parseFloat(approximateCost).toFixed(5)} RETH </span>
                             <span className="text-xs text-gray-400">Approximate cost of operation </span>
                         </div>
                     </div>

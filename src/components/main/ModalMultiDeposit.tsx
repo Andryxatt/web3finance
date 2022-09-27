@@ -2,15 +2,7 @@ import React, { useEffect, useState } from "react";
 import ManualDeposit from "./ManualDeposit";
 import FilesDeposit from "./FilesDeposit";
 import MultiDepoistPreview from "./MultiDepoistPreview";
-function Modal({ children, shown, close }: any) {
-    return shown ? (
-        <div className="modal-backdrop" onClick={() => { close( localStorage.setItem("filteredLang", "")) }}>
-            <div className="modal-content" onClick={e => { e.stopPropagation() }}>
-                {children}
-            </div>
-        </div>
-    ) : null;
-}
+import Modal from "../ui/Modal";
 const fileTypes = ["CSV", "Excel", "Txt"];
 function ModalMultiDeposit(props: any) {
     const [modalShown, toggleModal] = React.useState(false);
