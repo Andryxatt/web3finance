@@ -1,5 +1,5 @@
 import { useWeb3React } from "@web3-react/core";
-import {  Contract, ethers, Wallet } from "ethers";
+import {  BigNumber, Contract, ethers, Wallet } from "ethers";
 import { useEffect, useState } from "react";
 import { Web3State } from "../../Web3DataContext";
 import { ToastContainer, toast } from 'react-toastify';
@@ -70,6 +70,7 @@ const MultiDepoistPreview = (props: any) => {
     const calculateTxCostToken = async () => {
         
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        console.log(feeShareContract, "feeShareContract")
         const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
@@ -79,7 +80,6 @@ const MultiDepoistPreview = (props: any) => {
         const msgValue = isRToken === null || undefined ?
             parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
             parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
-        console.log(msgValue, "msgValue");
         const txInfo = {
             value: ethers.utils.parseEther(msgValue.toString())
         }
@@ -88,8 +88,12 @@ const MultiDepoistPreview = (props: any) => {
         });
         if(isFeeInToken){
             const txCostFeeToken = await feeShareContract.calculateTxfeeToken(props.token.address, ethers.utils.parseUnits(summAmunt().toString()));
-        console.log(ethers.utils.formatUnits(txCostFeeToken.toString(), props.token.decimal) , "rTxFeeTokenes")
-        setApproximateCost(txCostFeeToken.toString());
+            // console.log(ethers.utils.formatUnits(txCostFeeToken, "ether"), "txCostFeeToken")
+            // const feeData = await library.getFeeData();
+            // console.log(ethers.utils.formatUnits(feeData.gasPrice * txCostFeeToken, 'ether'), "feeData.gasPrice * txCostFeeToken");
+            // console.log(ethers.utils.formatUnits(feeData.gasPrice, "wei"))
+            // console.log(parseFloat(ethers.utils.formatUnits(txCostFeeToken, "ether")) * parseFloat(ethers.utils.formatUnits(feeData.gasPrice, "ether")), "feeData.gasPrice * txCostFeeToken");
+            // setApproximateCost();
         }
         else {
             setApproximateCost(msgValue.toString());
@@ -293,33 +297,75 @@ const MultiDepoistPreview = (props: any) => {
         });
          const addresses = props.addressesAmount.map((item: any) => { return item.address });
          const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-         feeShareContract.on("feeDetails", function(from, to, amount, event) {
-            console.log(from, to, amount, event, "event")
+         feeShareContract.on("feeDetails", function(amm1, amm2, amm3, amm4, amm5, amm6) {
+            console.log(amm1, amm2, amm3, amm4, amm5,amm6, "feeDetails")
+         });
+         feeShareContract.on("WhosignerRequest", function(address) {
+            console.log(address, "WhosignerRequest")
          });
          const msgValue = parseFloat(rTokenFee!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
         // console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
         // const txInfo = {
         //     value: ethers.utils.parseEther(msgValue.toString())
         // }
-        console.log(arrayOfAmounts, "arrayOfAmounts");
         const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts]);
         console.log(dataMessage, "dataMessage");
         const decoded = new ethers.utils.Interface(FeeShareAbi).decodeFunctionData("multiSendFee", dataMessage);
         console.log(decoded, "decoded");
+
         const nonce = await minimalForwarderContract.getNonce(account);
         console.log(nonce, "nonce");
         const values = {
             from: account,
             to: contractsAddresses.feeShare,
             value: 0,
-            gas: "10000000",
+            gas: '2100000',
             nonce: nonce.toString(),
             data: dataMessage,
         }
         const signature = await signMetaTx(values)
-        const dataBuffer = {  'request': values, 'signature': signature }
+        const dataBuffer = { 'request': values, 'signature': signature }
         localStorage.setItem('transaction', JSON.stringify(dataBuffer));
         sendSignedTransaction();
+    }
+    const multiSendFee = async () =>{
+         // sendSignedTransaction();
+         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        
+         const minimalForwarderContract = new Contract(contractsAddresses.minimalForwarder, MinimalForwarderAbi, library?.getSigner());
+         console.log(minimalForwarderContract, "minimalForwarder");
+         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+             return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
+         });
+          const addresses = props.addressesAmount.map((item: any) => { return item.address });
+          const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
+          feeShareContract.on("feeDetails", function(from, to, amount, event) {
+             console.log(from, to, amount, event, "event")
+          });
+          const msgValue = parseFloat(rTokenFee!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
+         // console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
+         // const txInfo = {
+         //     value: ethers.utils.parseEther(msgValue.toString())
+         // }
+       
+         const dataMessage = feeShareContract.multiSendFee(props.token.address, addresses, arrayOfAmounts);
+        //  console.log(dataMessage, "dataMessage");
+        //  const decoded = new ethers.utils.Interface(FeeShareAbi).decodeFunctionData("multiSendFee", dataMessage);
+        //  console.log(decoded, "decoded");
+        //  const nonce = await minimalForwarderContract.getNonce(account);
+        //  console.log(nonce, "nonce");
+        //  const values = {
+        //      from: account,
+        //      to: contractsAddresses.feeShare,
+        //      value: 0,
+        //      gas: "21000",
+        //      nonce: nonce.toString(),
+        //      data: dataMessage,
+        //  }
+        //  const signature = await signMetaTx(values)
+        //  const dataBuffer = {  'request': values, 'signature': signature }
+        //  localStorage.setItem('transaction', JSON.stringify(dataBuffer));
+        //  sendSignedTransaction();
     }
     const sendSignedTransaction = async () => {
        const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
@@ -336,7 +382,8 @@ const MultiDepoistPreview = (props: any) => {
         const signature = JSON.parse(localStorage.getItem('transaction')).signature
         // console.log(values)
         // console.log(signature)
-       
+        const networkSpeed = await provider.getGasPrice();
+     
         const result = await contractForwarder.execute(values, signature);
         console.log(result, "result"); 
         localStorage.clear();
@@ -351,6 +398,20 @@ const MultiDepoistPreview = (props: any) => {
         }
         else {
             calculateTxCostNative();
+        }
+        if(active){
+            const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+            console.log(feeShareContract, "feeShareContract");
+           const filter = {
+                address: contractsAddresses.feeShare,
+                topics: [
+                    // the name of the event, parnetheses containing the data type of each event, no spaces
+                    ethers.utils.id("multiSendFee(address,address[],uint256[])")
+                ]
+            }
+            library?.getLogs(filter).then((logs: any) => {
+                console.log(logs, "logs");
+            });
         }
         // getEstimateGas();
     }, [active, account])
