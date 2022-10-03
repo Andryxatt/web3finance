@@ -71,14 +71,10 @@ const MultiDepoistPreview = (props: any) => {
         }
 
     }
-    const txFeeCost = () => {
+    const calculateTxCostTokenFeeToken = async () =>{
 
     }
-
-    const calculateTxFeePayInToken = async () => {
-
-    }
-    const calculateTxCostToken = async () => {
+    const calculateTxCostTokenFeeNative = async () => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
         console.log(feeShareContract, "feeShareContract")
         const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
@@ -427,7 +423,7 @@ const MultiDepoistPreview = (props: any) => {
         getUserBalanceETH();
 
         if (!props.token.isNative) {
-            calculateTxCostToken();
+            calculateTxCostTokenFeeNative();
         }
         else {
             calculateTxCostNative();

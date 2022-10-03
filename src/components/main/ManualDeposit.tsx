@@ -59,14 +59,15 @@ function ManualDeposit(props: any){
         onChange: onChange,
     });
     const deleteInvalidLines = () => {
-        let newElems = "";
-
+        let newElems:string;
         const newArray = arrayOfAddrAmounts.filter((element: any, index: number) => {
             if (element.errorAddress === "" && element.errorAmount === "") {
                 return element
             }
         })
+        console.log(newArray, "newArray")
         newArray.forEach((element: any, index: number) => {
+            console.log(index, newArray.length)
             if (index === newArray.length - 1) {
                 newElems += element.address + "," + element.amount;
             }
@@ -75,6 +76,7 @@ function ManualDeposit(props: any){
             }
         })
         setElement(newElems)
+        validateinputs()
     }
     const showExample = ()=>{
         console.log("show example")
@@ -103,7 +105,9 @@ function ManualDeposit(props: any){
 
     const validateinputs = async () => {
         const arrayOfElements = element!.split("\n");
+        console.log(arrayOfElements, "arrayOfElements")
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
+       if(arrayOfElements.length > 0){
         arrayOfElements.forEach(async (element: any, index: number) => {
             const newElement = {
                 address: element.split(",")[0],
@@ -126,6 +130,11 @@ function ManualDeposit(props: any){
         }
         setIsValid(flag)
         setArrayOfAddrAmounts(arrayOfElementsWithoutEmpty);
+       }
+       else {
+        setIsValid(false);
+        setArrayOfAddrAmounts([]);
+       }
     }
     useEffect(() => {
         getListFromFile();
@@ -174,14 +183,11 @@ function ManualDeposit(props: any){
                 </div>
 
             </div>
-            <button onClick={() => {
-                validateinputs().then(() => {
-                    if (isValid) {
-                        console.log(isValid)
-                        props.changeModalContent(isValid, arrayOfAddrAmounts);
-                    }
-
-                })
+            <button onClick={() => {    
+                if(arrayOfAddrAmounts.length > 0){
+                    props.changeModalContent(isValid, arrayOfAddrAmounts);
+                }       
+                        
             }} className="text-white font-bold py-2 px-4 rounded-full bg-slate-500">Next</button>
         </div>
     );
