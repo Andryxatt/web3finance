@@ -7,7 +7,7 @@ import { Contract, ethers } from 'ethers';
 import { useWeb3React } from '@web3-react/core';
 import AnimatedDots from '../AnimatedDots';
 import { Web3State } from '../../Web3DataContext';
-
+import { ToastContainer, toast } from 'react-toastify';
 const TableElement = (props: any) => {
     const contractsAddresses = require("../../contracts/AddressesContracts.json")
     const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
@@ -33,6 +33,7 @@ const TableElement = (props: any) => {
         setIsFeeInToken } = Web3State();
     const handleAmountChange = (event: any) => {
         const value = Math.max(0, Math.min(parseFloat(userBalanceToken), Number(event.target.value)));
+       
         setAmountDeposit(value);
     };
     const getPrice = async () => {
@@ -81,28 +82,41 @@ const TableElement = (props: any) => {
         });
     }
     const depositAmount = async () => {
+    
         let contract = new Contract(contractsAddresses[props.token.name], RTokenAbi, library?.getSigner());
         let checkAllowance = await contract.allowance(account, contractsAddresses.feeShare);
         let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, 6)) <= amountDeposit!) {
+            const idToast = toast.loading("Approving please wait...")
             await contract?.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((res: any) => {
                 res.wait().then(async (receipt: any) => {
+                    toast.update(idToast, { render: "All is good", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                    const idToast2 = toast.loading("Depositing please wait...")
                     await feeShare.deposit(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                         result.wait().then(async (recept: any) => {
                             getUserBalanceRToken();
                             getTokenBalance();
+                            toast.update(idToast2, { render: "All is good", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                         })
-                    });
+                    }).catch((err:any) => {
+                        toast.update(idToast2, { render: "Something went wrong", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                    })
                 })
+            }).catch((err:any) =>{
+                toast.update(idToast, { render: "Something went wrong", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
             })
         }
         else {
+            const idToast2 = toast.loading("Depositing please wait...")
             await feeShare.deposit(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     getUserBalanceRToken();
                     getTokenBalance();
+                    toast.update(idToast2, { render: "All is good", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                 })
-            });
+            }).catch((err:any)=>{
+                toast.update(idToast2, { render: "Something went wrong", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
+            })
         }
     }
     const witdrawDeposit = async () => {
@@ -148,6 +162,7 @@ const TableElement = (props: any) => {
                 <div className='w-[150px] flex justify-center'>{totalDeposit !== "0" ? totalDeposit : <AnimatedDots />} $</div>
                 <div className='w-[150px] flex justify-center'>{userDepositBalance !== "0" ? userDepositBalance : <AnimatedDots />}</div>
             </div>
+            <ToastContainer/>
             {/* //TODO Move this modal to components folder */}
             <div className={isOpen ? "isopen mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5" : "hidden isopen"}>
                 <div className='flex flex-row justify-between'>
@@ -173,7 +188,7 @@ const TableElement = (props: any) => {
                         </div>
                     </div>
                     <div className='flex flex-col w-[40%] ml-4'>
-                        <button onClick={() => depositAmount()} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
+                        <button onClick={(e) => {e.preventDefault(); depositAmount()}} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
 
                         <ModalMultiDeposit token={props.token} userBalance={userBalanceToken} />
                     </div>

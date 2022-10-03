@@ -1,7 +1,7 @@
 
 import {Contract , ethers } from "ethers"
 class OrderService {
-    contract;
+    contract:Contract;
     constructor(provider:any, abi:any, address:string){
         this.contract = new Contract(address, abi, provider)
     }
