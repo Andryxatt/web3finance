@@ -3,6 +3,7 @@ import { BigNumber, Contract, ethers, Wallet } from "ethers";
 import { useEffect, useState } from "react";
 import { Web3State } from "../../Web3DataContext";
 import { ToastContainer, toast } from 'react-toastify';
+import Web3 from 'web3';
 import 'react-toastify/dist/ReactToastify.css';
 const MinimalForwarderAbi = require("../../contracts/MinimalForwarderAbi.json");
 const FeeShareAbi = require("../../contracts/FeeShare.json");
@@ -16,6 +17,8 @@ const MultiDepoistPreview = (props: any) => {
     const [userBalanceToken, setUserBalanceToken] = useState("0");
     const [userBalanceRETH, setUserBalanceRETH] = useState("0");
     const [estimateGas, setEstimateGas] = useState("0");
+
+    
 
     const [rTokenBalance, setRTokenBalance] = useState("0")
 
@@ -417,6 +420,55 @@ const MultiDepoistPreview = (props: any) => {
         console.log(result, "result");
         localStorage.clear();
     }
+    function formatOutput(data:any) {
+        let avgGasFee = 0;
+        let avgFill = 0;
+        let blocks = [];
+        for (let i = 0; i < 20; i++) {
+            avgGasFee = avgGasFee + Number(data.reward[i][1]) + Number(data.baseFeePerGas[i])
+            avgFill = avgFill + Math.round(data.gasUsedRatio[i] * 100);
+  
+          blocks.push({
+            blockNumber: Number(data.oldestBlock) + i,
+            reward: data.reward[i].map((r) => (Number(r) / 10 ** 9).toFixed(2)),
+            baseFeePerGas: (Number(data.baseFeePerGas[i]) / 10 ** 9).toFixed(2),
+            gasUsedRatio: Math.round(data.gasUsedRatio[i] * 100),
+          });
+        }
+       
+        avgGasFee = avgGasFee / 20;
+        avgGasFee = (avgGasFee / 10 ** 9);
+  
+
+        avgFill = avgFill / 20;
+        console.log(avgGasFee, "avgGasFee");
+        console.log(blocks, 'blocks');
+        return [blocks, avgGasFee, avgFill];
+    }
+      
+    const calculateGasLimit = async () => {
+        const BLOCKS = 20;
+        let blockHistory:any[] = [];
+        let avgGas:any;
+        let avgBlockVolume:any;
+        console.log(ethers, "ethers");
+        const web3 = new Web3('https://eth-rinkeby.alchemyapi.io/v2/n8SCturNweEoqNxxT73pEvrBpWBTSS1E');
+        setInterval(() => {
+            web3.eth
+              .getFeeHistory(BLOCKS, "latest", [25, 50, 75])
+              .then((feeHistory) => {
+                const [blocks, avgGasFee, avgFill] = formatOutput(feeHistory);
+                blockHistory.push(blocks);
+                avgGas = avgGasFee;
+                avgBlockVolume = avgFill;
+              });
+          }, 10000);
+        // console.log(history, "history");
+        console.log(avgGas, "avgGas");
+        console.log(avgBlockVolume, "avgBlockVolume");
+        console.log(blockHistory, "blockHistory");
+    }
+
     useEffect(() => {
         getUserBalanceToken();
         getRTokenFeePerAddress(props.token.address);
@@ -431,6 +483,7 @@ const MultiDepoistPreview = (props: any) => {
         if (active) {
             const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
             getRTokenBalance();
+            calculateGasLimit();
             const filter = {
                 address: contractsAddresses.feeShare,
                 topics: [

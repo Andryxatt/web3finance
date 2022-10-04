@@ -104,7 +104,7 @@ function ManualDeposit(props: any){
     }
 
     const validateinputs = async () => {
-        const arrayOfElements = element!.split("\n");
+        const arrayOfElements = element!.split("\n")[0] === "" ? [] : element!.split("\n");
         console.log(arrayOfElements, "arrayOfElements")
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
        if(arrayOfElements.length > 0){
@@ -132,7 +132,7 @@ function ManualDeposit(props: any){
         setArrayOfAddrAmounts(arrayOfElementsWithoutEmpty);
        }
        else {
-        setIsValid(false);
+        setIsValid(true);
         setArrayOfAddrAmounts([]);
        }
     }
@@ -181,14 +181,13 @@ function ManualDeposit(props: any){
                         })
                     }
                 </div>
-
             </div>
             <button onClick={() => {    
                 if(arrayOfAddrAmounts.length > 0){
                     props.changeModalContent(isValid, arrayOfAddrAmounts);
-                }       
+                }    
                         
-            }} className="text-white font-bold py-2 px-4 rounded-full bg-slate-500">Next</button>
+            }} className={`text-white font-bold py-2 px-4 rounded-full ${arrayOfAddrAmounts.length <= 0 ? "bg-red-500" : "bg-slate-500"}  `}>Next</button>
         </div>
     );
 }
