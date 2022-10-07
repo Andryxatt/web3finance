@@ -35,8 +35,8 @@ const WalletModal = () => {
         <div className="flex items-center flex-row flex-wrap">
           <WalletNetwork icon={binanceIcon} name="Binance Smart Chain" />
           <WalletNetwork icon={polyhonIcon} name="Polygon (Matic)" />
-          <WalletNetwork icon={ethIcon} name="Rinkeby Testnet" />
-          <WalletNetwork icon={ethereum} name="Rinkeby Mainnet" />
+          <WalletNetwork icon={ethIcon} name="Goerli Testnet" />
+          <WalletNetwork icon={ethereum} name="ETH Mainnet" />
         </div>
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
         <div className="flex items-center flex-row flex-wrap">

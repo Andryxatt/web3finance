@@ -1,19 +1,9 @@
 {
     "Tokenization": [
         {
-            "name": "USDC",
-            "decimal": 6,
-            "address": "0xeb8f08a975Ab53E34D8a0330E0D34de942C95926",
-            "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00",
-            "userBalanceDeposit": "0.00",
-            "isNative": false
-        },  
-        {
             "name": "LINK",
             "decimal": 18,
-            "address": "0x01BE23585060835E02B77ef475b0Cc51aA1e0709",
+            "address": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00",
@@ -23,7 +13,7 @@
         {
             "name":"WETH",
             "decimal": 18,
-            "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+            "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00",
@@ -33,7 +23,7 @@
         {
             "name":"RETH",
             "decimal": 18,
-            "address": "0xc778417E063141139Fce010982780140Aa0cD5Ab",
+            "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00",

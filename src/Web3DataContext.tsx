@@ -44,6 +44,7 @@ const Web3DataContext = ({ children }: any) => {
        return ethers.utils.formatUnits(price._hex, decimal);
     }
     const ConnectWallet = async (connectorName: string) => {
+        console.log("connectorName", connectorName);
         activate(connectors[connectorName]);
     }
     useEffect(() => {

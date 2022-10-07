@@ -3,7 +3,7 @@ import { BscConnector } from '@binance-chain/bsc-connector'
 import { WalletLinkConnector } from "@web3-react/walletlink-connector"
 import { WalletConnectConnector } from "@web3-react/walletconnect-connector"
 import { NetworkConnector } from "@web3-react/network-connector";
-const injected = new InjectedConnector({ supportedChainIds: [1, 3, 4, 5, 42, 56, 97, 137] })
+const injected = new InjectedConnector({ supportedChainIds: [1, 3, 5, 42, 56, 97, 137] })
 const bsc = new BscConnector({
   supportedChainIds: [56, 97] // later on 1 ethereum mainnet and 3 ethereum ropsten will be supported
 })

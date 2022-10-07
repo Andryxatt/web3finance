@@ -12,9 +12,10 @@ function WalletNetwork({ name, icon }: any) {
     })
     e.currentTarget.className = "network_wrapper active-network";
     let newChainId = 0;
+    console.log(name, "name")
     switch (name) {
-      case "Rinkeby Testnet":
-        newChainId = 4;
+      case "Goerli Testnet":
+        newChainId = 5;
         break;
       case "Polygon (Matic)":
         newChainId = 137;
@@ -26,7 +27,7 @@ function WalletNetwork({ name, icon }: any) {
         newChainId = 1;
         break;
       default:
-        newChainId = 1;
+        newChainId = 5;
         break;
     }
      if (active) {

@@ -10,7 +10,7 @@ import { ToastContainer } from "react-toastify";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
     const { active, account, library } = useWeb3React();
-    const rinkebyTokens = require("../../tokens/rinkeby.json");
+    const goerliTokens = require("../../tokens/goerli.json");
     const ethereumTokens = require("../../tokens/ethereum.json");
     const bscTokens = require("../../tokens/bsc.json");
     const polygonTokens = require("../../tokens/polygon.json");
@@ -57,7 +57,7 @@ const TableResponsive = () => {
             isSelected: false
         },
         {
-            name: "Rinkeby Testnet",
+            name: "Goerli Testnet",
             icon: require("../../images/ethereum.png"),
             isSelected: true
         },
@@ -71,8 +71,8 @@ const TableResponsive = () => {
     const [sortPrice, setSortPrice] = useState("");
     const [sortDeposits, setSortDeposits] = useState("");
     const [sortUserDeposit, setSortUserDeposit] = useState("");
-    const [currentNetwork, setCurrentNetwork] = useState("Rinkeby Testnet");
-    const [tokens, setTokens] = useState(rinkebyTokens.Tokenization);
+    const [currentNetwork, setCurrentNetwork] = useState("Goerli Testnet");
+    const [tokens, setTokens] = useState(goerliTokens.Tokenization);
     const updateNetwork = (network: any) => {
         const newState = networks.map(obj => {
             if (obj.name === network.name) {
@@ -84,8 +84,8 @@ const TableResponsive = () => {
                     case "Polygon":
                         setTokens(polygonTokens.Tokenization);
                         break;
-                    case "Rinkeby Testnet":
-                        setTokens(rinkebyTokens.Tokenization);
+                    case "Goerli Testnet":
+                        setTokens(goerliTokens.Tokenization);
                         break;
                     case "BSC":
                         setTokens(bscTokens.Tokenization);

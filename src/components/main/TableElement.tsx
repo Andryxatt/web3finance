@@ -32,12 +32,10 @@ const TableElement = (props: any) => {
     const { isFeeInToken,
         setIsFeeInToken } = Web3State();
     const handleAmountChange = (event: any) => {
-        const value = Math.max(0, Math.min(parseFloat(userBalanceToken), Number(event.target.value)));
-       
-        setAmountDeposit(value);
+        setAmountDeposit(parseFloat(event.target.value));
     };
     const getPrice = async () => {
-        const provider = new ethers.providers.JsonRpcProvider("https://rinkeby.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
+        const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
         const contract = new Contract(contractsAddresses.oracle, OracleAbi, provider);
         await contract.getAssetPrice(props.token.address).then((res: any) => {
             setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
@@ -50,16 +48,17 @@ const TableElement = (props: any) => {
         });
     }
     const getUserBalanceRToken = () => {
-        if (active && props.network === "Rinkeby Testnet") {
+        if (active && props.network === "Goerli Testnet") {
             let tokenName = "r" + props.token.name;
             let contract = new Contract(contractsAddresses[tokenName], RTokenAbi, library?.getSigner());
             contract.balanceOf(account).then((res: any) => {
+                console.log(ethers.utils.formatUnits(res._hex, props.token.decimal));
                 setUserTokenBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
             });
         }
     }
     const getTokenBalance = async () => {
-        if (active && props.network === "Rinkeby Testnet") {
+        if (active && props.network === "Goerli Testnet") {
             const balanceOf = new Contract(props.token.address, BalanceOfAbi, library.getSigner());
             const price = await balanceOf.balanceOf(account);
             setUserBalanceToken(ethers.utils.formatUnits(price._hex, props.token.decimal));
@@ -74,21 +73,28 @@ const TableElement = (props: any) => {
     const setMaxPrice = () => {
         setAmountDeposit(parseFloat(userBalanceToken));
     }
-    const getTotalDeposit = () => {
-        const provider = new ethers.providers.JsonRpcProvider("https://rinkeby.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
+    const getTotalDeposit = async () => {
+        const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
         const contract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, provider);
-        contract.totalSupply().then((res: any) => {
+        console.log(contract, "contract");
+       await contract.totalSupply().then((res: any) => {
+        console.log(res, "res");
             setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
         });
     }
     const depositAmount = async () => {
-    
         let contract = new Contract(contractsAddresses[props.token.name], RTokenAbi, library?.getSigner());
+        console.log(contract, "contract");
+        console.log(account, "account");
+        library.getCode()
+        console.log(contractsAddresses.feeShare, "amountDeposit");
         let checkAllowance = await contract.allowance(account, contractsAddresses.feeShare);
+        console.log(checkAllowance, "checkAllowance");
         let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, 6)) <= amountDeposit!) {
             const idToast = toast.loading("Approving please wait...")
-            await contract?.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((res: any) => {
+            await contract?.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 })
+            .then((res: any) => {
                 res.wait().then(async (receipt: any) => {
                     toast.update(idToast, { render: "All is good", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                     const idToast2 = toast.loading("Depositing please wait...")
@@ -121,15 +127,24 @@ const TableElement = (props: any) => {
     }
     const witdrawDeposit = async () => {
         let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        console.log(feeShare, "feeShare");
+        const idToast = toast.loading("Processing transaction please wait...")
         if (amountDeposit! > parseFloat(userDepositBalance) || amountDeposit! === undefined) {
-            alert("You don't have enough tokens to withdraw");
+            toast.update(idToast, { render: "Input amount to withdraw", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
         }
         else {
-            await feeShare.withdraw(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+            console.log(ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), "amountDeposit");
+
+             feeShare.withdraw(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), {gasLimit:"210000"}).then((result: any) => {
                 result.wait().then(async (recept: any) => {
+                    toast.update(idToast, { render: "Withdraw succesfuly", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                     getUserBalanceRToken();
                     getTokenBalance();
+                }).catch((err:any)=>{
+                    console.log(err, "err");
                 })
+            }).catch((err:any)=>{
+                toast.update(idToast, { render: "Transaction rejected", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
             });
         }
 
@@ -141,7 +156,7 @@ const TableElement = (props: any) => {
     useEffect(() => {
         getPrice();
         getTotalDeposit();
-        if (active && props.network === "Rinkeby Testnet") {
+        if (active && props.network === "Goerli Testnet") {
             getUserBalanceRToken();
             getUserDepositBalance();
             getPrice();
@@ -172,7 +187,7 @@ const TableElement = (props: any) => {
                             <span>{userBalanceToken !== "0" ? userBalanceToken : <AnimatedDots />} ($ {getPriceInUsd()})</span>
                         </div>
                         <div className='relative w-[100%] flex flex-row'>
-                            <input value={amountDeposit || ""}
+                            <input 
                                 onChange={handleAmountChange}
                                 disabled={userBalanceToken !== "0" ? false : true}
                                 step={"0.01"}
@@ -206,8 +221,8 @@ const TableElement = (props: any) => {
                     }
                     <button
                         onClick={witdrawDeposit}
-                        disabled={parseInt(userTokenBalance) !== 0 ? false : true}
-                        className={parseInt(userTokenBalance) > 0 ? "flex justify-between items-center w-[20%] hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md px-3" : "flex justify-between items-center cursor-not-allowed w-[20%] bg-gray-400 text-white font-bold h-[40px] rounded-md px-3"} >Withdraw <img className='w-[30px]' src={rightArrow} alt="rightArrow" /></button>
+                        disabled={parseFloat(userTokenBalance) > 0 ? false : true}
+                        className={parseFloat(userTokenBalance) > 0 ? "flex justify-between items-center w-[20%] hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md px-3" : "flex justify-between items-center cursor-not-allowed w-[20%] bg-gray-400 text-white font-bold h-[40px] rounded-md px-3"} >Withdraw <img className='w-[30px]' src={rightArrow} alt="rightArrow" /></button>
                 </div>
             </div>
         </div>
