@@ -18,9 +18,9 @@ window.Buffer = window.Buffer || require("buffer").Buffer
 const WalletModal = () => {
   const {
    account,
-   library,
    ConnectWallet
 } = Web3State();
+const [chainSelected, setChainSelected] = React.useState<any>(null)
   const switchNetwork = async (e:any) =>{
     document.querySelectorAll(".network_wrapper").forEach((el: any) => {
       el.classList.remove("active-network");
@@ -29,7 +29,6 @@ const WalletModal = () => {
     const name = e.target.textContent;
     e.currentTarget.className = "network_wrapper active-network";
     let newChainId = 0;
-    console.log(name, "name")
     switch (name) {
       case "Goerli Testnet":
         newChainId = 5;
@@ -47,11 +46,8 @@ const WalletModal = () => {
         newChainId = 5;
         break;
     }
-
-      await library?.provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: toHex(newChainId) }]
-      });
+    console.log(e.target.textContent, newChainId)
+    ConnectWallet(e.target.textContent, newChainId)
   }
   const [modalShown, toggleModal] = React.useState(false);
   useEffect(() => {
@@ -74,22 +70,22 @@ const WalletModal = () => {
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
         <div className="flex items-center flex-row flex-wrap">
           <div className="network_wrapper hover:bg-blue-300"
-            onClick={() => {ConnectWallet?.("injected")} }>
+            onClick={() => {ConnectWallet?.("injected", chainSelected)} }>
             <img alt="Metamask" src={metamaskIcon} />
             <span>Metamask</span>
             <p>Connect to your MetaMask</p>
           </div>
-          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("coinbaseWallet") }>
+          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("coinbaseWallet", chainSelected) }>
             <img alt="Coinbase" src={coinbaseIcon} />
             <span>Coinbase Wallet</span>
           </div>
           <div className="network_wrapper hover:bg-blue-300" onClick={() => {
-            ConnectWallet?.("bsc")
+            ConnectWallet?.("bsc", chainSelected)
           }}>
             <img alt="Binance" src={bnbIcon} />
             <span>Binance Chain Wallet</span>
           </div>
-          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("walletConnect") }>
+          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("walletConnect",chainSelected) }>
             <img alt="Wallet Connect" src={walletConnectIcon} />
             <span>Wallet Connect</span>
           </div>

@@ -2,23 +2,19 @@ import { useEffect, useState } from "react";
 import { useWeb3React } from "@web3-react/core";
 import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
-import { Contract, ethers } from "ethers";
 import sortIcon from "../../images/sort.svg";
 import sortAscIcon from "../../images/asc.svg";
 import sortDescIcon from "../../images/desc.svg";
-import { ToastContainer } from "react-toastify";
+import { Web3State } from "../../Web3DataContext";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
-    const { active, account, library } = useWeb3React();
+    const {checkNetwork} = Web3State();
+    const { active, account } = useWeb3React();
     const goerliTokens = require("../../tokens/goerli.json");
     const ethereumTokens = require("../../tokens/ethereum.json");
     const bscTokens = require("../../tokens/bsc.json");
     const polygonTokens = require("../../tokens/polygon.json");
     const searchIcon = require("../../images/search.png");
-    const contractsAddresses = require("../../contracts/AddressesContracts.json");
-    const RTokenAbi = require("../../contracts/RTokenAbi.json");
-    const OracleAbi = require("../../contracts/oracle/Oracle.json");
-    // const sortedIcon = require("../../images/sort_icon.svg");
     const [filters, setFilters] = useState([
         {
             name: "All",
@@ -49,22 +45,26 @@ const TableResponsive = () => {
         {
             name: "Ethereum",
             icon: require("../../images/ethereum.png"),
-            isSelected: false
+            isSelected: false,
+            chainId:1
         },
         {
             name: "Mumbai Testnet",
             icon: require("../../images/polygon.png"),
-            isSelected: false
+            isSelected: false,
+            chainId:80001
         },
         {
             name: "Goerli Testnet",
             icon: require("../../images/ethereum.png"),
-            isSelected: true
+            isSelected: true,
+            chainId:5
         },
         {
             name: "Smartchain Testnet",
             icon: require("../../images/binance.png"),
-            isSelected: false
+            isSelected: false,
+            chainId:97
         }
     ]);
     const [sortName, setSortName] = useState("");
@@ -100,6 +100,7 @@ const TableResponsive = () => {
             }
         });
         setNetworks(newState);
+        checkNetwork(network.chainId);
     };
     const updateState = (button: any) => {
         const newState = filters.map(obj => {

@@ -43,6 +43,20 @@ const TableElement = (props: any) => {
                 setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
             });
         }
+        else if(props.network === "Smartchain Testnet"){
+            const provider = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
+            const contract = new Contract(contractsAddresses[props.network][0].PriceOracle, OracleAbi, provider);
+            await contract.getAssetPrice(props.token.address).then((res: any) => {
+                setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
+            });
+        }
+        else if(props.network === "Mumbai Testnet"){
+            const provider = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
+            const contract = new Contract(contractsAddresses[props.network][0].PriceOracle, OracleAbi, provider);
+            await contract.getAssetPrice(props.token.address).then((res: any) => {
+                setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
+            });
+        }
         
     }
     const getUserDepositBalance = () => {
@@ -56,16 +70,22 @@ const TableElement = (props: any) => {
      
     }
     const getUserBalanceRToken = () => {
-            let contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
-            contract.balanceOf(account).then((res: any) => {
-                console.log(ethers.utils.formatUnits(res._hex, props.token.decimal), "balance");
-                setUserTokenBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
-            });
+            if(active){
+                let contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
+                contract.balanceOf(account).then((res: any) => {
+                    console.log(ethers.utils.formatUnits(res._hex, props.token.decimal), "balance");
+                    setUserTokenBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
+                });
+            }
+           
     }
     const getTokenBalance = async () => {
+        if(active){
+            console.log(account, "account")
             const balanceOf = new Contract(props.token.address, BalanceOfAbi, library.getSigner());
             const price = await balanceOf.balanceOf(account);
             setUserBalanceToken(ethers.utils.formatUnits(price._hex, props.token.decimal));
+        }
     }
     const getPriceInUsd = () => {
         if (userBalanceToken && tokenPrice) {
@@ -77,11 +97,28 @@ const TableElement = (props: any) => {
         setAmountDeposit(parseFloat(userBalanceToken));
     }
     const getTotalDeposit = async () => {
-        const provider = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
-        const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
-       await contract.totalSupply().then((res: any) => {
-            setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
-        });
+        if(props.network === "Goerli Testnet"){
+            const provider = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
+            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
+           await contract.totalSupply().then((res: any) => {
+                setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
+            });
+        }
+        else if(props.network === "Smartchain Testnet"){
+            const provider = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
+            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
+           await contract.totalSupply().then((res: any) => {
+                setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
+            });
+        }
+        else if(props.network === "Mumbai Testnet"){
+            const provider = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
+            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
+           await contract.totalSupply().then((res: any) => {
+                setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
+            });
+        }
+       
     }
     const depositAmount = async () => {
         let contract = new Contract(contractsAddresses[props.network][0][props.token.name], RTokenAbi, library?.getSigner());
@@ -147,14 +184,12 @@ const TableElement = (props: any) => {
         setIsFeeInToken(!isFeeInToken);
     }
     useEffect(() => {
-        
          getPrice();
          getTotalDeposit();
-        if (active ) {
-             getUserBalanceRToken();
+        if(active) {
+            getUserBalanceRToken();
             getUserDepositBalance();
             getTokenBalance();
-
         }
     }, [active, account, tokenPrice, userBalanceToken, userTokenBalance, chainId]);
     return (

@@ -6,7 +6,6 @@ import { NetworkConnector } from "@web3-react/network-connector";
 const injected = new InjectedConnector({ supportedChainIds: [1, 3, 5, 42, 56, 97, 137, 80001] })
 const bsc = new BscConnector({
   supportedChainIds: [56, 97] // later on 1 ethereum mainnet and 3 ethereum ropsten will be supported
-  
 })
 const walletlink = new WalletLinkConnector({
   url: `https://mainnet.infura.io/v3/${process.env.INFURA_KEY}`,
