@@ -1,145 +1,17 @@
 {
     "Tokenization": [
         {
-            "name": "BUSD",
+            "name": "WBNB",
             "decimal": 18,
-            "address": "0xe9e7CEA3DedcA5984780Bafc599bD69ADd087D56",
+            "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
              "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00"
         },
         {
-            "name": "USDT",
+            "name": "LINK",
             "decimal": 18,
-            "address": "0x55d398326f99059fF775485246999027B3197955",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Circle USD (USDC)",
-            "decimal": 18,
-            "address": "0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "True USD (TUSD)",
-            "decimal": 18,
-            "address": "0x14016E85a25aeb13065688cAFB43044C2ef86784",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "DAI (DAI)",
-            "decimal": 18,
-            "address": "0x1AF3F329e8BE154074D8769D1FFa4eE058B1DBc3",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Cardano (ADA)",
-            "decimal": 18,
-            "address": "0x3EE2200Efb3400fAbB9AacF31297cBdD1d435D47",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Ziliqa (ZIL)",
-            "decimal": 12,
-            "address": "0xb86AbCb37C3A4B64f74f59301AFF131a1BEcC787",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "YFII Finance (YFII)",
-            "decimal": 18,
-            "address": "0x7F70642d88cf1C4a3a7abb072B53B929b653edA5",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Yearn Finance (YFI)",
-            "decimal": 18,
-            "address": "0x88f1A5ae2A3BF98AEAF342D26B30a79438c9142e",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Venus (XVS)",
-            "decimal": 18,
-            "address": "0xcF6BB5389c92Bdda8a3747Ddb454cB7a64626C63",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Tezos (XTZ)",
-            "decimal": 18,
-            "address": "0x16939ef78684453bfDFb47825F8a5F714f12623a",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Uniswap (UNI)",
-            "decimal": 18,
-            "address": "0xBf5140A22578168FD562DCcF235E5D43A02ce9B1",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Tron (TRX)",
-            "decimal": 6,
-            "address": "0xCE7de646e7208a4Ef112cb6ed5038FA6cC6b12e3",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Sushi (SUSHI)",
-            "decimal": 18,
-            "address": "0x947950BcC74888a40Ffa2593C5798F11Fc9124C4",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Reef Finance (REEF)",
-            "decimal": 18,
-            "address": "0xF21768cCBC73Ea5B6fd3C687208a7c2def2d966e",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Chainlink (LINK)",
-            "decimal": 18,
-            "address": "0xF8A0BF9cF54Bb92F17374d9e9A321E6a111a51bD",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "Dogecoin (DOGE)",
-            "decimal": 8,
-            "address": "0xbA2aE424d960c26247Dd6c32edC70B295c744C43",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
-        },
-        {
-            "name": "PancakeSwap (CAKE)",
-            "decimal": 18,
-            "address": "0x0E09FaBB73Bd3Ade0a17ECC321fD13a19e81cE82",
+            "address": "0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06",
              "tokenPrice": "0.00",
             "deposits": "0.00",
             "userBalance": "0.00"

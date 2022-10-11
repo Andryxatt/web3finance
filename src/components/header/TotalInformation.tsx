@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 
-
 const TotalInformation = () => {
     const [total, setTotal] = useState(22333333);
     let timer: any;

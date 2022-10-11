@@ -40,16 +40,6 @@ const MultiDepoistPreview = (props: any) => {
         return res;
     }
     const { nativeTokenFeePerAddress } = Web3State();
-    // const summAndFee = () => {
-    //     const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-    //     feeShareContract.calculateFee().then((res: any) => {
-    //         console.log(res);
-    //         setFeePerAccount(parseFloat(ethers.utils.formatUnits(res._hex)))
-    //     });
-    //     const totalPrice = props.addressesAmount.length * feePerAccount;
-    //     console.log(totalPrice, "totalPrice");
-    //     return totalPrice;
-    // }
     const getRTokenFeePerAddress = async (address: string) => {
         const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library.getSigner());
         const res = await feeShareContract["calculateFee(address)"](address);
@@ -216,7 +206,6 @@ const MultiDepoistPreview = (props: any) => {
             feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
                 .then((res: any) => {
                     res.wait().then((res: any) => {
-                       
 
                     })
                 }).catch((err: any) => {

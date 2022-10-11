@@ -1,42 +1,4 @@
-import { toHex } from "../../helpers/utils";
-import { Web3State } from "../../Web3DataContext";
-
-function WalletNetwork({ name, icon }: any) {
-  const {
-    active,
-    library,
- } = Web3State();
-  const switchNetwork = async (e: any) => {
-    document.querySelectorAll(".network_wrapper").forEach((el: any) => {
-      el.classList.remove("active-network");
-    })
-    e.currentTarget.className = "network_wrapper active-network";
-    let newChainId = 0;
-    console.log(name, "name")
-    switch (name) {
-      case "Goerli Testnet":
-        newChainId = 5;
-        break;
-      case "Polygon (Matic)":
-        newChainId = 137;
-        break;
-      case "Binance Smart Chain":
-        newChainId = 56;
-        break;
-      case "Ethereum":
-        newChainId = 1;
-        break;
-      default:
-        newChainId = 5;
-        break;
-    }
-     if (active) {
-      await library?.provider.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: toHex(newChainId) }]
-      });
-     }
-  }
+function WalletNetwork({ name, icon, switchNetwork }: any) {
   return (
     <div className="network_wrapper" onClick={(e) => { switchNetwork(e) }}>
       <img src={icon} alt={name}/>

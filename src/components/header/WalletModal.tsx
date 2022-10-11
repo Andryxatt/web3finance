@@ -12,14 +12,48 @@ import binanceIcon from "../../images/binance.png"
 import ethereum from "../../images/ethereum.png"
 import walletConnectIcon from "../../images/wallet-connect-modal.png"
 import Modal from "../ui/Modal"
+import { toHex } from "../../helpers/utils"
 window.Buffer = window.Buffer || require("buffer").Buffer
 
 const WalletModal = () => {
   const {
    account,
+   active,
+   library,
    ConnectWallet
 } = Web3State();
+  const switchNetwork = async (e:any) =>{
+    document.querySelectorAll(".network_wrapper").forEach((el: any) => {
+      el.classList.remove("active-network");
+    })
+    //text content
+    const name = e.target.textContent;
+    e.currentTarget.className = "network_wrapper active-network";
+    let newChainId = 0;
+    console.log(name, "name")
+    switch (name) {
+      case "Goerli Testnet":
+        newChainId = 5;
+        break;
+      case "Mumbai Testnet":
+        newChainId = 80001;
+        break;
+      case "Smartchain Testnet":
+        newChainId = 97;
+        break;
+      case "Ethereum":
+        newChainId = 1;
+        break;
+      default:
+        newChainId = 5;
+        break;
+    }
 
+      await library?.provider.request({
+        method: "wallet_switchEthereumChain",
+        params: [{ chainId: toHex(newChainId) }]
+      });
+  }
   const [modalShown, toggleModal] = React.useState(false);
   useEffect(() => {
 
@@ -33,10 +67,10 @@ const WalletModal = () => {
       <Modal shown={modalShown} close={() => { toggleModal(false) }}>
         <h1 className="px-3 text-center modal-title">1. Choose Network</h1>
         <div className="flex items-center flex-row flex-wrap">
-          <WalletNetwork icon={binanceIcon} name="Binance Smart Chain" />
-          <WalletNetwork icon={polyhonIcon} name="Polygon (Matic)" />
-          <WalletNetwork icon={ethIcon} name="Goerli Testnet" />
-          <WalletNetwork icon={ethereum} name="ETH Mainnet" />
+          <WalletNetwork icon={binanceIcon} name="Smartchain Testnet" switchNetwork={switchNetwork} />
+          <WalletNetwork icon={polyhonIcon} name="Mumbai Testnet" switchNetwork={switchNetwork} />
+          <WalletNetwork icon={ethIcon} name="Goerli Testnet" switchNetwork={switchNetwork} />
+          <WalletNetwork icon={ethereum} name="ETH Mainnet" switchNetwork={switchNetwork} />
         </div>
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
         <div className="flex items-center flex-row flex-wrap">

@@ -35,34 +35,33 @@ const TableElement = (props: any) => {
         setAmountDeposit(parseFloat(event.target.value));
     };
     const getPrice = async () => {
-        const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
-        const contract = new Contract(contractsAddresses.oracle, OracleAbi, provider);
-        await contract.getAssetPrice(props.token.address).then((res: any) => {
-            setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
-        });
+        console.log(props.network, "props.network")
+        if(props.network === "Goerli Testnet"){
+            const provider = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
+            const contract = new Contract(contractsAddresses[props.network][0].PriceOracle, OracleAbi, provider);
+            await contract.getAssetPrice(props.token.address).then((res: any) => {
+                setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
+            });
+        }
+        
     }
     const getUserDepositBalance = () => {
-        const contract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, library?.getSigner());
+        const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
         contract.balanceOf(account).then((res: any) => {
             setUserDepositBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
         });
     }
     const getUserBalanceRToken = () => {
-        if (active && props.network === "Goerli Testnet") {
-            let tokenName = "r" + props.token.name;
-            let contract = new Contract(contractsAddresses[tokenName], RTokenAbi, library?.getSigner());
+            let contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
             contract.balanceOf(account).then((res: any) => {
                 console.log(ethers.utils.formatUnits(res._hex, props.token.decimal));
                 setUserTokenBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
             });
-        }
     }
     const getTokenBalance = async () => {
-        if (active && props.network === "Goerli Testnet") {
             const balanceOf = new Contract(props.token.address, BalanceOfAbi, library.getSigner());
             const price = await balanceOf.balanceOf(account);
             setUserBalanceToken(ethers.utils.formatUnits(price._hex, props.token.decimal));
-        }
     }
     const getPriceInUsd = () => {
         if (userBalanceToken && tokenPrice) {
@@ -74,68 +73,59 @@ const TableElement = (props: any) => {
         setAmountDeposit(parseFloat(userBalanceToken));
     }
     const getTotalDeposit = async () => {
-        const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
-        const contract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, provider);
-        console.log(contract, "contract");
+        const provider = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
+        const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
        await contract.totalSupply().then((res: any) => {
-        console.log(res, "res");
             setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
         });
     }
     const depositAmount = async () => {
-        let contract = new Contract(contractsAddresses[props.token.name], RTokenAbi, library?.getSigner());
-        console.log(contract, "contract");
-        console.log(account, "account");
-        library.getCode()
-        console.log(contractsAddresses.feeShare, "amountDeposit");
-        let checkAllowance = await contract.allowance(account, contractsAddresses.feeShare);
-        console.log(checkAllowance, "checkAllowance");
-        let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        let contract = new Contract(contractsAddresses[props.network][0][props.token.name], RTokenAbi, library?.getSigner());
+       
+        let checkAllowance = await contract.allowance(account, contractsAddresses[props.network][0].FeeShare);
+        let feeShare = new Contract(contractsAddresses[props.network][0].FeeShare, FeeShareAbi, library?.getSigner());
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, 6)) <= amountDeposit!) {
             const idToast = toast.loading("Approving please wait...")
-            await contract?.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 })
+            await contract?.approve(contractsAddresses[props.network][0].FeeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 })
             .then((res: any) => {
                 res.wait().then(async (receipt: any) => {
-                    toast.update(idToast, { render: "All is good", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                    toast.update(idToast, { render: "Transaction succesfuly", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                     const idToast2 = toast.loading("Depositing please wait...")
-                    await feeShare.deposit(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                    await feeShare.deposit(contractsAddresses[props.network][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                         result.wait().then(async (recept: any) => {
                             getUserBalanceRToken();
                             getTokenBalance();
-                            toast.update(idToast2, { render: "All is good", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                            toast.update(idToast2, { render: "Transaction succesfuly", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                         })
                     }).catch((err:any) => {
-                        toast.update(idToast2, { render: "Something went wrong", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                        toast.update(idToast2, { render: "Your transaction rejected!", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
                     })
                 })
             }).catch((err:any) =>{
-                toast.update(idToast, { render: "Something went wrong", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                toast.update(idToast, { render: "Your transaction rejected!", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
             })
         }
         else {
             const idToast2 = toast.loading("Depositing please wait...")
-            await feeShare.deposit(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+            await feeShare.deposit(contractsAddresses[props.network][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     getUserBalanceRToken();
                     getTokenBalance();
-                    toast.update(idToast2, { render: "All is good", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                    toast.update(idToast2, { render: "Transaction succesfuly", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                 })
             }).catch((err:any)=>{
-                toast.update(idToast2, { render: "Something went wrong", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
+                toast.update(idToast2, { render: "Your transaction rejected!", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
             })
         }
     }
     const witdrawDeposit = async () => {
-        let feeShare = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
-        console.log(feeShare, "feeShare");
+        let feeShare = new Contract(contractsAddresses[props.network][0].FeeShare, FeeShareAbi, library?.getSigner());
         const idToast = toast.loading("Processing transaction please wait...")
         if (amountDeposit! > parseFloat(userDepositBalance) || amountDeposit! === undefined) {
             toast.update(idToast, { render: "Input amount to withdraw", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
         }
         else {
-            console.log(ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), "amountDeposit");
-
-             feeShare.withdraw(contractsAddresses[props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), {gasLimit:"210000"}).then((result: any) => {
+             feeShare.withdraw(contractsAddresses[props.network][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), {gasLimit:"210000"}).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToast, { render: "Withdraw succesfuly", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                     getUserBalanceRToken();
@@ -150,16 +140,15 @@ const TableElement = (props: any) => {
 
     }
     const changeFeeType = () => {
-        console.log(isFeeInToken);
         setIsFeeInToken(!isFeeInToken);
     }
     useEffect(() => {
-        getPrice();
-        getTotalDeposit();
-        if (active && props.network === "Goerli Testnet") {
-            getUserBalanceRToken();
+        
+         getPrice();
+         getTotalDeposit();
+        if (active ) {
+             getUserBalanceRToken();
             getUserDepositBalance();
-            getPrice();
             getTokenBalance();
 
         }

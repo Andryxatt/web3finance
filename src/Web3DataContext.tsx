@@ -2,10 +2,7 @@ import { useWeb3React } from "@web3-react/core";
 import { Contract, ethers } from "ethers";
 import { useContext, createContext, useState, useEffect } from 'react';
 import { connectors } from "./helpers/connectors";
-import ContractsAdresses from "./contracts/AddressesContracts.json";
-import OracleAbi from "./contracts/oracle/Oracle.json";
-import FeeShareAbi from "./contracts/FeeShare.json";
-import { toHex } from "./helpers/utils";
+
 
 type ContextProps = {
     active: boolean,
@@ -17,7 +14,6 @@ type ContextProps = {
     addressesFromFile: any,
     setAddressesFromFile: any,
     getUserBalanceToken: any,
-    getAssetFeePerAddress: any,
     nativeTokenFeePerAddress: string,
     isFeeInToken: boolean,
     setIsFeeInToken: any,
@@ -32,24 +28,17 @@ const Web3DataContext = ({ children }: any) => {
     const [addressesFromFile, setAddressesFromFile] = useState<any[]>([]);
     const [nativeTokenFeePerAddress, setNativeTokenFeePerAddress] = useState("");
     const [isFeeInToken, setIsFeeInToken] = useState<boolean>(false);
-    const getAssetFeePerAddress = async () => {
-        const feeShareContract = new Contract(ContractsAdresses.feeShare, FeeShareAbi, library.getSigner());
-        const res = await feeShareContract["calculateFee()"]();
-        setNativeTokenFeePerAddress(ethers.utils.formatUnits(res.toString()));
-    }
 
-    const getUserBalanceToken = async (address:string, decimal:number) =>{
-        const balanceOf = new Contract(address, BalanceOfAbi, library?.getSigner());
-        const price = await balanceOf.balanceOf(account);
-       return ethers.utils.formatUnits(price._hex, decimal);
-    }
+    // const getUserBalanceToken = async (address:string, decimal:number) =>{
+    //     const balanceOf = new Contract(address, BalanceOfAbi, library?.getSigner());
+    //     const price = await balanceOf.balanceOf(account);
+    //    return ethers.utils.formatUnits(price._hex, decimal);
+    // }
     const ConnectWallet = async (connectorName: string) => {
-        console.log("connectorName", connectorName);
         activate(connectors[connectorName]);
     }
     useEffect(() => {
         if(active){
-            getAssetFeePerAddress();
             // if(chainId !== 4){
             //     library?.provider.request({
             //         method: "wallet_switchEthereumChain",
@@ -69,10 +58,9 @@ const Web3DataContext = ({ children }: any) => {
             ConnectWallet,
             addressesFromFile: addressesFromFile,
             setAddressesFromFile,
-            getUserBalanceToken,
-            getAssetFeePerAddress,
+            // getUserBalanceToken,
             nativeTokenFeePerAddress,
-            userTokenBalance: getUserBalanceToken,
+            // userTokenBalance: getUserBalanceToken,
             isFeeInToken,
             setIsFeeInToken,
             chainId

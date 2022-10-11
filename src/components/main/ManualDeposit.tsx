@@ -59,15 +59,13 @@ function ManualDeposit(props: any){
         onChange: onChange,
     });
     const deleteInvalidLines = () => {
-        let newElems:string;
+        let newElems = "";
         const newArray = arrayOfAddrAmounts.filter((element: any, index: number) => {
             if (element.errorAddress === "" && element.errorAmount === "") {
                 return element
             }
         })
-        console.log(newArray, "newArray")
         newArray.forEach((element: any, index: number) => {
-            console.log(index, newArray.length)
             if (index === newArray.length - 1) {
                 newElems += element.address + "," + element.amount;
             }
@@ -79,7 +77,6 @@ function ManualDeposit(props: any){
         validateinputs()
     }
     const showExample = ()=>{
-        console.log("show example")
         const example = [
             {
                 'address':'0xa0Ee7A142d267C1f36714E4a8F75612F20a79720','amount':'0.001'
@@ -105,7 +102,6 @@ function ManualDeposit(props: any){
 
     const validateinputs = async () => {
         const arrayOfElements = element!.split("\n")[0] === "" ? [] : element!.split("\n");
-        console.log(arrayOfElements, "arrayOfElements")
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
        if(arrayOfElements.length > 0){
         arrayOfElements.forEach(async (element: any, index: number) => {
@@ -116,7 +112,10 @@ function ManualDeposit(props: any){
                 errorAmount: isNaN(element.split(",")[1]) === true ? "is not valid" : "",
                 row: index + 1
             }
-            arrayOfElementsWithoutEmpty.push(newElement);
+            if(element!== undefined){
+                arrayOfElementsWithoutEmpty.push(newElement);
+            }
+           
         })
         let flag = true;
         for (let i = 0; i < arrayOfElementsWithoutEmpty.length; i++) {

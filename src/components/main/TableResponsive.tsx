@@ -52,7 +52,7 @@ const TableResponsive = () => {
             isSelected: false
         },
         {
-            name: "Polygon",
+            name: "Mumbai Testnet",
             icon: require("../../images/polygon.png"),
             isSelected: false
         },
@@ -62,7 +62,7 @@ const TableResponsive = () => {
             isSelected: true
         },
         {
-            name: "BSC",
+            name: "Smartchain Testnet",
             icon: require("../../images/binance.png"),
             isSelected: false
         }
@@ -81,13 +81,13 @@ const TableResponsive = () => {
                     case "Ethereum":
                         setTokens(ethereumTokens.Tokenization);
                         break;
-                    case "Polygon":
+                    case "Mumbai Testnet":
                         setTokens(polygonTokens.Tokenization);
                         break;
                     case "Goerli Testnet":
                         setTokens(goerliTokens.Tokenization);
                         break;
-                    case "BSC":
+                    case "Smartchain Testnet":
                         setTokens(bscTokens.Tokenization);
                         break;
                     default:
