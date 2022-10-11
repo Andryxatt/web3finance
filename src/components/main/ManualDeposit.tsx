@@ -50,7 +50,7 @@ function ManualDeposit(props: any){
         // deleteInvalidLines();
     }
     const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
-    const { setContainer, view, state } = useCodeMirror({
+    const { setContainer } = useCodeMirror({
         container: editor.current,
         extensions: [javascript({ jsx: true })],
         value: element,
@@ -64,6 +64,7 @@ function ManualDeposit(props: any){
             if (element.errorAddress === "" && element.errorAmount === "") {
                 return element
             }
+        
         })
         newArray.forEach((element: any, index: number) => {
             if (index === newArray.length - 1) {

@@ -38,7 +38,7 @@ const SocialNetworks = () => {
                 icons.map((icon: any) => {
                     return (
                         <div key={icon.name} className="flex cursor-pointer">
-                            <a><img className="w-full h-full" src={icon.icon} /></a>
+                           <img className="w-full h-full" src={icon.icon} alt="icon" />
                         </div>
                     )
                 }

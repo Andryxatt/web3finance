@@ -1,14 +1,7 @@
-import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 const ExampleFiles = (props: any) => {
-    const [showExampleManual, setShowExampleManual] = useState<boolean>(false);
-    console.log(props)
-    useEffect(() => {
-        if (props.showExampleManual) {
-            setShowExampleManual(true);
-        }
-    }, [props.showExampleManual]);
+
     return(
     <div className="relative p-[15px] text-[#00174b] rounded-md bg-[#dbeeff]">
     <button onClick={props.close} type="button" className="absolute right-[15px] bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500">

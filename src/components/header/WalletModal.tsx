@@ -18,7 +18,6 @@ window.Buffer = window.Buffer || require("buffer").Buffer
 const WalletModal = () => {
   const {
    account,
-   active,
    library,
    ConnectWallet
 } = Web3State();

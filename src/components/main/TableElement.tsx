@@ -46,15 +46,19 @@ const TableElement = (props: any) => {
         
     }
     const getUserDepositBalance = () => {
-        const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
-        contract.balanceOf(account).then((res: any) => {
-            setUserDepositBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
-        });
+        if(active){
+            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
+            console.log(contract, "contract")
+            contract.balanceOf(account).then((res: any) => {
+                setUserDepositBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
+            });
+        }
+     
     }
     const getUserBalanceRToken = () => {
             let contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
             contract.balanceOf(account).then((res: any) => {
-                console.log(ethers.utils.formatUnits(res._hex, props.token.decimal));
+                console.log(ethers.utils.formatUnits(res._hex, props.token.decimal), "balance");
                 setUserTokenBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
             });
     }
