@@ -4,30 +4,30 @@
             "name": "LINK",
             "decimal": 18,
             "address": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
-            "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00",
-            "userBalanceDeposit": "0.00",
+            "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
             "isNative": false
         },
         {
             "name":"WETH",
             "decimal": 18,
             "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-            "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00",
-            "userBalanceDeposit": "0.00",
+            "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
             "isNative": false
         },
         {
             "name":"RETH",
             "decimal": 18,
             "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-            "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00",
-            "userBalanceDeposit": "0.00",
+            "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
             "isNative": true
         }
     ]

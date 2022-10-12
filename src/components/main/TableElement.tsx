@@ -11,16 +11,13 @@ import { ToastContainer, toast } from 'react-toastify';
 const TableElement = (props: any) => {
     const contractsAddresses = require("../../contracts/AddressesContracts.json")
     const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
-    const OracleAbi = require("../../contracts/oracle/Oracle.json");
     const FeeShareAbi = require("../../contracts/FeeShare.json");
     const RTokenAbi = require("../../contracts/RTokenAbi.json");
     const [isOpen, setIsOpen] = useState(false);
     const [amountDeposit, setAmountDeposit] = useState<number>();
     const [userBalanceToken, setUserBalanceToken] = useState("0");
-    const [tokenPrice, setTokenPrice] = useState("0");
     const [userTokenBalance, setUserTokenBalance] = useState("0");
     const [userDepositBalance, setUserDepositBalance] = useState("0");
-    const [totalDeposit, setTotalDeposit] = useState("0");
     const { library, active, account, chainId } = useWeb3React();
 
     const changeOpen = (e: any, isOpen: boolean) => {
@@ -34,31 +31,6 @@ const TableElement = (props: any) => {
     const handleAmountChange = (event: any) => {
         setAmountDeposit(parseFloat(event.target.value));
     };
-    const getPrice = async () => {
-        console.log(props.network, "props.network")
-        if(props.network === "Goerli Testnet"){
-            const provider = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
-            const contract = new Contract(contractsAddresses[props.network][0].PriceOracle, OracleAbi, provider);
-            await contract.getAssetPrice(props.token.address).then((res: any) => {
-                setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
-            });
-        }
-        else if(props.network === "Smartchain Testnet"){
-            const provider = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
-            const contract = new Contract(contractsAddresses[props.network][0].PriceOracle, OracleAbi, provider);
-            await contract.getAssetPrice(props.token.address).then((res: any) => {
-                setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
-            });
-        }
-        else if(props.network === "Mumbai Testnet"){
-            const provider = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
-            const contract = new Contract(contractsAddresses[props.network][0].PriceOracle, OracleAbi, provider);
-            await contract.getAssetPrice(props.token.address).then((res: any) => {
-                setTokenPrice(ethers.utils.formatUnits(res._hex, 8));
-            });
-        }
-        
-    }
     const getUserDepositBalance = () => {
         if(active){
             const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
@@ -87,38 +59,17 @@ const TableElement = (props: any) => {
             setUserBalanceToken(ethers.utils.formatUnits(price._hex, props.token.decimal));
         }
     }
+    const getTotalDeposidedInUSD = () => {
+        return (parseFloat(props.token.deposites) * parseFloat(props.token.tokenPrice)).toFixed(2);
+    }
     const getPriceInUsd = () => {
-        if (userBalanceToken && tokenPrice) {
-            return (parseFloat(userBalanceToken) * parseFloat(tokenPrice)).toFixed(4)
+        if (userBalanceToken && props.token.tokenPrice) {
+            return (parseFloat(userBalanceToken) * parseFloat(props.token.tokenPrice)).toFixed(4)
         }
         return <AnimatedDots />
     }
     const setMaxPrice = () => {
         setAmountDeposit(parseFloat(userBalanceToken));
-    }
-    const getTotalDeposit = async () => {
-        if(props.network === "Goerli Testnet"){
-            const provider = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
-            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
-           await contract.totalSupply().then((res: any) => {
-                setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
-            });
-        }
-        else if(props.network === "Smartchain Testnet"){
-            const provider = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
-            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
-           await contract.totalSupply().then((res: any) => {
-                setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
-            });
-        }
-        else if(props.network === "Mumbai Testnet"){
-            const provider = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
-            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, provider);
-           await contract.totalSupply().then((res: any) => {
-                setTotalDeposit((parseFloat(ethers.utils.formatUnits(res._hex, props.token.decimal)) * parseFloat(tokenPrice)).toFixed(2).toString());
-            });
-        }
-       
     }
     const depositAmount = async () => {
         let contract = new Contract(contractsAddresses[props.network][0][props.token.name], RTokenAbi, library?.getSigner());
@@ -184,14 +135,12 @@ const TableElement = (props: any) => {
         setIsFeeInToken(!isFeeInToken);
     }
     useEffect(() => {
-         getPrice();
-         getTotalDeposit();
         if(active) {
             getUserBalanceRToken();
             getUserDepositBalance();
             getTokenBalance();
         }
-    }, [active, account, tokenPrice, userBalanceToken, userTokenBalance, chainId]);
+    }, [active, account, userBalanceToken, userTokenBalance, chainId, props.token.tokenPrice]);
     return (
         // TODO Fixe styles tailwind
         <div className={
@@ -201,8 +150,8 @@ const TableElement = (props: any) => {
                 <div className='flex relative ml-10 font-bold w-[150px]'>
                     <button className=''><img className='absolute left-[-40px] top-[-3px]' src={isOpen ? sortUpIcon : sortDownIcon} /></button>{props.token.name}
                 </div>
-                <div className='mr-[-10px] flex font-bold w-[150px] justify-left'>{tokenPrice !== "0" ? tokenPrice.slice(0, 8) : <AnimatedDots />}</div>
-                <div className='w-[150px] flex justify-center'>{totalDeposit !== "0" ? totalDeposit : <AnimatedDots />} $</div>
+                <div className='mr-[-10px] flex font-bold w-[150px] justify-left'>{props.token.tokenPrice !== "0" ? props.token.tokenPrice.slice(0, 8) : <AnimatedDots />}</div>
+                <div className='w-[150px] flex justify-center'>{props.token.deposits !== "0" ? props.token.deposits * props.token.tokenPrice : <AnimatedDots />} $</div>
                 <div className='w-[150px] flex justify-center'>{userDepositBalance !== "0" ? userDepositBalance : <AnimatedDots />}</div>
             </div>
             <ToastContainer/>

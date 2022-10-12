@@ -4,17 +4,17 @@
             "name": "WBNB",
             "decimal": 18,
             "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
+             "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0"
         },
         {
             "name": "LINK",
             "decimal": 18,
             "address": "0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06",
-             "tokenPrice": "0.00",
-            "deposits": "0.00",
-            "userBalance": "0.00"
+             "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0"
         }
     ]
 }

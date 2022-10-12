@@ -18,41 +18,36 @@ window.Buffer = window.Buffer || require("buffer").Buffer
 const WalletModal = () => {
   const {
    account,
-   ConnectWallet
+   ConnectWallet,
+   SwitchNetwork,
+   chainId,
+   networks,
+   setNetworks
 } = Web3State();
+
 const [chainSelected, setChainSelected] = React.useState<any>(null)
-  const switchNetwork = async (e:any) =>{
+  const changeNetwork = async (e:any) =>{
     document.querySelectorAll(".network_wrapper").forEach((el: any) => {
       el.classList.remove("active-network");
     })
-    //text content
     const name = e.target.textContent;
     e.currentTarget.className = "network_wrapper active-network";
-    let newChainId = 0;
-    switch (name) {
-      case "Goerli Testnet":
-        newChainId = 5;
-        break;
-      case "Mumbai Testnet":
-        newChainId = 80001;
-        break;
-      case "Smartchain Testnet":
-        newChainId = 97;
-        break;
-      case "Ethereum":
-        newChainId = 1;
-        break;
-      default:
-        newChainId = 5;
-        break;
-    }
-    console.log(e.target.textContent, newChainId)
-    ConnectWallet(e.target.textContent, newChainId)
+    const newState = networks.map((obj:any) => {
+      if (obj.name === name) {
+        setChainSelected(obj)
+        SwitchNetwork(obj);
+        return {...obj, isActive: true};
+      }
+      else {
+        return {...obj, isActive: false};
+      }
+    });
+    setNetworks(newState);
   }
   const [modalShown, toggleModal] = React.useState(false);
   useEffect(() => {
-
-  },[account])
+    
+  },[])
   return (
     <>
       <Button onClick={() => {
@@ -62,10 +57,12 @@ const [chainSelected, setChainSelected] = React.useState<any>(null)
       <Modal shown={modalShown} close={() => { toggleModal(false) }}>
         <h1 className="px-3 text-center modal-title">1. Choose Network</h1>
         <div className="flex items-center flex-row flex-wrap">
-          <WalletNetwork icon={binanceIcon} name="Smartchain Testnet" switchNetwork={switchNetwork} />
-          <WalletNetwork icon={polyhonIcon} name="Mumbai Testnet" switchNetwork={switchNetwork} />
-          <WalletNetwork icon={ethIcon} name="Goerli Testnet" switchNetwork={switchNetwork} />
-          <WalletNetwork icon={ethereum} name="ETH Mainnet" switchNetwork={switchNetwork} />
+          {
+            networks.map((network: any, index: number) => {
+               return <WalletNetwork icon={network.icon} key={index} name={network.name} isActive={network.isActive} switchNetwork={changeNetwork} />
+            })
+          }
+        
         </div>
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
         <div className="flex items-center flex-row flex-wrap">

@@ -1,6 +1,6 @@
-function WalletNetwork({ name, icon, switchNetwork }: any) {
+function WalletNetwork({ name, icon, switchNetwork, isActive }: any) {
   return (
-    <div className="network_wrapper" onClick={(e) => { switchNetwork(e) }}>
+    <div className={`${isActive ? "active-network" : ""} network_wrapper`}  onClick={(e) => { e.preventDefault(); switchNetwork(e) }}>
       <img src={icon} alt={name}/>
       <span>{name}</span>
     </div>

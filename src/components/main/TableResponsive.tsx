@@ -8,100 +8,15 @@ import sortDescIcon from "../../images/desc.svg";
 import { Web3State } from "../../Web3DataContext";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
-    const {checkNetwork} = Web3State();
-    const { active, account } = useWeb3React();
-    const goerliTokens = require("../../tokens/goerli.json");
-    const ethereumTokens = require("../../tokens/ethereum.json");
-    const bscTokens = require("../../tokens/bsc.json");
-    const polygonTokens = require("../../tokens/polygon.json");
+    const {SwitchNetwork, tokens, filters, networks, UpdateNetwork, setTokens, setFilters, currentNetwork} = Web3State();
     const searchIcon = require("../../images/search.png");
-    const [filters, setFilters] = useState([
-        {
-            name: "All",
-            isSelected: true
-        },
-        {
-            name: "Token Price",
-            isSelected: false
-        },
-        {
-            name: "Some Filter 2",
-            isSelected: false
-        },
-        {
-            name: "Some Filter 3",
-            isSelected: false
-        },
-        {
-            name: "Some Filter 4",
-            isSelected: false
-        },
-        {
-            name: "Some Filter 5",
-            isSelected: false
-        }
-    ]);
-    const [networks, setNetworks] = useState([
-        {
-            name: "Ethereum",
-            icon: require("../../images/ethereum.png"),
-            isSelected: false,
-            chainId:1
-        },
-        {
-            name: "Mumbai Testnet",
-            icon: require("../../images/polygon.png"),
-            isSelected: false,
-            chainId:80001
-        },
-        {
-            name: "Goerli Testnet",
-            icon: require("../../images/ethereum.png"),
-            isSelected: true,
-            chainId:5
-        },
-        {
-            name: "Smartchain Testnet",
-            icon: require("../../images/binance.png"),
-            isSelected: false,
-            chainId:97
-        }
-    ]);
     const [sortName, setSortName] = useState("");
     const [sortPrice, setSortPrice] = useState("");
     const [sortDeposits, setSortDeposits] = useState("");
     const [sortUserDeposit, setSortUserDeposit] = useState("");
-    const [currentNetwork, setCurrentNetwork] = useState("Goerli Testnet");
-    const [tokens, setTokens] = useState(goerliTokens.Tokenization);
-    const updateNetwork = (network: any) => {
-        const newState = networks.map(obj => {
-            if (obj.name === network.name) {
-                setCurrentNetwork(network.name);
-                switch (network.name) {
-                    case "Ethereum":
-                        setTokens(ethereumTokens.Tokenization);
-                        break;
-                    case "Mumbai Testnet":
-                        setTokens(polygonTokens.Tokenization);
-                        break;
-                    case "Goerli Testnet":
-                        setTokens(goerliTokens.Tokenization);
-                        break;
-                    case "Smartchain Testnet":
-                        setTokens(bscTokens.Tokenization);
-                        break;
-                    default:
-                        setTokens([]);
-                }
-                return { ...obj, isSelected: true };
-            }
-            else {
-                return { ...obj, isSelected: false };
-            }
-        });
-        setNetworks(newState);
-        checkNetwork(network.chainId);
-    };
+    
+    // const [tokens, setTokens] = useState(goerliTokens.Tokenization);
+  
     const updateState = (button: any) => {
         const newState = filters.map(obj => {
             if (obj.name === button.name) {
@@ -127,10 +42,10 @@ const TableResponsive = () => {
         setSortDeposits("");
         setSortUserDeposit("");
         setSortName(sortName === "asc" ? "desc" : "asc");
-        setTokens(tokens => res);
+        setTokens(res);
     }
     const sortByPrice = () => {
-        const res = [...tokens].sort((a: any, b: any) => {
+        const res = tokens.sort((a: any, b: any) => {
             if (sortPrice === "asc") {
                 return a.tokenPrice > b.tokenPrice ? 1 : -1;
             }
@@ -145,7 +60,7 @@ const TableResponsive = () => {
         setTokens(res);
     }
     const sortByDeposits = () => {
-        const res = [...tokens].sort((a: any, b: any) => {
+        const res = tokens.sort((a: any, b: any) => {
             if (sortDeposits === "asc") {
                 return a.deposits > b.deposits ? 1 : -1;
             }
@@ -160,7 +75,7 @@ const TableResponsive = () => {
         setTokens(res);
     }
     const sortByUserDeposit = () => {
-        const res = [...tokens].sort((a: any, b: any) => {
+        const res = tokens.sort((a: any, b: any) => {
             if (sortUserDeposit === "asc") {
                 return a.userBalance > b.userBalance ? 1 : -1;
             }
@@ -174,38 +89,23 @@ const TableResponsive = () => {
         setSortUserDeposit(sortUserDeposit === "asc" ? "desc" : "asc");
         setTokens(res);
     }
-    useEffect(() => {
-        if (active) {
-            // tokens.map((token: any) => {
-            //     const contract = new Contract(contractsAddresses["r" + token.name], RTokenAbi, library?.getSigner());
-            //     const contractOracle = new Contract(contractsAddresses.oracle, OracleAbi, library?.getSigner())
-            //      contract.totalSupply().then((res: any) => {
-            //         token.deposits = ethers.utils.formatUnits(res._hex, token.decimal);
-            //     });
-            //      contract.balanceOf(account).then((res: any) => {
-            //         token.userBalance =  ethers.utils.formatUnits(res._hex, token.decimal);
-            //     });
-            //     contractOracle.getAssetPrice(token.address).then((res: any) => {
-            //         token.tokenPrice = ethers.utils.formatUnits(res._hex, 8);
-            //     });
-            // });
-            // updateNetwork(currentNetwork);
-        }
-    }, [account, active, tokens])
 
+    useEffect(() => {
+       console.log(tokens);
+       
+    },[tokens]);
     return (
         <div className="">
-         
             <div className="flex justify-between items-center border-b-[1px] border-gray-300">
                 {
-                    networks.map((network, index) => {
+                    networks.map((network:any, index:number) => {
                         return (
-                            network.isSelected ?
+                            network.isActive ?
                                 <div key={index} className="group w-full h-full cursor-not-allowed flex flex-row items-center justify-center border-b-4 px-10 py-10 border-orange-400">
                                     <img className="w-[40px] mr-5" src={network.icon} alt={network.name} />
                                     <h2 className="group-hover:underline text-xl font-bold">{network.name}</h2>
                                 </div> :
-                                <div key={index} onClick={() => updateNetwork(network)} className="group w-full h-full cursor-pointer px-10 py-10 flex flex-row items-center justify-center">
+                                <div key={index} onClick={() => UpdateNetwork(network)} className="group w-full h-full cursor-pointer px-10 py-10 flex flex-row items-center justify-center">
                                     <img className="w-[40px] mr-5" src={network.icon} alt={network.name} />
                                     <h2 className="group-hover:underline text-xl font-bold">{network.name}</h2>
                                 </div>
@@ -218,7 +118,7 @@ const TableResponsive = () => {
                     {
                         filters.map((button, index) => {
                             return (
-                                button.isSelected ?
+                                button.isActive ?
                                     <button key={index} className="min-w-[50px] px-2 h-[50px] mr-5 border-2 rounded-xl border-orange-400 bg-yellow-200">{button.name}</button> :
                                     <button key={index} onClick={() => updateState(button)} className="min-w-[50px] px-2 h-[50px] mr-5 border-2 rounded-xl border-gray-400 bg-white">{button.name}</button>
                             )
