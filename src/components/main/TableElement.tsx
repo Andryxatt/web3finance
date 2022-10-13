@@ -18,7 +18,7 @@ const TableElement = (props: any) => {
     const [userBalanceToken, setUserBalanceToken] = useState("0");
     const [userTokenBalance, setUserTokenBalance] = useState("0");
     const [userDepositBalance, setUserDepositBalance] = useState("0");
-    const { library, active, account, chainId } = useWeb3React();
+    const { library, active, account } = useWeb3React();
 
     const changeOpen = (e: any, isOpen: boolean) => {
         setIsOpen(!isOpen);
@@ -141,7 +141,7 @@ const TableElement = (props: any) => {
             getUserDepositBalance();
             getTokenBalance();
         }
-    }, [active, account, userBalanceToken, userTokenBalance, chainId, props]);
+    });
     return (
         // TODO Fixe styles tailwind
         <div className={

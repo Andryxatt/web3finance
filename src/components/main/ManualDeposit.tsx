@@ -60,11 +60,11 @@ function ManualDeposit(props: any){
     });
     const deleteInvalidLines = () => {
         let newElems = "";
-        const newArray = arrayOfAddrAmounts.filter((element: any, index: number) => {
+        const newArray = arrayOfAddrAmounts.map((element: any, index: number) => {
             if (element.errorAddress === "" && element.errorAmount === "") {
-                return element
+                return element;
             }
-        
+            
         })
         newArray.forEach((element: any, index: number) => {
             if (index === newArray.length - 1) {

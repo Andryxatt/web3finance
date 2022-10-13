@@ -518,13 +518,11 @@ const MultiDepoistPreview = (props: any) => {
             calculateTxCostNative();
         }
         if (active) {
-            // const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+            console.log(fast);
             getRTokenBalance();
-         
             const filter = {
                 address: contractsAddresses.feeShare,
                 topics: [
-                    // the name of the event, parnetheses containing the data type of each event, no spaces
                     ethers.utils.id("multiSendFee(address,address[],uint256[])")
                 ]
             }

@@ -4,15 +4,10 @@ import { Button } from "@material-tailwind/react"
 import WalletNetwork from "./WalletNetwork"
 import { Web3State } from "../../Web3DataContext"
 import bnbIcon from "../../images/bnb-modal.png"
-import ethIcon from "../../images/eth-modal.png"
 import metamaskIcon from "../../images/metamask-modal.svg"
 import coinbaseIcon from "../../images/coinbase-modal.png"
-import polyhonIcon from "../../images/polygon-modal.svg"
-import binanceIcon from "../../images/binance.png"
-import ethereum from "../../images/ethereum.png"
 import walletConnectIcon from "../../images/wallet-connect-modal.png"
 import Modal from "../ui/Modal"
-import { toHex } from "../../helpers/utils"
 window.Buffer = window.Buffer || require("buffer").Buffer
 
 const WalletModal = () => {

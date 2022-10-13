@@ -3,7 +3,6 @@ import ManualDeposit from "./ManualDeposit";
 import FilesDeposit from "./FilesDeposit";
 import MultiDepoistPreview from "./MultiDepoistPreview";
 import Modal from "../ui/Modal";
-const fileTypes = ["CSV", "Excel", "Txt"];
 function ModalMultiDeposit(props: any) {
     const [modalShown, toggleModal] = React.useState(false);
     const [manualOrFiles, setManualOrFiles] = React.useState(true);
@@ -26,8 +25,7 @@ function ModalMultiDeposit(props: any) {
         setArrayOfAddrAmounts(array)
         setNextModal(flag);
     }
-    useEffect(() => {
-    }, [arrayOfAddrAmounts])
+
     return (
         <>
             <button
