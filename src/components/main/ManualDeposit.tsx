@@ -1,6 +1,6 @@
 import { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback,  useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { Web3State } from '../../Web3DataContext';
 import ExampleManual from './ExampleManual';
@@ -49,6 +49,7 @@ function ManualDeposit(props: any){
         
         // deleteInvalidLines();
     }
+    getListFromFile();
     const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
     const { setContainer } = useCodeMirror({
         container: editor.current,
@@ -58,14 +59,15 @@ function ManualDeposit(props: any){
         placeholder: "Enter your deposit address and amount",
         onChange: onChange,
     });
+    setContainer(editor.current);
     const deleteInvalidLines = () => {
         let newElems = "";
-        const newArray = arrayOfAddrAmounts.map((element: any, index: number) => {
-            if (element.errorAddress === "" && element.errorAmount === "") {
-                return element;
+        let newArray = [];
+        for (let index = 0; index < arrayOfAddrAmounts.length; index++) {
+           if (arrayOfAddrAmounts[index]["errorAddress"] === "" && arrayOfAddrAmounts[index]["errorAmount"] === "") {
+            newArray.push(arrayOfAddrAmounts[index]);
             }
-            
-        })
+        }
         newArray.forEach((element: any, index: number) => {
             if (index === newArray.length - 1) {
                 newElems += element.address + "," + element.amount;
@@ -136,17 +138,17 @@ function ManualDeposit(props: any){
         setArrayOfAddrAmounts([]);
        }
     }
-    useEffect(() => {
-        getListFromFile();
-        localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
-        if (editor.current) {
-            setContainer(editor.current);
-            localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
-        }
-        if (element !== "" && element !== undefined) {
-            validateinputs()
-        }
-    }, [element, addressesFromFile])
+    // useEffect(() => {
+    //     getListFromFile();
+    //     localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
+    //     if (editor.current) {
+    //         setContainer(editor.current);
+    //         localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
+    //     }
+    //     if (element !== "" && element !== undefined) {
+    //         validateinputs()
+    //     }
+    // }, [element, addressesFromFile])
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">

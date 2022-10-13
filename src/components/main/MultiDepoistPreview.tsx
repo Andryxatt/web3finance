@@ -577,7 +577,7 @@ const MultiDepoistPreview = (props: any) => {
 
                             <span className={!errorEstimate ? "text-xs text-red-500" : " text-xs text-gray-400"}>
                                 {
-                                    !errorEstimate ? "Your don't have enoth amount to make this transaction" : "Your " + "r" + props.token.name + " balance"
+                                    errorEstimate !== false ? "Your don't have enoth amount to make this transaction" : "Your r" + props.token.name + " balance"
                                 }
 
                             </span>

@@ -1,6 +1,6 @@
 import { useWeb3React } from "@web3-react/core";
 import { Contract, ethers } from "ethers";
-import { useContext, createContext, useState, useEffect } from 'react';
+import { useContext, createContext, useState } from 'react';
 import { connectors } from "./helpers/connectors";
 import { toHex } from "./helpers/utils";
 
@@ -29,6 +29,7 @@ type ContextProps = {
     setFilters: any,
     currentNetwork: any,
     setNetworks:any,
+    currentChainId: any,
 };
 const Web3Ctx = createContext<Partial<ContextProps>>({});
 
@@ -214,7 +215,8 @@ const Web3DataContext = ({ children }: any) => {
             })
        
     }
- 
+    getAssetsPrices();
+    getTotalDeposit();
     // useEffect(() => {
     //     getAssetsPrices();
     //     getTotalDeposit();
@@ -273,7 +275,8 @@ return (
         setFilters,
         UpdateNetwork,
         currentNetwork,
-        setNetworks
+        setNetworks,
+        currentChainId
     }}>
         {children}
     </Web3Ctx.Provider>
