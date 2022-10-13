@@ -17,37 +17,36 @@ window.Buffer = window.Buffer || require("buffer").Buffer
 
 const WalletModal = () => {
   const {
-   account,
-   ConnectWallet,
-   SwitchNetwork,
-   chainId,
-   networks,
-   setNetworks
-} = Web3State();
+    account,
+    ConnectWallet,
+    SwitchNetwork,
+    networks,
+    setNetworks
+  } = Web3State();
 
-const [chainSelected, setChainSelected] = React.useState<any>(null)
-  const changeNetwork = async (e:any) =>{
+  const [chainSelected, setChainSelected] = React.useState<any>(null)
+  const changeNetwork = async (e: any) => {
     document.querySelectorAll(".network_wrapper").forEach((el: any) => {
       el.classList.remove("active-network");
     })
     const name = e.target.textContent;
     e.currentTarget.className = "network_wrapper active-network";
-    const newState = networks.map((obj:any) => {
+    const newState = networks.map((obj: any) => {
       if (obj.name === name) {
         setChainSelected(obj)
         SwitchNetwork(obj);
-        return {...obj, isActive: true};
+        return { ...obj, isActive: true };
       }
       else {
-        return {...obj, isActive: false};
+        return { ...obj, isActive: false };
       }
     });
     setNetworks(newState);
   }
   const [modalShown, toggleModal] = React.useState(false);
   useEffect(() => {
-    
-  },[])
+
+  }, [])
   return (
     <>
       <Button onClick={() => {
@@ -59,20 +58,20 @@ const [chainSelected, setChainSelected] = React.useState<any>(null)
         <div className="flex items-center flex-row flex-wrap">
           {
             networks.map((network: any, index: number) => {
-               return <WalletNetwork icon={network.icon} key={index} name={network.name} isActive={network.isActive} switchNetwork={changeNetwork} />
+              return <WalletNetwork icon={network.icon} key={index} name={network.name} isActive={network.isActive} switchNetwork={changeNetwork} />
             })
           }
-        
+
         </div>
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
         <div className="flex items-center flex-row flex-wrap">
           <div className="network_wrapper hover:bg-blue-300"
-            onClick={() => {ConnectWallet?.("injected", chainSelected)} }>
+            onClick={() => { ConnectWallet?.("injected", chainSelected) }}>
             <img alt="Metamask" src={metamaskIcon} />
             <span>Metamask</span>
             <p>Connect to your MetaMask</p>
           </div>
-          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("coinbaseWallet", chainSelected) }>
+          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("coinbaseWallet", chainSelected)}>
             <img alt="Coinbase" src={coinbaseIcon} />
             <span>Coinbase Wallet</span>
           </div>
@@ -82,7 +81,7 @@ const [chainSelected, setChainSelected] = React.useState<any>(null)
             <img alt="Binance" src={bnbIcon} />
             <span>Binance Chain Wallet</span>
           </div>
-          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("walletConnect",chainSelected) }>
+          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("walletConnect", chainSelected)}>
             <img alt="Wallet Connect" src={walletConnectIcon} />
             <span>Wallet Connect</span>
           </div>

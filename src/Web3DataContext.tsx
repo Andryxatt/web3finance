@@ -43,9 +43,8 @@ const Web3DataContext = ({ children }: any) => {
     const { activate, active, account, library, chainId } = useWeb3React();
     const [addressesFromFile, setAddressesFromFile] = useState<any[]>([]);
     const [isFeeInToken, setIsFeeInToken] = useState<boolean>(false);
-    const [currentChainId, setCurrentChainId] = useState<any>(0);
-    const [currentNetwork, setCurrentNetwork] = useState<any>("Goerli Testnet");
-    const [currentWallet, setCurrentWallet] = useState<any>(null);
+    const [currentChainId, setCurrentChainId] = useState<any>("0x5");
+  
     const [tokens, setTokens] = useState<any>(goerliTokens.Tokenization);
     const [filters, setFilters] = useState([
         {
@@ -108,11 +107,12 @@ const Web3DataContext = ({ children }: any) => {
             rpcUrl:'https://data-seed-prebsc-1-s3.binance.org:8545'
         }
     ]);
+    const [currentNetwork, setCurrentNetwork] = useState<any>(networks[2]);
     const ConnectWallet = async (connectorName: string) => {
         activate(connectors[connectorName]);
-        
     }
     const SwitchNetwork = async (network:any) => {
+        console.log(network, "network")
         if(active){
             try {
                 console.log("Switching to network", toHex(chainId), network.chainId);
@@ -121,6 +121,7 @@ const Web3DataContext = ({ children }: any) => {
                         method: 'wallet_switchEthereumChain',
                         params: [{ chainId: network.chainId }]
                     });
+                    UpdateNetwork(network);
                 }
             } catch (err) {
                 // This error code indicates that the chain has not been added to MetaMask
@@ -141,7 +142,7 @@ const Web3DataContext = ({ children }: any) => {
     const UpdateNetwork = (network: any) => {
         const newState = networks.map(obj => {
             if (obj.name === network.name) {
-                setCurrentNetwork(network.name);
+                setCurrentNetwork(network);
                 setCurrentChainId(network.chainId);
                 switch (network.name) {
                     case "Ethereum":
@@ -211,16 +212,31 @@ const Web3DataContext = ({ children }: any) => {
                 const totalDeposit = await contractPolygon.totalSupply();
                  token.deposits = parseFloat(ethers.utils.formatUnits(totalDeposit, token.decimal));
             })
-           
        
     }
+ 
     useEffect(() => {
         getAssetsPrices();
         getTotalDeposit();
-        console.log(networks, "networks");
-        console.log(tokens, "tokens");
         if (active) {
-            console.log(currentChainId, "currentChainId");
+            if(currentNetwork.chainId !== chainId){
+                switch (currentNetwork.name) {
+                    case "Ethereum":
+                        setTokens(ethereumTokens.Tokenization);
+                        break;
+                    case "Mumbai Testnet":
+                        setTokens(polygonTokens.Tokenization);
+                        break;
+                    case "Goerli Testnet":
+                        setTokens(goerliTokens.Tokenization);
+                        break;
+                    case "Smart Chain Testnet":
+                        setTokens(bscTokens.Tokenization);
+                        break;
+                    default:
+                        setTokens([]);
+                }
+            }
             if (chainId !== currentChainId) {
                 SwitchNetwork(currentNetwork);
             }
@@ -235,7 +251,7 @@ const Web3DataContext = ({ children }: any) => {
             // }
         }
 
-    }, [active, account, chainId, currentChainId]);
+    }, [active, account, chainId, currentChainId, tokens]);
 
 return (
     <Web3Ctx.Provider value={{

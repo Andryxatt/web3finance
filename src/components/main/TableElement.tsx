@@ -33,7 +33,7 @@ const TableElement = (props: any) => {
     };
     const getUserDepositBalance = () => {
         if(active){
-            const contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
+            const contract = new Contract(contractsAddresses[props.network.name][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
             console.log(contract, "contract")
             contract.balanceOf(account).then((res: any) => {
                 setUserDepositBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
@@ -43,7 +43,7 @@ const TableElement = (props: any) => {
     }
     const getUserBalanceRToken = () => {
             if(active){
-                let contract = new Contract(contractsAddresses[props.network][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
+                let contract = new Contract(contractsAddresses[props.network.name][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
                 contract.balanceOf(account).then((res: any) => {
                     console.log(ethers.utils.formatUnits(res._hex, props.token.decimal), "balance");
                     setUserTokenBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
@@ -59,9 +59,9 @@ const TableElement = (props: any) => {
             setUserBalanceToken(ethers.utils.formatUnits(price._hex, props.token.decimal));
         }
     }
-    const getTotalDeposidedInUSD = () => {
-        return (parseFloat(props.token.deposites) * parseFloat(props.token.tokenPrice)).toFixed(2);
-    }
+    // const getTotalDeposidedInUSD = () => {
+    //     return (parseFloat(props.token.deposites) * parseFloat(props.token.tokenPrice)).toFixed(2);
+    // }
     const getPriceInUsd = () => {
         if (userBalanceToken && props.token.tokenPrice) {
             return (parseFloat(userBalanceToken) * parseFloat(props.token.tokenPrice)).toFixed(4)
@@ -72,18 +72,18 @@ const TableElement = (props: any) => {
         setAmountDeposit(parseFloat(userBalanceToken));
     }
     const depositAmount = async () => {
-        let contract = new Contract(contractsAddresses[props.network][0][props.token.name], RTokenAbi, library?.getSigner());
+        let contract = new Contract(contractsAddresses[props.network.name][0][props.token.name], RTokenAbi, library?.getSigner());
        
-        let checkAllowance = await contract.allowance(account, contractsAddresses[props.network][0].FeeShare);
-        let feeShare = new Contract(contractsAddresses[props.network][0].FeeShare, FeeShareAbi, library?.getSigner());
+        let checkAllowance = await contract.allowance(account, contractsAddresses[props.network.name][0].FeeShare);
+        let feeShare = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, 6)) <= amountDeposit!) {
             const idToast = toast.loading("Approving please wait...")
-            await contract?.approve(contractsAddresses[props.network][0].FeeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 })
+            await contract?.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 })
             .then((res: any) => {
                 res.wait().then(async (receipt: any) => {
                     toast.update(idToast, { render: "Transaction succesfuly", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                     const idToast2 = toast.loading("Depositing please wait...")
-                    await feeShare.deposit(contractsAddresses[props.network][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                    await feeShare.deposit(contractsAddresses[props.network.name][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                         result.wait().then(async (recept: any) => {
                             getUserBalanceRToken();
                             getTokenBalance();
@@ -99,7 +99,7 @@ const TableElement = (props: any) => {
         }
         else {
             const idToast2 = toast.loading("Depositing please wait...")
-            await feeShare.deposit(contractsAddresses[props.network][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
+            await feeShare.deposit(contractsAddresses[props.network.name][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), { gasLimit: 200000 }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     getUserBalanceRToken();
                     getTokenBalance();
@@ -111,13 +111,13 @@ const TableElement = (props: any) => {
         }
     }
     const witdrawDeposit = async () => {
-        let feeShare = new Contract(contractsAddresses[props.network][0].FeeShare, FeeShareAbi, library?.getSigner());
+        let feeShare = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         const idToast = toast.loading("Processing transaction please wait...")
         if (amountDeposit! > parseFloat(userDepositBalance) || amountDeposit! === undefined) {
             toast.update(idToast, { render: "Input amount to withdraw", autoClose:2000, type: "error", isLoading: false, position:toast.POSITION.TOP_CENTER });
         }
         else {
-             feeShare.withdraw(contractsAddresses[props.network][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), {gasLimit:"210000"}).then((result: any) => {
+             feeShare.withdraw(contractsAddresses[props.network.name][0][props.token.name], ethers.utils.parseUnits(amountDeposit!.toString(), props.token.decimal), {gasLimit:"210000"}).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToast, { render: "Withdraw succesfuly", autoClose:2000, type: "success", isLoading: false, position:toast.POSITION.TOP_CENTER });
                     getUserBalanceRToken();
@@ -135,12 +135,13 @@ const TableElement = (props: any) => {
         setIsFeeInToken(!isFeeInToken);
     }
     useEffect(() => {
+        console.log(props, "props")
         if(active) {
             getUserBalanceRToken();
             getUserDepositBalance();
             getTokenBalance();
         }
-    }, [active, account, userBalanceToken, userTokenBalance, chainId, props.token.tokenPrice]);
+    }, [active, account, userBalanceToken, userTokenBalance, chainId, props]);
     return (
         // TODO Fixe styles tailwind
         <div className={
@@ -148,10 +149,10 @@ const TableElement = (props: any) => {
         }>
             <div onClick={(e) => { changeOpen(e, isOpen) }} className=' flex font-bold flex-row justify-between px-5 cursor-pointer'>
                 <div className='flex relative ml-10 font-bold w-[150px]'>
-                    <button className=''><img className='absolute left-[-40px] top-[-3px]' src={isOpen ? sortUpIcon : sortDownIcon} /></button>{props.token.name}
+                    <button className=''><img alt="img" className='absolute left-[-40px] top-[-3px]' src={isOpen ? sortUpIcon : sortDownIcon} /></button>{props.token.name}
                 </div>
                 <div className='mr-[-10px] flex font-bold w-[150px] justify-left'>{props.token.tokenPrice !== "0" ? props.token.tokenPrice.slice(0, 8) : <AnimatedDots />}</div>
-                <div className='w-[150px] flex justify-center'>{props.token.deposits !== "0" ? props.token.deposits * props.token.tokenPrice : <AnimatedDots />} $</div>
+                <div className='w-[150px] flex justify-center'>{props.token.deposits !== "0" ? parseFloat((props.token.deposits * props.token.tokenPrice).toString()).toFixed(2) : <AnimatedDots />} $</div>
                 <div className='w-[150px] flex justify-center'>{userDepositBalance !== "0" ? userDepositBalance : <AnimatedDots />}</div>
             </div>
             <ToastContainer/>

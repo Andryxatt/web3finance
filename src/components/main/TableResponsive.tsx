@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useWeb3React } from "@web3-react/core";
+import { useState } from "react";
 import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
 import sortIcon from "../../images/sort.svg";
@@ -8,7 +7,7 @@ import sortDescIcon from "../../images/desc.svg";
 import { Web3State } from "../../Web3DataContext";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
-    const {SwitchNetwork, tokens, filters, networks, UpdateNetwork, setTokens, setFilters, currentNetwork} = Web3State();
+    const { tokens, filters, networks, UpdateNetwork, setTokens, setFilters, currentNetwork} = Web3State();
     const searchIcon = require("../../images/search.png");
     const [sortName, setSortName] = useState("");
     const [sortPrice, setSortPrice] = useState("");
@@ -90,10 +89,7 @@ const TableResponsive = () => {
         setTokens(res);
     }
 
-    useEffect(() => {
-       console.log(tokens);
-       
-    },[tokens]);
+
     return (
         <div className="">
             <div className="flex justify-between items-center border-b-[1px] border-gray-300">
