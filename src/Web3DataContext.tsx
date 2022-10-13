@@ -215,43 +215,43 @@ const Web3DataContext = ({ children }: any) => {
        
     }
  
-    useEffect(() => {
-        getAssetsPrices();
-        getTotalDeposit();
-        if (active) {
-            if(currentNetwork.chainId !== chainId){
-                switch (currentNetwork.name) {
-                    case "Ethereum":
-                        setTokens(ethereumTokens.Tokenization);
-                        break;
-                    case "Mumbai Testnet":
-                        setTokens(polygonTokens.Tokenization);
-                        break;
-                    case "Goerli Testnet":
-                        setTokens(goerliTokens.Tokenization);
-                        break;
-                    case "Smart Chain Testnet":
-                        setTokens(bscTokens.Tokenization);
-                        break;
-                    default:
-                        setTokens([]);
-                }
-            }
-            if (chainId !== currentChainId) {
-                SwitchNetwork(currentNetwork);
-            }
-            // else if (chainId === 80001) {
-            //     UpdateNetwork(networks[1]);
-            // }
-            // else if (chainId === 97) {
-            //     UpdateNetwork(networks[3]);
-            // }
-            // else if (chainId === 1) {
-            //     UpdateNetwork(networks[0]);
-            // }
-        }
+    // useEffect(() => {
+    //     getAssetsPrices();
+    //     getTotalDeposit();
+    //     if (active) {
+    //         if(currentNetwork.chainId !== chainId){
+    //             switch (currentNetwork.name) {
+    //                 case "Ethereum":
+    //                     setTokens(ethereumTokens.Tokenization);
+    //                     break;
+    //                 case "Mumbai Testnet":
+    //                     setTokens(polygonTokens.Tokenization);
+    //                     break;
+    //                 case "Goerli Testnet":
+    //                     setTokens(goerliTokens.Tokenization);
+    //                     break;
+    //                 case "Smart Chain Testnet":
+    //                     setTokens(bscTokens.Tokenization);
+    //                     break;
+    //                 default:
+    //                     setTokens([]);
+    //             }
+    //         }
+    //         if (chainId !== currentChainId) {
+    //             SwitchNetwork(currentNetwork);
+    //         }
+    //         // else if (chainId === 80001) {
+    //         //     UpdateNetwork(networks[1]);
+    //         // }
+    //         // else if (chainId === 97) {
+    //         //     UpdateNetwork(networks[3]);
+    //         // }
+    //         // else if (chainId === 1) {
+    //         //     UpdateNetwork(networks[0]);
+    //         // }
+    //     }
 
-    }, [active, account, chainId, currentChainId, tokens]);
+    // }, [active, account, chainId, currentChainId, tokens]);
 
 return (
     <Web3Ctx.Provider value={{

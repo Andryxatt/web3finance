@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import ManualDeposit from "./ManualDeposit";
 import FilesDeposit from "./FilesDeposit";
 import MultiDepoistPreview from "./MultiDepoistPreview";

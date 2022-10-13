@@ -531,7 +531,7 @@ const MultiDepoistPreview = (props: any) => {
             });
         }
         // getEstimateGas();
-    },[active])
+    })
     return (
         <div className="px-5 py-5">
             <div className="w-full">
