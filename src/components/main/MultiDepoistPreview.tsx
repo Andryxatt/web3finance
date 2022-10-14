@@ -75,7 +75,7 @@ const MultiDepoistPreview = (props: any) => {
 
     // }
     const calculateTxCostTokenFeeNative = async () => {
-        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
@@ -119,7 +119,7 @@ const MultiDepoistPreview = (props: any) => {
         }
         else {
             const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
-            const allowance = await rTokenContract.allowance(account, contractsAddresses.feeShare);
+            const allowance = await rTokenContract.allowance(account, contractsAddresses[props.network.name][0].FeeShare);
             // const feeData = await library.getFeeData();
             const count = props.addressesAmount.length / 255;
             if (parseFloat(ethers.utils.formatUnits(allowance.toString(), props.token.decimal)) >= summAmunt()) {
@@ -130,7 +130,7 @@ const MultiDepoistPreview = (props: any) => {
                 setTxCount(parseFloat((1 + count).toString()).toFixed());
             }
             else {
-                const units = await rTokenContract.estimateGas.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toString(), props.token.decimal));
+                const units = await rTokenContract.estimateGas.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toString(), props.token.decimal));
                 const txFee = BigNumber.from(average).mul(units);
                 setApproximateCost(ethers.utils.formatEther(txFee));
                 // setEstimateGas(ethers.utils.formatEther(txFee));
@@ -139,20 +139,20 @@ const MultiDepoistPreview = (props: any) => {
         }
     }
     const getRTokenBalance = async () => {
-        const rTokenContract = new Contract(contractsAddresses["r" + props.token.name], RTokenAbi, library?.getSigner());
+        const rTokenContract = new Contract(contractsAddresses[props.network.name][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
         const balanceOf = await rTokenContract.balanceOf(account);
         console.log(balanceOf, "balanceOf")
         setRTokenBalance(ethers.utils.formatUnits(balanceOf, props.token.decimal));
     }
     const calculateTxCostNative = async () => {
         console.log("calculateTxCostNative");
-        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
         });
         arrayOfAmounts.unshift(summAmunt().toString().trim());
         const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        addresses.unshift(contractsAddresses.feeShare);
+        addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
 
         const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
       
@@ -172,7 +172,7 @@ const MultiDepoistPreview = (props: any) => {
     }
     const sendTransactionToken = async () => {
         console.log(isFeeInToken, "isFeeInToken");
-        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
 
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
@@ -191,7 +191,7 @@ const MultiDepoistPreview = (props: any) => {
         });
 
         const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
-        const allowance = await rTokenContract.allowance(account, contractsAddresses.feeShare);
+        const allowance = await rTokenContract.allowance(account, contractsAddresses[props.network.name][0].FeeShare);
         // const feeData = await library.getFeeData();
         if (parseFloat(ethers.utils.formatUnits(allowance.toString(), props.token.decimal)) >= parseFloat(summAmunt().toString())) {
             const idToast = toast.loading("Please wait...")
@@ -207,7 +207,7 @@ const MultiDepoistPreview = (props: any) => {
         }
         else {
             const idToast = toast.loading("Please wait...")
-            rTokenContract.approve(contractsAddresses.feeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal))
+            rTokenContract.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal))
                 .then((res: any) => {
                     res.wait().then(async (res: any) => {
                         const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
@@ -232,13 +232,13 @@ const MultiDepoistPreview = (props: any) => {
     }
     const sendTransactionNative = async () => {
         //calculate fee method and get rToken address
-        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
         });
         arrayOfAmounts.unshift(summAmunt().toString().trim());
         const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        addresses.unshift(contractsAddresses.feeShare);
+        addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
         const msgValue = parseFloat(nativeTokenFeePerAddress!) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
         console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
         const txInfo = {
@@ -261,7 +261,7 @@ const MultiDepoistPreview = (props: any) => {
             domain: {
                 chainId: chainId,
                 name: 'FeeShare',
-                verifyingContract: contractsAddresses.minimalForwarder,
+                verifyingContract: contractsAddresses[props.network.name][0].MinimalForwarder,
                 version: '1.0.0',
             },
             // Defining the message signing data content.
@@ -300,9 +300,9 @@ const MultiDepoistPreview = (props: any) => {
     }
     const sendTransactionAndPayFeeInToken = async () => {
         // sendSignedTransaction();
-        const feeShareContract = new Contract(contractsAddresses.feeShare, FeeShareAbi, library?.getSigner());
+        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
 
-        const minimalForwarderContract = new Contract(contractsAddresses.minimalForwarder, MinimalForwarderAbi, library?.getSigner());
+        const minimalForwarderContract = new Contract(contractsAddresses[props.network.name][0].MinimalForwarder, MinimalForwarderAbi, library?.getSigner());
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
         });
@@ -328,7 +328,7 @@ const MultiDepoistPreview = (props: any) => {
         console.log(nonce, "nonce");
         const values = {
             from: account,
-            to: contractsAddresses.feeShare,
+            to: contractsAddresses[props.network.name][0].FeeShare,
             value: 0,
             gas: '21000000',
             nonce: nonce.toString(),
@@ -387,7 +387,7 @@ const MultiDepoistPreview = (props: any) => {
         const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
         let walletSigner = walletPrivateKey.connect(provider)
         const contractForwarder = new ethers.Contract(
-            contractsAddresses.minimalForwarder,
+            contractsAddresses[props.network.name][0].MinimalForwarder,
             MinimalForwarderAbi,
             walletSigner
         );
@@ -510,7 +510,7 @@ const MultiDepoistPreview = (props: any) => {
         getUserBalanceToken();
         getRTokenFeePerAddress(props.token.address);
         getUserBalanceETH();
-       calculateGasLimit();
+    //    calculateGasLimit();
         if (!props.token.isNative) {
             calculateTxCostTokenFeeNative();
         }
@@ -518,10 +518,9 @@ const MultiDepoistPreview = (props: any) => {
             calculateTxCostNative();
         }
         if (active) {
-            console.log(fast);
             getRTokenBalance();
             const filter = {
-                address: contractsAddresses.feeShare,
+                address: contractsAddresses[props.network.name][0].FeeShare,
                 topics: [
                     ethers.utils.id("multiSendFee(address,address[],uint256[])")
                 ]
@@ -531,7 +530,7 @@ const MultiDepoistPreview = (props: any) => {
             });
         }
         // getEstimateGas();
-    })
+    },)
     return (
         <div className="px-5 py-5">
             <div className="w-full">

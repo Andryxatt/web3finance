@@ -88,7 +88,9 @@ const TableResponsive = () => {
         setSortUserDeposit(sortUserDeposit === "asc" ? "desc" : "asc");
         setTokens(res);
     }
-
+    const updateTokens = (balance:any) => {
+        console.log(balance, "balance");
+    }
 
     return (
         <div className="">
@@ -149,7 +151,7 @@ const TableResponsive = () => {
             {
                 tokens && tokens.map((token: any, index: any) => {
                     return (
-                        <TableElement token={token} key={index + currentNetwork} network={currentNetwork} />
+                        <TableElement token={token} key={index + currentNetwork} network={currentNetwork} updateTokens={updateTokens} />
                     )
                 })
             }

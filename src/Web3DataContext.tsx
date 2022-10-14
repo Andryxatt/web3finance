@@ -88,7 +88,7 @@ const Web3DataContext = ({ children }: any) => {
             const totalDeposit = await contractPolygon.totalSupply();
             token.deposits = parseFloat(ethers.utils.formatUnits(totalDeposit, token.decimal));
         })
-
+        
     }
     getAssetsPrices();
     getTotalDeposit();

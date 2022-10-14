@@ -37,6 +37,7 @@ const TableElement = (props: any) => {
             console.log(contract, "contract")
             contract.balanceOf(account).then((res: any) => {
                 setUserDepositBalance(ethers.utils.formatUnits(res._hex, props.token.decimal));
+                props.updateTokens(ethers.utils.formatUnits(res._hex, props.token.decimal));
             });
         }
      
@@ -69,6 +70,7 @@ const TableElement = (props: any) => {
         return <AnimatedDots />
     }
     const setMaxPrice = () => {
+        console.log(userBalanceToken, "userBalanceToken")
         setAmountDeposit(parseFloat(userBalanceToken));
     }
     const depositAmount = async () => {
@@ -134,13 +136,13 @@ const TableElement = (props: any) => {
     const changeFeeType = () => {
         setIsFeeInToken(!isFeeInToken);
     }
+    getUserBalanceRToken();
+    getUserDepositBalance();
+    getTokenBalance();
     useEffect(() => {
-        console.log(props, "props")
-        if(active) {
-            getUserBalanceRToken();
-            getUserDepositBalance();
-            getTokenBalance();
-        }
+        getUserBalanceRToken();
+        getUserDepositBalance();
+        getTokenBalance();
     });
     return (
         // TODO Fixe styles tailwind
@@ -166,6 +168,7 @@ const TableElement = (props: any) => {
                         </div>
                         <div className='relative w-[100%] flex flex-row'>
                             <input 
+                            value={amountDeposit}
                                 onChange={handleAmountChange}
                                 disabled={userBalanceToken !== "0" ? false : true}
                                 step={"0.01"}
@@ -177,13 +180,13 @@ const TableElement = (props: any) => {
                                 className={userBalanceToken !== "0" ?
                                     "absolute  right-2 bottom-1 rounded-xl bg-gray-300 px-2 py-1"
                                     : "text-gray-400 font-bold absolute cursor-not-allowed right-2 bottom-1 rounded-xl bg-gray-300 px-2 py-1"}
-                                onClick={setMaxPrice}>MAX</button>
+                                onClick={()=>{setMaxPrice()}}>MAX</button>
                         </div>
                     </div>
                     <div className='flex flex-col w-[40%] ml-4'>
                         <button onClick={(e) => {e.preventDefault(); depositAmount()}} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
 
-                        <ModalMultiDeposit token={props.token} userBalance={userBalanceToken} />
+                        <ModalMultiDeposit network={props.network} token={props.token} userBalance={userBalanceToken} />
                     </div>
                 </div>
                 <div className='mt-5 flex justify-between items-center'>
@@ -198,7 +201,7 @@ const TableElement = (props: any) => {
                             </label>
                     }
                     <button
-                        onClick={witdrawDeposit}
+                        onClick={()=>{witdrawDeposit()}}
                         disabled={parseFloat(userTokenBalance) > 0 ? false : true}
                         className={parseFloat(userTokenBalance) > 0 ? "flex justify-between items-center w-[20%] hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md px-3" : "flex justify-between items-center cursor-not-allowed w-[20%] bg-gray-400 text-white font-bold h-[40px] rounded-md px-3"} >Withdraw <img className='w-[30px]' src={rightArrow} alt="rightArrow" /></button>
                 </div>

@@ -6,26 +6,19 @@ import Modal from "../ui/Modal";
 function ModalMultiDeposit(props: any) {
     const [modalShown, toggleModal] = React.useState(false);
     const [manualOrFiles, setManualOrFiles] = React.useState(true);
-
     const switchDepoist = (manualOrFiles: boolean) => {
         setManualOrFiles(manualOrFiles);
     }
     const [nextModal, setNextModal] = useState(false);
-    // const [mode, setMode] = React.useState("out-in");
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
-    // const deleteInvalidRows = () => {
-    //     const newarr = arrayOfAddrAmounts.map((element: any, index: number) => {
-    //         if (element.errorAddress === "" && element.errorAmount === "") {
-    //             return element;
-    //         }
-    //     })
-    //     setArrayOfAddrAmounts(newarr);
-    // }
     const changeModalContent = (flag: boolean, array: []) => {
         setArrayOfAddrAmounts(array)
         setNextModal(flag);
     }
-
+    console.log(arrayOfAddrAmounts, "arrayOfAddrAmounts");
+    console.log(nextModal, "nextModal");
+    console.log(manualOrFiles, "manualOrFiles");
+    
     return (
         <>
             <button
@@ -37,7 +30,7 @@ function ModalMultiDeposit(props: any) {
             </button>
             <Modal shown={modalShown} close={() => { toggleModal(false) }}>
                 {nextModal ?
-                    <MultiDepoistPreview token={props.token} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} />
+                    <MultiDepoistPreview token={props.token} network={props.network} addressesAmount={arrayOfAddrAmounts} changeModalContent={changeModalContent} />
                     :
                     manualOrFiles ? <ManualDeposit changeModalContent={changeModalContent} switchDepoist={switchDepoist} />
                     :

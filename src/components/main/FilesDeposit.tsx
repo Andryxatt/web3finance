@@ -109,7 +109,7 @@ const FilesDeposit = (props: any) => {
                     <div className="flex flex-col justify-center items-center">
                         <img className="w-[46px] h-[46px]" src={uploadIcon} alt="upload" />
                         <p>Drag and drop your file here or</p>
-                        <button onClick={onButtonClick} className="upload-button">Upload a file</button>
+                        <button onClick={()=>{onButtonClick()}} className="upload-button">Upload a file</button>
                     </div>
                 </label>
                 {dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}

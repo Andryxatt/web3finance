@@ -1,6 +1,6 @@
 import { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import { useCallback,  useRef, useState } from 'react';
+import { useCallback,  useEffect,  useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { Web3State } from '../../Web3DataContext';
 import ExampleManual from './ExampleManual';
@@ -19,7 +19,6 @@ function ManualDeposit(props: any){
     const onChange = useCallback((value: any, viewUpdate: any) => {
         localStorage.setItem("filteredLang", value);
         setElement(value);
-
     }, []);
     const getListFromFile = () =>{
         let newArr = [];
@@ -47,9 +46,9 @@ function ManualDeposit(props: any){
             setAddressesFromFile([]);
         }
         
-        // deleteInvalidLines();
+         deleteInvalidLines();
     }
-    getListFromFile();
+    // getListFromFile();
     const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
     const { setContainer } = useCodeMirror({
         container: editor.current,
@@ -59,7 +58,6 @@ function ManualDeposit(props: any){
         placeholder: "Enter your deposit address and amount",
         onChange: onChange,
     });
-    setContainer(editor.current);
     const deleteInvalidLines = () => {
         let newElems = "";
         let newArray = [];
@@ -104,7 +102,7 @@ function ManualDeposit(props: any){
     }
 
     const validateinputs = async () => {
-        const arrayOfElements = element!.split("\n")[0] === "" ? [] : element!.split("\n");
+        const arrayOfElements = element?.split("\n")[0] === "" ? [] : element!.split("\n");
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
        if(arrayOfElements.length > 0){
         arrayOfElements.forEach(async (element: any, index: number) => {
@@ -138,17 +136,19 @@ function ManualDeposit(props: any){
         setArrayOfAddrAmounts([]);
        }
     }
-    // useEffect(() => {
-    //     getListFromFile();
-    //     localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
-    //     if (editor.current) {
-    //         setContainer(editor.current);
-    //         localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
-    //     }
-    //     if (element !== "" && element !== undefined) {
-    //         validateinputs()
-    //     }
-    // }, [element, addressesFromFile])
+    
+    useEffect(() => {
+        getListFromFile();
+        localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
+        if (editor.current) {
+            setContainer(editor.current);
+            localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
+        }
+        if (element !== "" && element !== undefined) {
+            console.log(element, "element")
+            validateinputs()
+        }
+    }, [element, addressesFromFile, setContainer]);
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">
@@ -170,11 +170,11 @@ function ManualDeposit(props: any){
             <div className={ isValid === true ? "hidden" : ""}>
                 <div className="flex flex-row justify-between">
                     <span className="text-red-500">The below addresses cannot be processed</span>
-                    <button onClick={deleteInvalidLines} className="underline text-red-500">Delete them</button>
+                    <button onClick={()=>{deleteInvalidLines()}} className="underline text-red-500">Delete them</button>
                 </div>
                 <div className="border-2 px-3 py-3 border-red-500 w-full min-h-[50px] bg-white rounded-md">
                     {
-                        arrayOfAddrAmounts?.map((element: any, index: number) => {
+                      arrayOfAddrAmounts && arrayOfAddrAmounts?.map((element: any, index: number) => {
                             return (
                                 (element.errorAddress !== "" || element.errorAmount !== "") ? <div className="text-red-500" key={index}>
                                     Line {element.row} address or amount is not valid
