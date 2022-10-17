@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import {  useState } from 'react';
 import ModalMultiDeposit from './ModalMultiDeposit';
 import rightArrow from '../../images/right-arrow.png'
 import sortUpIcon from '../../images/sort-up.png';

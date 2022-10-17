@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
 import sortIcon from "../../images/sort.svg";

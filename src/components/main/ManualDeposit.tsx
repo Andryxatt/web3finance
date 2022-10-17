@@ -1,6 +1,6 @@
 import { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import { useCallback,  useEffect,  useRef, useState } from 'react';
+import { useCallback,   useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { Web3State } from '../../Web3DataContext';
 import ExampleManual from './ExampleManual';
@@ -136,11 +136,10 @@ function ManualDeposit(props: any){
         setArrayOfAddrAmounts([]);
        }
     }
+    getListFromFile();
 
-    useEffect(() =>{
-        getListFromFile();
-    },[])
-    useEffect(() => {
+
+
         localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
         if (editor.current) {
             setContainer(editor.current);
@@ -149,7 +148,7 @@ function ManualDeposit(props: any){
         if (element !== "" && element !== undefined) {
             validateinputs()
         }
-    },[element, setContainer]);
+  
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">
