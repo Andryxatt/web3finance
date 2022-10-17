@@ -126,18 +126,15 @@ const MultiDepoistPreview = (props: any) => {
             return item.amount.toString().trim();
         });
         const feePerAddressNative = await feeShareContract["calculateFee()"]();
-        console.log(feePerAddressNative.toString(), "feePerAddressNative")
         arrayOfAmounts.unshift(summAmunt().toString());
         const addresses = props.addressesAmount.map((item: any) => { return item.address });
         addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
-
-        const msgValue = feePerAddressNative.mul(props.addressesAmount.length);
-        msgValue.add(ethers.utils.parseUnits(summAmunt().toString(), "ether"));
-        console.log(msgValue, "msgValue")
+        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
         const feeData = await library.getFeeData();
         const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas)
         const txInfo = {
-            value: msgValue,
+            value: ethers.utils.parseEther(msgValue.toString()),
+            maxFeePerGas: maxFeePerGas,
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseEther(item);
@@ -223,27 +220,34 @@ const MultiDepoistPreview = (props: any) => {
         }
     }
     const sendTransactionNative = async () => {
-        //calculate fee method and get rToken address
+        const idToast = toast.loading("Processing transaction please wait...")
         const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         const arrayOfAmounts = props.addressesAmount.map((item: any) => {
             return item.amount.toString().trim();
         });
-        arrayOfAmounts.unshift(summAmunt().toString().trim());
+        const feePerAddressNative = await feeShareContract["calculateFee()"]();
+        arrayOfAmounts.unshift(summAmunt().toString());
         const addresses = props.addressesAmount.map((item: any) => { return item.address });
         addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
-        const msgValue = parseFloat(feePerAddressNative!) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
-        // console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
+        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
+        const feeData = await library.getFeeData();
+        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas)
         const txInfo = {
-            value: ethers.utils.parseEther(msgValue.toString())
+            value: ethers.utils.parseEther(msgValue.toString()),
+            maxFeePerGas: maxFeePerGas,
+            maxPriorityFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei")
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
-            return ethers.utils.parseUnits(item);
+            return ethers.utils.parseEther(item);
         });
-        const multiSendUnsigned = await feeShareContract['multiSend(address[],uint256[])'](addresses, finalAmount, txInfo);
-        multiSendUnsigned.wait().then((res: any) => {
-            // console.log(res, "res");
+       feeShareContract['multiSend(address[],uint256[])'](addresses, finalAmount, txInfo).then((res:any) =>{
+            res.wait().then((res:any) =>{
+                toast.update(idToast, { render: "Transaction success", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+            }).catch((err:any) =>{
+                toast.update(idToast, { render: "Transaction error", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+            })
         }).catch((err: any) => {
-            console.log(err, "err");
+            toast.update(idToast, { render: "Transaction rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
         });
 
     }
