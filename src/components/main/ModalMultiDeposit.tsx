@@ -15,15 +15,13 @@ function ModalMultiDeposit(props: any) {
         setArrayOfAddrAmounts(array)
         setNextModal(flag);
     }
-    // console.log(arrayOfAddrAmounts, "arrayOfAddrAmounts");
-    // console.log(nextModal, "nextModal");
-    // console.log(manualOrFiles, "manualOrFiles");
+
     
     return (
         <>
             <button
                 disabled={props.userTokenBalance !== "0" ? false : true}
-                onClick={() => { toggleModal(!modalShown); }}
+                onClick={(e) => { e.preventDefault(); toggleModal(!modalShown); }}
                 className={props.userTokenBalance !== "0" ?
                     "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>
                 Multi Deposits

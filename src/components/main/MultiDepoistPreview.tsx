@@ -1,6 +1,6 @@
 import { useWeb3React } from "@web3-react/core";
-import {  Contract, ethers, Wallet } from "ethers";
-import {  useState } from "react";
+import { Contract, ethers, Wallet } from "ethers";
+import { useState } from "react";
 import { Web3State } from "../../Web3DataContext";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,12 +10,11 @@ const RTokenAbi = require("../../contracts/RTokenAbi.json");
 const contractsAddresses = require("../../contracts/AddressesContracts.json");
 const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
 const MultiDepoistPreview = (props: any) => {
-    const { library,  account } = useWeb3React();
+    const { library, account } = useWeb3React();
     const [userBalanceToken, setUserBalanceToken] = useState("0");
     const [userBalanceNative, setUserBalanceNative] = useState("0");
     const [feePerAddressNative, setFeePerAddressNative] = useState("0");
     const [rTokenBalance, setRTokenBalance] = useState("0")
-
 
     // const [errorEstimate, setErrorEstimate] = useState(true)
     const [networkSpeed, setNetworkSpeed] = useState("3");
@@ -58,7 +57,6 @@ const MultiDepoistPreview = (props: any) => {
     getUserBalanceNative();
     getUserBalanceToken();
     const calculateTxCostTokenFeeNative = async () => {
-        
         const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         const feePerAddressNative = await feeShareContract["calculateFee()"]();
         setFeePerAddressNative(ethers.utils.formatEther(feePerAddressNative));
@@ -70,12 +68,12 @@ const MultiDepoistPreview = (props: any) => {
         const msgValue = isRToken === null || undefined ?
             parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
             parseFloat(ethers.utils.formatEther(feePerAddressNative)!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
-            const feeData = await library.getFeeData();
-            const txInfo = {
-                value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18), "ether"),
-                maxFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas),
-            }
-            const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas);
+        const feeData = await library.getFeeData();
+        const txInfo = {
+            value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18), "ether"),
+            maxFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas),
+        }
+        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas);
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item, props.token.decimal);
         });
@@ -109,15 +107,11 @@ const MultiDepoistPreview = (props: any) => {
             else {
                 const units = await rTokenContract.estimateGas.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toString(), props.token.decimal));
                 const txFee = units.mul(maxFeePerGas);
-                console.log(txFee, "txFee")
                 setApproximateCost(ethers.utils.formatUnits(txFee, 'ether'));
-                // setEstimateGas(ethers.utils.formatEther(txFee));
                 setTxCount(parseFloat((2 + count).toString()).toFixed());
             }
         }
     }
-
-
     const getRTokenBalance = async () => {
         const rTokenContract = new Contract(contractsAddresses[props.network.name][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
         const balanceOf = await rTokenContract.balanceOf(account);
@@ -136,28 +130,33 @@ const MultiDepoistPreview = (props: any) => {
         addresses.unshift(contractsAddresses.feeShare);
 
         const msgValue = parseFloat(feePerAddressNative!) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
-      
+        const feeData = await library.getFeeData();
+        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas)
         const txInfo = {
-            value: ethers.utils.parseEther(parseFloat(msgValue.toString()).toFixed(18))
+            value: ethers.utils.parseEther(parseFloat(msgValue.toString()).toFixed(18)),
+            maxFeePerGas: maxFeePerGas,
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item);
         });
-        // console.log(feeData, "feeData");
         const count = props.addressesAmount.length / 255;
         const units = await feeShareContract.estimateGas["multiSend(address[],uint256[])"](addresses, finalAmount, txInfo);
-        console.log(units, "units");
-        // const txFee = BigNumber.from(slow).mul(units);
-        // setApproximateCost(ethers.utils.formatEther(txFee));
+        const txFee = units.mul(maxFeePerGas);
+        setApproximateCost(ethers.utils.formatEther(txFee));
         setTxCount(parseFloat((1 + count).toString()).toFixed());
     }
-    if(!props.token.isNative){
-        calculateTxCostTokenFeeNative();
-     }
-        
-  else {
-         calculateTxCostNative();
-     }
+    if (props.token.isNative) {
+        calculateTxCostNative();
+    }
+    else {
+        if (isFeeInToken) {
+
+        }
+        else {
+            calculateTxCostTokenFeeNative();
+        }
+
+    }
     const sendTransactionToken = async () => {
         // console.log(isFeeInToken, "isFeeInToken");
         const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
@@ -174,9 +173,7 @@ const MultiDepoistPreview = (props: any) => {
         const maxFeePerGas = feeData.lastBaseFeePerGas.add(ethers.utils.parseUnits(networkSpeed, "gwei"));
         const txInfo = {
             value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18)),
-            maxPriorityFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei"),
             maxFeePerGas: maxFeePerGas,
-            type:2,
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item, props.token.decimal);
@@ -199,7 +196,7 @@ const MultiDepoistPreview = (props: any) => {
         }
         else {
             const idToast = toast.loading("Please wait...")
-            rTokenContract.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal))
+            rTokenContract.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal), { maxFeePerGas: maxFeePerGas })
                 .then((res: any) => {
                     res.wait().then(async (res: any) => {
                         const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
@@ -335,7 +332,7 @@ const MultiDepoistPreview = (props: any) => {
         // const multiSendUnsigned = await feeShareContract['multiSendFee(address,address[],uint256[])'](props.token.address, addresses, arrayOfAmounts, {gasLimit:"210000"});
         //  console.log(multiSendUnsigned, "multiSendUnsigned");
     }
-    
+
     const sendSignedTransaction = async () => {
         const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
         const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
@@ -415,28 +412,28 @@ const MultiDepoistPreview = (props: any) => {
     //     const sum = arr.reduce((a, v) => a + v);
     //     return Math.round(sum/arr.length);
     //   }
-      
-//     const calculateGasLimit = async () => {
-//         const web3 = new Web3('https://eth-goerli.g.alchemy.com/v2/' + process.env.REACT_APP_ALCHEMY_GOERLY_KEY);
-//         web3.eth.getFeeHistory(historicalBlocks, "pending", [25, 50, 75]).then((feeHistory) => {
-//             const blocks = formatFeeHistory(feeHistory, false);
-//             const slow    = avg(blocks.map(b => b.priorityFeePerGas[0]));
-//             const average = avg(blocks.map(b => b.priorityFeePerGas[1]));
-//             const fast    = avg(blocks.map(b => b.priorityFeePerGas[2]));
-          
-//             web3.eth.getBlock("pending").then((block) => {
-//               const baseFeePerGas = Number(block.baseFeePerGas);
-//               setSlow((slow + baseFeePerGas).toString());
-//               setAverage((average + baseFeePerGas).toString());
-//               setFast((fast + baseFeePerGas).toString());
-//             //   console.log("Manual estimate:", {
-//             //     slow: slow + baseFeePerGas,
-//             //     average: average + baseFeePerGas,
-//             //     fast: fast + baseFeePerGas,
-//             //   });
-//             });
-//     });
-// }
+
+    //     const calculateGasLimit = async () => {
+    //         const web3 = new Web3('https://eth-goerli.g.alchemy.com/v2/' + process.env.REACT_APP_ALCHEMY_GOERLY_KEY);
+    //         web3.eth.getFeeHistory(historicalBlocks, "pending", [25, 50, 75]).then((feeHistory) => {
+    //             const blocks = formatFeeHistory(feeHistory, false);
+    //             const slow    = avg(blocks.map(b => b.priorityFeePerGas[0]));
+    //             const average = avg(blocks.map(b => b.priorityFeePerGas[1]));
+    //             const fast    = avg(blocks.map(b => b.priorityFeePerGas[2]));
+
+    //             web3.eth.getBlock("pending").then((block) => {
+    //               const baseFeePerGas = Number(block.baseFeePerGas);
+    //               setSlow((slow + baseFeePerGas).toString());
+    //               setAverage((average + baseFeePerGas).toString());
+    //               setFast((fast + baseFeePerGas).toString());
+    //             //   console.log("Manual estimate:", {
+    //             //     slow: slow + baseFeePerGas,
+    //             //     average: average + baseFeePerGas,
+    //             //     fast: fast + baseFeePerGas,
+    //             //   });
+    //             });
+    //     });
+    // }
     // const calculateGasLimit = async () => {
     //     const BLOCKS = 20;
     //     let blockHistory:any[] = [];
@@ -462,21 +459,21 @@ const MultiDepoistPreview = (props: any) => {
     // getUserBalanceToken();
     // getRTokenFeePerAddress(props.token.address);
     // getUserBalanceNative();
-//    calculateGasLimit();
-//    calculateTxCostTokenFeeNative();
-//    getRTokenBalance();
+    //    calculateGasLimit();
+    //    calculateTxCostTokenFeeNative();
+    //    getRTokenBalance();
 
     // useEffect(() => {
-        
+
     //     if (!props.token.isNative) {
-            
+
     //     }
     //     else {
     //         calculateTxCostNative();
     //     }
     //     if (active) {
     //         console.log(fast);
-          
+
     //         const filter = {
     //             address: contractsAddresses.feeShare,
     //             topics: [
@@ -489,10 +486,10 @@ const MultiDepoistPreview = (props: any) => {
     //     }
     //     // getEstimateGas();
     // })
-    const updateGasFee = (value:any) =>{
+    const updateGasFee = (value: any) => {
         setNetworkSpeed(value);
     }
-  
+
     return (
         <div className="px-5 py-5">
             <div className="w-full">
@@ -520,7 +517,7 @@ const MultiDepoistPreview = (props: any) => {
                         <div className="px-8 py-8 flex flex-col">
                             <span className="text-xl text-blue-900 font-bold">{
                                 isFeeInToken ? parseFloat(approximateCost).toFixed(6) + " " + props.token.name :
-                                parseFloat(approximateCost).toFixed(6) + " RETH"
+                                    parseFloat(approximateCost).toFixed(6) + " RETH"
                             }  </span>
                             <span className="text-xs text-gray-400">Approximate cost of operation </span>
                         </div>
@@ -538,7 +535,7 @@ const MultiDepoistPreview = (props: any) => {
 
                             <span className={" text-xs text-gray-400"}>
                                 {
-                                   "Your r" + props.token.name + " balance"
+                                    "Your r" + props.token.name + " balance"
                                 }
                             </span>
                         </div>

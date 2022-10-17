@@ -1,6 +1,6 @@
 import { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
-import { useCallback,   useRef, useState } from 'react';
+import { useCallback,  useEffect,  useRef, useState } from 'react';
 import { ethers } from 'ethers';
 import { Web3State } from '../../Web3DataContext';
 import ExampleManual from './ExampleManual';
@@ -20,88 +20,38 @@ function ManualDeposit(props: any){
         localStorage.setItem("filteredLang", value);
         setElement(value);
     }, []);
-    const getListFromFile = () =>{
-        let newArr = [];
-        let newElems = "";
-        if(addressesFromFile.length > 0){
-            for (let index = 0; index < addressesFromFile.length; index++) {
-                if (index === addressesFromFile.length - 1) {
-                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1];
-                }
-                else {
-                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1] + "\n";
-                }
-                const newElement = {
-                    address: addressesFromFile[index][0],
-                    amount: addressesFromFile[index][1],
-                    errorAddress: !ethers.utils.isAddress(addressesFromFile[index][0]) ? "is not valid" : "",
-                    errorAmount: isNaN(addressesFromFile[index][1]) === true ? "is not valid" : "",
-                    row: index + 1
-                }
-                newArr.push(newElement);
-            }
-            localStorage.setItem("filteredLang", newElems);
-            setArrayOfAddrAmounts(newArr);
-            setElement(newElems);
-            setAddressesFromFile([]);
-        }
+    // const getListFromFile = () =>{
+    //     let newArr = [];
+    //     let newElems = "";
+    //     if(addressesFromFile.length > 0){
+    //         for (let index = 0; index < addressesFromFile.length; index++) {
+    //             if (index === addressesFromFile.length - 1) {
+    //                 newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1];
+    //             }
+    //             else {
+    //                 newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1] + "\n";
+    //             }
+    //             const newElement = {
+    //                 address: addressesFromFile[index][0],
+    //                 amount: addressesFromFile[index][1],
+    //                 errorAddress: !ethers.utils.isAddress(addressesFromFile[index][0]) ? "is not valid" : "",
+    //                 errorAmount: isNaN(addressesFromFile[index][1]) === true ? "is not valid" : "",
+    //                 row: index + 1
+    //             }
+    //             newArr.push(newElement);
+    //         }
+    //         localStorage.setItem("filteredLang", newElems);
+    //         setArrayOfAddrAmounts(newArr);
+    //         setElement(newElems);
+    //         setAddressesFromFile([]);
+    //     }
         
-         deleteInvalidLines();
-    }
-    // getListFromFile();
-    const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
-    const { setContainer } = useCodeMirror({
-        container: editor.current,
-        extensions: [javascript({ jsx: true })],
-        value: element,
-        height: "200px",
-        placeholder: "Enter your deposit address and amount",
-        onChange: onChange,
-    });
+    //      deleteInvalidLines();
+    // }
     const deleteInvalidLines = () => {
-        let newElems = "";
-        let newArray = [];
-        for (let index = 0; index < arrayOfAddrAmounts.length; index++) {
-           if (arrayOfAddrAmounts[index]["errorAddress"] === "" && arrayOfAddrAmounts[index]["errorAmount"] === "") {
-            newArray.push(arrayOfAddrAmounts[index]);
-            }
-        }
-        newArray.forEach((element: any, index: number) => {
-            if (index === newArray.length - 1) {
-                newElems += element.address + "," + element.amount;
-            }
-            else {
-                newElems += element.address + "," + element.amount + "\n";
-            }
-        })
-        setElement(newElems)
-        validateinputs()
+       
     }
-    const showExample = ()=>{
-        const example = [
-            {
-                'address':'0xa0Ee7A142d267C1f36714E4a8F75612F20a79720','amount':'0.001'
-            },
-            {
-                'address':'0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266','amount':'1.01'
-            },
-            {
-                'address':'0x5E8aC7D1BC6214e4CF2bE9dA175b9b9Ec1B94102','amount':'0.2'
-            },
-        ]
-        let newElems = "";
-        example.forEach((element: any, index: number) => {
-            if (index === example.length - 1) {
-                newElems += element.address + "," + element.amount;
-            }
-            else {
-                newElems += element.address + "," + element.amount + "\n";
-            }
-        })
-        setElement(newElems)
-    }
-
-    const validateinputs = async () => {
+    const validate = useCallback(() => {
         const arrayOfElements = element!.split("\n")[0] === "" ? [] : element!.split("\n");
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
        if(arrayOfElements.length > 0){
@@ -135,20 +85,136 @@ function ManualDeposit(props: any){
         setIsValid(true);
         setArrayOfAddrAmounts([]);
        }
+      }, [element]);
+    const deleteInvalid = useCallback(()=>{
+        let newElems = "";
+        let newArray = [];
+        for (let index = 0; index < arrayOfAddrAmounts.length; index++) {
+           if (arrayOfAddrAmounts[index]["errorAddress"] === "" && arrayOfAddrAmounts[index]["errorAmount"] === "") {
+            newArray.push(arrayOfAddrAmounts[index]);
+            }
+        }
+        newArray.forEach((element: any, index: number) => {
+            if (index === newArray.length - 1) {
+                newElems += element.address + "," + element.amount;
+            }
+            else {
+                newElems += element.address + "," + element.amount + "\n";
+            }
+        })
+        setElement(newElems)
+        validate()
+    },[arrayOfAddrAmounts, validate])
+    const filesUpdate = useCallback(() =>{
+        let newArr = [];
+        let newElems = "";
+        if(addressesFromFile.length > 0){
+            for (let index = 0; index < addressesFromFile.length; index++) {
+                if (index === addressesFromFile.length - 1) {
+                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1];
+                }
+                else {
+                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1] + "\n";
+                }
+                const newElement = {
+                    address: addressesFromFile[index][0],
+                    amount: addressesFromFile[index][1],
+                    errorAddress: !ethers.utils.isAddress(addressesFromFile[index][0]) ? "is not valid" : "",
+                    errorAmount: isNaN(addressesFromFile[index][1]) === true ? "is not valid" : "",
+                    row: index + 1
+                }
+                newArr.push(newElement);
+            }
+            localStorage.setItem("filteredLang", newElems);
+            setArrayOfAddrAmounts(newArr);
+            setElement(newElems);
+            setAddressesFromFile([]);
+        }
+        
+        deleteInvalid();
+    }, [addressesFromFile, deleteInvalid, setAddressesFromFile]);
+    // getListFromFile();
+    const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
+    const { setContainer } = useCodeMirror({
+        container: editor.current,
+        extensions: [javascript({ jsx: true })],
+        value: element,
+        height: "200px",
+        placeholder: "Enter your deposit address and amount",
+        onChange: onChange,
+    });
+   
+    const showExample = ()=>{
+        const example = [
+            {
+                'address':'0xa0Ee7A142d267C1f36714E4a8F75612F20a79720','amount':'0.001'
+            },
+            {
+                'address':'0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266','amount':'1.01'
+            },
+            {
+                'address':'0x5E8aC7D1BC6214e4CF2bE9dA175b9b9Ec1B94102','amount':'0.2'
+            },
+        ]
+        let newElems = "";
+        example.forEach((element: any, index: number) => {
+            if (index === example.length - 1) {
+                newElems += element.address + "," + element.amount;
+            }
+            else {
+                newElems += element.address + "," + element.amount + "\n";
+            }
+        })
+        setElement(newElems)
     }
-    getListFromFile();
-
-
-
+   
+    // const validateinputs = async () => {
+    //     const arrayOfElements = element!.split("\n")[0] === "" ? [] : element!.split("\n");
+    //     const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
+    //    if(arrayOfElements.length > 0){
+    //     arrayOfElements.forEach(async (element: any, index: number) => {
+    //         const newElement = {
+    //             address: element.split(",")[0],
+    //             amount: element.split(",")[1],
+    //             errorAddress: !ethers.utils.isAddress(element.split(",")[0]) ? "is not valid" : "",
+    //             errorAmount: isNaN(element.split(",")[1]) === true ? "is not valid" : "",
+    //             row: index + 1
+    //         }
+    //         if(element!== undefined){
+    //             arrayOfElementsWithoutEmpty.push(newElement);
+    //         }
+           
+    //     })
+    //     let flag = true;
+    //     for (let i = 0; i < arrayOfElementsWithoutEmpty.length; i++) {
+    //         if (arrayOfElementsWithoutEmpty[i].errorAddress !== "" || arrayOfElementsWithoutEmpty[i].errorAmount !== "") {
+    //             flag = false;
+    //             break;
+    //         }
+    //         else {
+    //             flag = true;
+    //         }
+    //     }
+    //     setIsValid(flag)
+    //     setArrayOfAddrAmounts(arrayOfElementsWithoutEmpty);
+    //    }
+    //    else {
+    //     setIsValid(true);
+    //     setArrayOfAddrAmounts([]);
+    //    }
+    // }
+    useEffect(() =>{
+    },[filesUpdate])
+    useEffect(() => {
         localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
         if (editor.current) {
             setContainer(editor.current);
             localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
         }
         if (element !== "" && element !== undefined) {
-            validateinputs()
+            validate()
         }
-  
+    },[element, setContainer,validate]);
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">

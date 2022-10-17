@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const TotalInformation = () => {
     const [total, setTotal] = useState(22333333);
@@ -22,9 +22,8 @@ const TotalInformation = () => {
         return final
     }
 
-    useEffect(() => {
         updateCount()
-    })
+  
     return (
         <div>
             <div className="text-gray-400 flex">Deposits: <span className="total-usd text-black text-xl font-extrabold ml-10 ">{showPrice(total)} USD</span></div>
