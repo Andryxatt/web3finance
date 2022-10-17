@@ -24,7 +24,7 @@ const TotalInformation = () => {
 
     useEffect(() => {
         updateCount()
-    })
+    }, [])
     return (
         <div>
             <div className="text-gray-400 flex">Deposits: <span className="total-usd text-black text-xl font-extrabold ml-10 ">{showPrice(total)} USD</span></div>

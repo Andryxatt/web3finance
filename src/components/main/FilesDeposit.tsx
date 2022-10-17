@@ -28,19 +28,16 @@ const FilesDeposit = (props: any) => {
        
         e.preventDefault();
         e.stopPropagation();
-        console.log(e)
         if(e.dataTransfer.files[0].name.split('.')[1] === "xlsx"){
             excelFileRead(e.dataTransfer.files);
         }
         else if(e.dataTransfer.files[0].type === "text/plain" || e.dataTransfer.files[0].name.split('.')[1] === "csv"){
-            console.log(e.dataTransfer.files);
             txtcsvFileRead(e.dataTransfer.files);
         }
     };
     // triggers when file is selected with click
     const handleChange = async (e: any) => {
         e.preventDefault();
-        console.log(e)
         if(e.target.files[0].name.split('.')[1] === "xlsx"){
             excelFileRead(e.target.files);
         }

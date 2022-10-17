@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
 import sortIcon from "../../images/sort.svg";
@@ -88,10 +88,21 @@ const TableResponsive = () => {
         setSortUserDeposit(sortUserDeposit === "asc" ? "desc" : "asc");
         setTokens(res);
     }
-    const updateTokens = (balance:any) => {
+    const updateTokens = (balance:any, tokenName:any) => {
         console.log(balance, "balance");
+        const newState = tokens.map(obj => {
+            // 👇️ if id equals 2, update country property
+            if (obj.name === tokenName) {
+              return {...obj, userBalance: balance};
+            }
+      
+            // 👇️ otherwise return object as is
+            return obj;
+          });
+      
+          setTokens(newState);
     }
-
+  
     return (
         <div className="">
             <div className="flex justify-between items-center border-b-[1px] border-gray-300">

@@ -15,7 +15,7 @@ function ManualDeposit(props: any){
     const [isValid, setIsValid] = useState<boolean>(true);
     const [modalShown, toggleModal] = React.useState(false);
     const [arrayOfAddrAmounts, setArrayOfAddrAmounts] = useState<object[]>([]);
-    const [element, setElement] = useState<string>();
+    const [element, setElement] = useState<string>("");
     const onChange = useCallback((value: any, viewUpdate: any) => {
         localStorage.setItem("filteredLang", value);
         setElement(value);
@@ -102,7 +102,7 @@ function ManualDeposit(props: any){
     }
 
     const validateinputs = async () => {
-        const arrayOfElements = element?.split("\n")[0] === "" ? [] : element!.split("\n");
+        const arrayOfElements = element!.split("\n")[0] === "" ? [] : element!.split("\n");
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
        if(arrayOfElements.length > 0){
         arrayOfElements.forEach(async (element: any, index: number) => {
@@ -136,19 +136,20 @@ function ManualDeposit(props: any){
         setArrayOfAddrAmounts([]);
        }
     }
-    
-    useEffect(() => {
+
+    useEffect(() =>{
         getListFromFile();
+    },[])
+    useEffect(() => {
         localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
         if (editor.current) {
             setContainer(editor.current);
             localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
         }
         if (element !== "" && element !== undefined) {
-            console.log(element, "element")
             validateinputs()
         }
-    }, [element, addressesFromFile, setContainer]);
+    },[element, setContainer]);
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">
