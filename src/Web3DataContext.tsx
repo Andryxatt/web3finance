@@ -142,7 +142,7 @@ const Web3DataContext = ({ children }: any) => {
             icon: require("./images/ethereum.png"),
             chainId: "0x5",
             isActive: true,
-            Currency: '',
+            Currency: 'RETH',
             rpcUrl: ''
         },
         {
