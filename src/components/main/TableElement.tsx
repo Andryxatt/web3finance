@@ -18,6 +18,7 @@ const TableElement = (props: any) => {
     const [userTokenBalance, setUserTokenBalance] = useState("0");
     const [userRTokenBalance, setUserRTokenBalance] = useState("0");
     const [userDepositBalance, setUserDepositBalance] = useState("0");
+    const [userNativeBalance, setUserNativeBalance] = useState("0");
     const { library, active, account } = useWeb3React();
     const changeOpen = (e: any, isOpen: boolean) => {
         setIsOpen(!isOpen);
@@ -57,6 +58,15 @@ const TableElement = (props: any) => {
             setUserTokenBalance(ethers.utils.formatUnits(price._hex, props.token.decimal));
         }
     }
+    const getNativeBalance = async () => {
+        if(active){
+            const balance = await library?.getSigner().getBalance();
+            console.log(balance)
+            setUserNativeBalance(ethers.utils.formatEther(balance))
+        }
+      
+    }
+    getNativeBalance();
     // const getTotalDeposidedInUSD = () => {
     //     return (parseFloat(props.token.deposites) * parseFloat(props.token.tokenPrice)).toFixed(2);
     // }
@@ -174,7 +184,11 @@ const TableElement = (props: any) => {
                     <div className='flex flex-col w-[60%] '>
                         <div className='flex justify-between mb-3'>
                             <label>Balance <span className='font-bold'>{props.token.name}</span></label>
-                            <span>{userTokenBalance !== "0" ? userTokenBalance : <AnimatedDots />} ($ {getPriceInUsd()})</span>
+                            <span>   {
+                               props.token.isNative ? userNativeBalance !== "0" ? userNativeBalance :  <AnimatedDots /> : userTokenBalance !== "0" ? userTokenBalance : <AnimatedDots />
+                            }
+                             ($ {getPriceInUsd()})
+                            </span>
                         </div>
                         <div className='relative w-[100%] flex flex-row'>
                             <input
@@ -194,7 +208,9 @@ const TableElement = (props: any) => {
                         </div>
                     </div>
                     <div className='flex flex-col w-[40%] ml-4'>
-                        <button onClick={(e) => { e.preventDefault(); depositAmount() }} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>
+
+                        {props.token.isNative ? null: <button onClick={(e) => { e.preventDefault(); depositAmount() }} disabled={amountDeposit !== undefined ? false : true} className={amountDeposit !== undefined ? "mt-2 hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md" : "mt-2 cursor-not-allowed bg-gray-400 text-white font-bold h-[40px] rounded-md"}>Deposit</button>}
+                        
 
                         <ModalMultiDeposit network={props.network} token={props.token} userTokenBalance={userTokenBalance} />
                     </div>
@@ -210,10 +226,11 @@ const TableElement = (props: any) => {
                                 <span className="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300">Pay fee in token</span>
                             </label>
                     }
-                    <button
+                   {props.token.isNative ? null :  <button
                         onClick={() => { witdrawDeposit() }}
                         disabled={parseFloat(userRTokenBalance) > 0 ? false : true}
-                        className={parseFloat(userRTokenBalance) > 0 ? "flex justify-between items-center w-[20%] hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md px-3" : "flex justify-between items-center cursor-not-allowed w-[20%] bg-gray-400 text-white font-bold h-[40px] rounded-md px-3"} >Withdraw <img className='w-[30px]' src={rightArrow} alt="rightArrow" /></button>
+                        className={parseFloat(userRTokenBalance) > 0 ? "flex justify-between items-center w-[20%] hover:bg-gray-600 bg-gray-500 text-white font-bold h-[40px] rounded-md px-3" : "flex justify-between items-center cursor-not-allowed w-[20%] bg-gray-400 text-white font-bold h-[40px] rounded-md px-3"} >Withdraw <img className='w-[30px]' src={rightArrow} alt="rightArrow" /></button>} 
+                   
                 </div>
             </div>
         </div>

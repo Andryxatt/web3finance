@@ -142,7 +142,7 @@ const MultiDepoistPreview = (props: any) => {
         const count = props.addressesAmount.length / 255;
         const units = await feeShareContract.estimateGas["multiSend(address[],uint256[])"](addresses, finalAmount, txInfo);
         const txFee = units.mul(maxFeePerGas);
-        setApproximateCost(ethers.utils.formatEther(txFee));
+        setApproximateCost((parseFloat(ethers.utils.formatEther(txFee)) + parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length)).toString());
         setTxCount(parseFloat((1 + count).toString()).toFixed());
     }
     if (props.token.isNative) {
