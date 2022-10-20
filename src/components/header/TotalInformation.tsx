@@ -25,7 +25,7 @@ const TotalInformation = () => {
         updateCount()
   
     return (
-        <div>
+        <div className="lg:justify-center">
             <div className="text-gray-400 flex">Deposits: <span className="total-usd text-black text-xl font-extrabold ml-10 ">{showPrice(total)} USD</span></div>
             <div className="text-gray-400">FARM Price: <span className="text-black text-xl font-extrabold  ml-4">44.55 USD</span></div>
         </div>

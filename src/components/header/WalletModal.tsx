@@ -42,10 +42,15 @@ const WalletModal = () => {
 
   return (
     <>
-      <Button onClick={() => {
-        toggleModal(!modalShown);
-      }} className="black bg-orange-400 rounded-lg text-md py-3 px-5 h-12 mt-3 hover:bg-orange-500"><AccountBalanceWalletTwoToneIcon />
-        {account === null ? 'Connect Wallet' : account ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}` : 'Connect Wallet'}</Button>
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          toggleModal(!modalShown);
+        }}
+        className="black bg-orange-400 font-bold rounded-lg text-md py-3 px-5 h-12 mt-3 hover:bg-orange-500 lg:w-[200px] lg:absolute lg:right-5 lg:mt-0 ">
+        <AccountBalanceWalletTwoToneIcon />
+        {account === null ? 'Connect Wallet' : account ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}` : 'Connect Wallet'}
+      </button>
       <Modal shown={modalShown} close={() => { toggleModal(false) }}>
         <h1 className="px-3 text-center modal-title">1. Choose Network</h1>
         <div className="flex items-center flex-row flex-wrap">

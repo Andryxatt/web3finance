@@ -8,7 +8,8 @@
             "deposits": "0",
             "userBalance": "0",
             "userBalanceDeposit": "0",
-            "isNative": false
+            "isNative": false,
+            "isOpen": false
         },
         {
             "name":"WETH",
@@ -18,7 +19,8 @@
             "deposits": "0",
             "userBalance": "0",
             "userBalanceDeposit": "0",
-            "isNative": false
+            "isNative": false,
+            "isOpen": false
         },
         {
             "name":"RETH",
@@ -28,7 +30,8 @@
             "deposits": "0",
             "userBalance": "0",
             "userBalanceDeposit": "0",
-            "isNative": true
+            "isNative": true,
+            "isOpen": false
         }
     ]
 }

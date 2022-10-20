@@ -175,3 +175,6 @@ html {
   }
 }
   
+.cm-editor, .cm-gutters{
+  border-radius:10px;
+}

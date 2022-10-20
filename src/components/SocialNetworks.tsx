@@ -4,7 +4,7 @@ import facebook from '../images/facebook.svg'
 import telegram from '../images/telegram.svg'
 import medium from '../images/medium.svg'
 import reddit from '../images/reddit.svg'
-const SocialNetworks = () => {
+const SocialNetworks = (props:any) => {
     const icons = [
         {
             name: 'facebook',
@@ -33,7 +33,8 @@ const SocialNetworks = () => {
 
     ]
     return(
-        <div className="flex flex-col right-5 fixed">
+        // "flex flex-col right-5 fixed"
+        <div className={props.class}>
             {
                 icons.map((icon: any) => {
                     return (

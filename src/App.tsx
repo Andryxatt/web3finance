@@ -8,14 +8,14 @@ import TopNavigation from './components/header/TopNavigation';
 import SocialNetworks from './components/SocialNetworks';
 import Footer from './components/Footer';
 import Web3Context from './Web3DataContext';
-window.Buffer = window.Buffer || require("buffer").Buffer; 
+window.Buffer = window.Buffer || require("buffer").Buffer;
 function App() {
   return (
-      <div>
-          <Web3Context>
+    <div>
+      <Web3Context>
         <TopNavigation />
-        <SocialNetworks />
-        <div className='mx-auto max-w-screen-xl'>
+        <SocialNetworks class={"flex flex-col right-5 fixed lg:hidden"} />
+        <div className='mx-auto max-w-screen-xl max-w-[960px]'>
           <Routes>
             <Route path='/' element={<Main />} />
             <Route path='/stats' element={<Stats />} />
@@ -24,8 +24,8 @@ function App() {
           </Routes>
           <Footer />
         </div>
-        </Web3Context>
-      </div>
+      </Web3Context>
+    </div>
   );
 }
 export default App;

@@ -105,23 +105,7 @@ const TableResponsive = () => {
   
     return (
         <div className="">
-            <div className="flex justify-between items-center border-b-[1px] border-gray-300">
-                {
-                    networks.map((network:any, index:number) => {
-                        return (
-                            network.isActive ?
-                                <div key={index} className="group w-full h-full cursor-not-allowed flex flex-row items-center justify-center border-b-4 px-10 py-10 border-orange-400">
-                                    <img className="w-[40px] mr-5" src={network.icon} alt={network.name} />
-                                    <h2 className="group-hover:underline text-xl font-bold">{network.name}</h2>
-                                </div> :
-                                <div key={index} onClick={() => UpdateNetwork(network)} className="group w-full h-full cursor-pointer px-10 py-10 flex flex-row items-center justify-center">
-                                    <img className="w-[40px] mr-5" src={network.icon} alt={network.name} />
-                                    <h2 className="group-hover:underline text-xl font-bold">{network.name}</h2>
-                                </div>
-                        )
-                    })
-                }
-            </div>
+         
             <div className="flex flex-row justify-between px-5 py-[15px] border-b-[1px] border-gray-300">
                 <div className="flex justify-between items-center">
                     {
