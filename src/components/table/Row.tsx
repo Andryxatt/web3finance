@@ -1,7 +1,6 @@
 import sortUpIcon from '../../images/sort-up.png';
 import sortDownIcon from '../../images/sort-down.png';
 import EditorAddresses from '../assets/EditorAddresses';
-import DepositWithdraw from '../assets/DepositWithdraw';
 const Row = (props: any) => {
     return (
         <div className={
@@ -31,9 +30,7 @@ const Row = (props: any) => {
                 </div>
             </div>
             <div className={props.element.isOpen ? "isopen mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5 flex" : "hidden isopen"}>
-               <EditorAddresses/>
-               <DepositWithdraw/>
-
+              <EditorAddresses/> 
             </div>
 
         </div>

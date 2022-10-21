@@ -3,7 +3,7 @@ import Row from "./Row";
 import TableHeader from "./TableHeader";
 
 const Table = () => {
-    const { tokens, setTokens } = Web3State();
+    const { tokens, setTokens,setAddressesFromFile } = Web3State();
     const openElement = (nameAsset: string) => {
         tokens.map((token: any) => {
             if (token.name === nameAsset) {

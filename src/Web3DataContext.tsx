@@ -1,6 +1,7 @@
 import { useWeb3React } from "@web3-react/core";
 import { Contract, ethers } from "ethers";
 import { useContext, createContext, useState } from 'react';
+import Web3 from "web3";
 import { connectors } from "./helpers/connectors";
 import { toHex } from "./helpers/utils";
 
@@ -45,6 +46,26 @@ const Web3DataContext = ({ children }: any) => {
     const [addressesFromFile, setAddressesFromFile] = useState<any[]>([]);
     const [isFeeInToken, setIsFeeInToken] = useState<boolean>(false);
     const [currentChainId, setCurrentChainId] = useState<any>("0x5");
+    const validateAddresses = () => {
+        for(let i =0; i > addressesFromFile.length; i++){
+            if(addressesFromFile[i].length !== 42){
+                return false;
+            }
+        }
+    }
+    const removeInvalidAddresses = () => {
+
+    }
+    const stringToAddresses = (addresses: string) => {
+        let addressesArray = addresses.split("\n");
+        let addressesArrayFormatted = [];
+        addressesArray.forEach((address: any) => {
+            if (address.split(",")[0].length === 42) {
+                addressesArrayFormatted.push(address.split(","));
+            }
+        });
+        setAddressesFromFile(addressesArrayFormatted);
+    }
     const getAssetsPrices = async () => {
         const providerInfura = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
         const contractGoerli = new Contract(contractsAddresses["Goerli Testnet"][0].PriceOracle, OracleAbi, providerInfura);
@@ -92,6 +113,13 @@ const Web3DataContext = ({ children }: any) => {
     }
     getAssetsPrices();
     getTotalDeposit();
+    const getFeePrice = async () =>{
+        if(library){
+            const web3 = new Web3('https://eth-goerli.g.alchemy.com/v2/' + process.env.REACT_APP_ALCHEMY_GOERLY_KEY);
+     
+        }
+    }
+    getFeePrice();
     const [tokens, setTokens] = useState<any>(goerliTokens.Tokenization);
     const [filters, setFilters] = useState([
         {
