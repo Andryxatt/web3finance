@@ -9,10 +9,9 @@ const PreviewResult = (props:any) =>{
         <div className="w-full">
             <GasFeeEstimator/>
             <ListOfRecipients/>
-            <Summary/>
-            <MultiSendError/>
+            <Summary isNative={props.isNative} token={props.token}/>
             <button className="bg-blue-500 text-white font-bold px-5 py-1 rounded-md" onClick={props.showPrev}>Prev</button>
-            <button>Send</button>
+            <button className="b">Send</button>
         </div>
     )
 }

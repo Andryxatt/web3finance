@@ -75,10 +75,10 @@ const HeaderAssets = () => {
             <div onClick={() => sortByName()} className="flex cursor-pointer justify-center w-[150px] font-lg">Asset
                 <img className="ml-2 w-[16px]" src={sortName === "" ? sortIcon : sortName === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
-            <div onClick={() => sortByPrice()} className="flex cursor-pointer justify-center w-[150px] ">Token Price
+            <div onClick={() => sortByPrice()} className="flex cursor-pointer justify-center w-[150px] ">Token price
                 <img className="ml-2 w-[16px]" src={sortPrice === "" ? sortIcon : sortPrice === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
-            <div onClick={() => sortByDeposits()} className="flex cursor-pointer justify-center w-[150px]">Deposit ($)
+            <div onClick={() => sortByDeposits()} className="flex cursor-pointer justify-center w-[150px]">Total deposits ($)
                 <img className="ml-2 w-[16px]" src={sortDeposits === "" ? sortIcon : sortDeposits === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
             <div onClick={() => sortByUserDeposit()} className="flex cursor-pointer justify-center w-[150px]">Your balance
