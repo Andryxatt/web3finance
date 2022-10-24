@@ -56,17 +56,13 @@ const EditorManual = () => {
             setArrayOfAddressesFromEditor(arrayOfElementsWithoutEmpty);
             setAddressesFromFile(arrayOfElementsWithoutEmpty);
         }
-        else {
-            setArrayOfAddressesFromEditor([]);
-           setAddressesFromFile([]);
-        }
     }, [codeMirrorElement]);
     const deleteInvalid = useCallback(() => {
         let newElems = "";
         const validArray = [];
         arrayOfAddressesFromEditor.forEach((element: any, index: number) => {
             if (element.errorAddress === "" && element.errorAmount === "") {
-               
+
                 validArray.push(element);
             }
 
@@ -84,7 +80,6 @@ const EditorManual = () => {
     }, [arrayOfAddressesFromEditor])
 
     useEffect(() => {
-        setArrayOfAddressesFromEditor([]);
         setContainer(editor.current);
         validate();
     }, [codeMirrorElement, setContainer, validate]);
@@ -100,8 +95,7 @@ const EditorManual = () => {
 
                     {!isValid && <div className="flex justify-between"> <span className="text-red-600">The below addresses cannot be processed</span> <button className="text-red-600 underline" onClick={() => { deleteInvalid() }}>Delete them</button></div>}
                 </div>
-
-                <div className={!isValid ? "flex flex-col rounded-xl bg-white border-2 border-red-400 p-3 mb-1": "hidden"}>
+                <div className={!isValid ? "flex flex-col rounded-xl bg-white border-2 border-red-400 p-3 mb-1" : "hidden"}>
                     {
                         !isValid && arrayOfAddressesFromEditor.length > 0 && arrayOfAddressesFromEditor.map((element: any, index: number) => {
 
@@ -112,7 +106,6 @@ const EditorManual = () => {
                                     </>
                                 )
                             }
-
                         })
                     }
                 </div>

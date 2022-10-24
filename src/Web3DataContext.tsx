@@ -255,12 +255,13 @@ const Web3DataContext = ({ children }: any) => {
           const feeData = await library.getFeeData();
           const txInfo = {
               value: ethers.utils.parseEther(msgValue.toString()),
+              maxFeePerGas: ethers.utils.parseUnits(speedNetwork, "gwei"),
           }
           const finalAmount = arrayOfAmounts.map((item: any) => {
               return ethers.utils.parseEther(item);
           });
           const units = await feeShare.estimateGas["multiSend(address[],uint256[])"](addresses, finalAmount, txInfo);
-          const txFee = feeData.gasPrice.mul(units);
+          const txFee = ethers.utils.parseUnits(speedNetwork, "gwei").mul(units);
           console.log("txFee", ethers.utils.formatEther(txFee));
           return (parseFloat(ethers.utils.formatEther(txFee)) + parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (addressesFromFile.length)).toString();
     }
@@ -282,13 +283,12 @@ const Web3DataContext = ({ children }: any) => {
        
         const txInfo = {
             value: ethers.utils.parseEther(msgValue.toString()),
-            maxPriorityFeePerGas: ethers.utils.parseUnits("1", "gwei"),
+            maxFeePerGas: ethers.utils.parseUnits(speedNetwork, "gwei"),
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseEther(item);
         });
         const feeData = await library.getFeeData();
-        console.log(feeData, "fee data");
         const rTokenContract = new Contract(addressToken, RTokenAbi, library?.getSigner());
         const allowance = await rTokenContract.allowance(account, contractsAddresses[currentNetwork.name][0].FeeShare);
             if (parseFloat(ethers.utils.formatUnits(allowance.toString(), decimal)) >= ammount) {
@@ -303,6 +303,7 @@ const Web3DataContext = ({ children }: any) => {
                 return ethers.utils.formatUnits(txFee, 'ether');
             }      
     }
+   
     const calculateApproximateFeeTokenToken = (addressToken:any) =>{
         const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
 
@@ -580,31 +581,6 @@ const Web3DataContext = ({ children }: any) => {
         localStorage.clear();
     }
 
-    function formatOutput(data: any) {
-        let avgGasFee = 0;
-        let avgFill = 0;
-        let blocks = [];
-        for (let i = 0; i < 20; i++) {
-            avgGasFee = avgGasFee + Number(data.reward[i][1]) + Number(data.baseFeePerGas[i])
-            avgFill = avgFill + Math.round(data.gasUsedRatio[i] * 100);
-
-            blocks.push({
-                blockNumber: Number(data.oldestBlock) + i,
-                reward: data.reward[i].map((r) => (Number(r) / 10 ** 9).toFixed(2)),
-                baseFeePerGas: (Number(data.baseFeePerGas[i]) / 10 ** 9).toFixed(2),
-                gasUsedRatio: Math.round(data.gasUsedRatio[i] * 100),
-            });
-        }
-
-        avgGasFee = avgGasFee / 20;
-        avgGasFee = (avgGasFee / 10 ** 9);
-
-
-        avgFill = avgFill / 20;
-        console.log(avgGasFee, "avgGasFee");
-        console.log(blocks, 'blocks');
-        return [blocks, avgGasFee, avgFill];
-    }
     const historicalBlocks = 20;
     function formatFeeHistory(result:any, includePending:any) {
         let blockNum = result.oldestBlock;
@@ -641,7 +617,7 @@ const Web3DataContext = ({ children }: any) => {
 
     const calculateGasLimit = async () => {
             const web3 = new Web3('https://eth-goerli.g.alchemy.com/v2/' + process.env.REACT_APP_ALCHEMY_GOERLY_KEY);
-            web3.eth.getFeeHistory(historicalBlocks, "pending", [25, 50, 75]).then((feeHistory) => {
+            web3.eth.getFeeHistory(historicalBlocks, "pending", [30, 55, 80]).then((feeHistory) => {
                 const blocks = formatFeeHistory(feeHistory, false);
                 const slow    = avg(blocks.map(b => b.priorityFeePerGas[0]));
                 const average = avg(blocks.map(b => b.priorityFeePerGas[1]));
@@ -649,9 +625,9 @@ const Web3DataContext = ({ children }: any) => {
 
                 web3.eth.getBlock("pending").then((block) => {
                   const baseFeePerGas = Number(block.baseFeePerGas);
-                  setSlow(ethers.utils.formatUnits(slow, "gwei"));
-                  setAverage(ethers.utils.formatUnits(average, "gwei"));
-                  setFast(ethers.utils.formatUnits(fast, "gwei"));
+                  setSlow(ethers.utils.formatUnits(slow + baseFeePerGas, "gwei"));
+                  setAverage(ethers.utils.formatUnits(average + baseFeePerGas, "gwei"));
+                  setFast(ethers.utils.formatUnits(fast + baseFeePerGas, "gwei"));
                   console.log("Manual estimate:", {
                     slow: ethers.utils.formatUnits(slow + baseFeePerGas, "gwei"),
                     average: ethers.utils.formatUnits(average + baseFeePerGas, "gwei"),

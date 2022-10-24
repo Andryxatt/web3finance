@@ -7,7 +7,7 @@ import EditorManual from "./EditorManual";
 import PreviewResult from "./PreviewResult";
 import DepositWithdraw from "./DepositWithdraw";
 const EditorAddresses = (props:any) => {
-    const {addressesFromFile, setAddressesFromFile} = Web3State();
+    const {addressesFromFile} = Web3State();
     const [isManual, setIsManual] = useState(true);
     const [isPreview, setIsPreview] = useState(true);
     const showNext = () =>{
