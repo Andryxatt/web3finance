@@ -203,18 +203,18 @@ function ManualDeposit(props: any){
     //     setArrayOfAddrAmounts([]);
     //    }
     // }
-    useEffect(() =>{
-    },[filesUpdate])
-    useEffect(() => {
-        localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
-        if (editor.current) {
-            setContainer(editor.current);
-            localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
-        }
-        if (element !== "" && element !== undefined) {
-            validate()
-        }
-    },[element, setContainer,validate]);
+    // useEffect(() =>{
+    // },[filesUpdate])
+    // useEffect(() => {
+    //     localStorage.getItem("filteredLang") !== "" ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
+    //     if (editor.current) {
+    //         setContainer(editor.current);
+    //         localStorage.getItem("filteredLang") !== null ? setElement(localStorage.getItem("filteredLang") || "") : setElement("");
+    //     }
+    //     if (element !== "" && element !== undefined) {
+    //         validate()
+    //     }
+    // },[element, setContainer,validate]);
     return (
         <div className="px-5 py-5">
             <div className="flex justify-between items-center mb-2">

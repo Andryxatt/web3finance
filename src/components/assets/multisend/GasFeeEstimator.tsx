@@ -5,7 +5,10 @@ import { Web3State } from "../../../Web3DataContext";
 const GasFeeEstimator = () => {
     const {fast,average, slow, setSpeedNetwork, speedNetwork} = Web3State();
     useEffect(()=>{
-        setSpeedNetwork(average);
+        if(average > 0){
+            setSpeedNetwork(average);
+        }
+        
     }, [average])
     return (
         <div className="w-full">

@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { ethers } from "ethers";
+import { useCallback, useEffect, useState } from "react";
 import { Web3State } from "../../../Web3DataContext";
 import MultiSendError from "./MultiSendError";
 
@@ -13,60 +14,70 @@ const Summary = (props: any) => {
         calculateApproximateFeeTokenNative,
         totalAmount,
         calculateApproximateFeeNative,
-        speedNetwork
+        speedNetwork,
+        txGasUnits
     } = Web3State();
-    const [txCount, setTxCount] = useState(0);
     const [totalTokens, setTotalTokens] = useState(0);
     const [userTokenBalance, setUserTokenBalance] = useState(0);
     const [userNativeBalance, setUserNativeBalance] = useState(0);
     const [approximateCostTx, setApproximateCostTx] = useState(0);
     const [error, setError] = useState(false);
-    const calculateCost = async () => {
+    const calculateCost = useCallback(() => {
         if (props.token.isNative) {
-            const res = await calculateApproximateFeeNative();
-            console.log("res", res);
-            setApproximateCostTx(res)
-        }
-        // else if (props.isPayToken) {
-        //     const res = await calculateApproximateFeeTokenNative(props.token.address, props.token.decimal);
-        //     console.log("res", res);
-        //     setApproximateCostTx(res)
-        // }
-        else {
-            console.log("props.token.address", props.token.address);
-            const res = await calculateApproximateFeeTokenNative(props.token.address, props.token.decimal);
-            setApproximateCostTx(res);
-        }
+             calculateApproximateFeeNative();
+             const res = ethers.utils.parseUnits(speedNetwork, "gwei").mul(txGasUnits)
+             setApproximateCostTx(parseFloat(ethers.utils.formatUnits(res, 'ether')));
+         }
+         // else if (props.isPayToken) {
+         //     const res = await calculateApproximateFeeTokenNative(props.token.address, props.token.decimal);
+         //     console.log("res", res);
+         //     setApproximateCostTx(res)
+         // }
+         else {
+              calculateApproximateFeeTokenNative(props.token.address, props.token.decimal);
+             const res = ethers.utils.parseUnits(speedNetwork, "gwei").mul(txGasUnits);
+             console.log("res", res);
+             setApproximateCostTx(parseFloat(ethers.utils.formatUnits(res, 'ether')));
+         }
+    },[props.token.isNative, props.token.address, props.token.decimal, speedNetwork, txGasUnits, calculateApproximateFeeNative, calculateApproximateFeeTokenNative]);
+ 
 
-    }
+    
     useEffect(() => {
-        setTxCount(countTransactions(props.isNative));
+        
         setTotalTokens(totalTokensToMultiSend());
         const nativeBalance = async () => {
             const balance = await getUserNativeBalance();
             setUserNativeBalance(balance);
+            if (props.isNative) {
+                setUserTokenBalance(balance);
+            }
         }
         nativeBalance();
         const tokenBalance = async () => {
             const balance = await getUserTokenBalance(props.token.address, props.token.decimal);
-            if (props.isNative) {
-                setUserTokenBalance(userNativeBalance);
+            if (!props.isNative) {
+                setUserTokenBalance(balance);
             }
-            setUserTokenBalance(balance);
+           
         }
         tokenBalance();
+        calculateCost();
+       
+    },[calculateCost, getUserNativeBalance, getUserTokenBalance, props.isNative, props.token.address, props.token.decimal, totalTokensToMultiSend]);
+    useEffect(() =>{
+        console.log("totalTokens", totalTokens);
+        console.log("userTokenBalance", userTokenBalance);
         if (totalTokens > userTokenBalance) {
             setError(true);
         }
         else {
             setError(false);
         }
-        
-       
-    }, [addressesFromFile, totalTokens, userTokenBalance, error, ])
-    useEffect(()=>{
+    }, [totalTokens, userTokenBalance, error, userNativeBalance])
+    useEffect(() =>{
         calculateCost();
-    },[speedNetwork])
+    },[speedNetwork,calculateCost])
     return (
         <div className="mb-3">
             <h3>Summary</h3>
@@ -78,7 +89,7 @@ const Summary = (props: any) => {
                     </div>
                     <div className="px-3 py-3 flex flex-col border-b-2">
                         <span className="text-xl text-blue-900 font-bold">
-                            {txCount}
+                            {countTransactions}
                         </span>
                         <span className="text-xs text-gray-400">Total number of transactions needed </span>
                     </div>

@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Web3State } from "../../Web3DataContext";
 import Row from "./Row";
 import TableHeader from "./TableHeader";
@@ -15,6 +16,7 @@ const Table = () => {
         })
         setTokens([...tokens])
     }
+ 
     return (
         <>
             <TableHeader />

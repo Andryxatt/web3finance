@@ -32,8 +32,8 @@ type ContextProps = {
     setNetworks: any,
     currentChainId: any,
     totalAmount:any,
-    fast:any, slow:any, average: any,
-    countTransactions: (isNative:boolean)=> any,
+    fast:any, slow:any, average: any, baseFeePerGas:any,
+    countTransactions: any,
     totalTokensToMultiSend: ()=> any,
     getUserTokenBalance: (address:any, decimal:any) => any,
     getUserNativeBalance: () => any,
@@ -41,6 +41,11 @@ type ContextProps = {
     calculateApproximateFeeNative:()=> any,
     setSpeedNetwork: any,
     speedNetwork: any,
+    txGasUnits:any, setTxGasUnits:any,
+    sendTransactionToken: (addressToken:any, decimal:any) => void,
+    sendTransactionNative: ()=>void,
+    sendTransactionAndPayFeeInToken:(addressToken:any, decimal:any)=>void,
+    calculateGasLimit: ()=>void,
 
 };
 const Web3Ctx = createContext<Partial<ContextProps>>({});
@@ -58,12 +63,15 @@ const Web3DataContext = ({ children }: any) => {
     const [average, setAverage] = useState('0');
     const [fast, setFast] = useState('0');
     const [speedNetwork, setSpeedNetwork] = useState('0');
+    const [baseFeePerGas, setBaseFeePerGas] = useState('0');
     const { activate, active, account, library, chainId } = useWeb3React();
     const [addressesFromFile, setAddressesFromFile] = useState<any[]>([]);
     const [isFeeInToken, setIsFeeInToken] = useState<boolean>(false);
     const [currentChainId, setCurrentChainId] = useState<any>("0x5");
-    const [currentAsset, setCurrentAsset] = useState<any>(undefined);
     const [totalAmount, setTotalAmount] = useState<any>(0);
+    const [txGasUnits, setTxGasUnits] = useState<any>(0);
+    const [countTransactions, setCountTransactions] = useState<any>(0);
+
     const [networks, setNetworks] = useState([
         {
             name: "Ethereum",
@@ -126,41 +134,41 @@ const Web3DataContext = ({ children }: any) => {
         }
     ]);
     const [currentNetwork, setCurrentNetwork] = useState<any>(networks[2]);
-    const validateAddresses = () => {
-        for (let i = 0; i > addressesFromFile.length; i++) {
-            if (addressesFromFile[i].length !== 42) {
-                return false;
-            }
-        }
-    }
+    // const validateAddresses = () => {
+    //     for (let i = 0; i > addressesFromFile.length; i++) {
+    //         if (addressesFromFile[i].length !== 42) {
+    //             return false;
+    //         }
+    //     }
+    // }
    
-    const stringToAddresses = (addresses: string) => {
-        let addressesArray = addresses.split("\n");
-        let addressesArrayFormatted = [];
-        addressesArray.forEach((address: any) => {
-            if (address.split(",")[0].length === 42) {
-                addressesArrayFormatted.push(address.split(","));
-            }
-        });
-        setAddressesFromFile(addressesArrayFormatted);
-    }
+    // const stringToAddresses = (addresses: string) => {
+    //     let addressesArray = addresses.split("\n");
+    //     let addressesArrayFormatted = [];
+    //     addressesArray.forEach((address: any) => {
+    //         if (address.split(",")[0].length === 42) {
+    //             addressesArrayFormatted.push(address.split(","));
+    //         }
+    //     });
+    //     setAddressesFromFile(addressesArrayFormatted);
+    // }
     const getAssetsPrices = async () => {
         const providerInfura = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
         const contractGoerli = new Contract(contractsAddresses["Goerli Testnet"][0].PriceOracle, OracleAbi, providerInfura);
-        goerliTokens.Tokenization.map(async (token: any) => {
+        goerliTokens.Tokenization.forEach(async (token: any) => {
             const goerliPrice = await contractGoerli.getAssetPrice(token.address);
             token.tokenPrice = ethers.utils.formatUnits(goerliPrice, 8);
         })
 
         const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
         const contractBsc = new Contract(contractsAddresses["Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
-        bscTokens.Tokenization.map(async (token: any) => {
+        bscTokens.Tokenization.forEach(async (token: any) => {
             const bscPrice = await contractBsc.getAssetPrice(token.address);
             token.tokenPrice = ethers.utils.formatUnits(bscPrice, 8);
         })
         const providerPolygon = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
         const contractMumbai = new Contract(contractsAddresses["Mumbai Testnet"][0].PriceOracle, OracleAbi, providerPolygon);
-        polygonTokens.Tokenization.map(async (token: any) => {
+        polygonTokens.Tokenization.forEach(async (token: any) => {
             const polygonPrice = await contractMumbai.getAssetPrice(token.address);
             token.tokenPrice = ethers.utils.formatUnits(polygonPrice, 8);
         });
@@ -168,30 +176,30 @@ const Web3DataContext = ({ children }: any) => {
     }
     const getTotalDeposit = async () => {
         const providerInfura = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
-        goerliTokens.Tokenization.map(async (token: any) => {
+        goerliTokens.Tokenization.forEach(async (token: any) => {
             const contractGoerli = new Contract(contractsAddresses["Goerli Testnet"][0]["r" + token.name], RTokenAbi, providerInfura);
             const totalDeposit = await contractGoerli.totalSupply();
             token.deposits = parseFloat(ethers.utils.formatUnits(totalDeposit, token.decimal));
         })
 
         const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
-        bscTokens.Tokenization.map(async (token: any) => {
+        bscTokens.Tokenization.forEach(async (token: any) => {
             const contractBsc = new Contract(contractsAddresses["Smart Chain Testnet"][0]["r" + token.name], RTokenAbi, providerBsc);
             const totalDeposit = await contractBsc.totalSupply();
             token.deposits = parseFloat(ethers.utils.formatUnits(totalDeposit, token.decimal));
         })
 
         const providerPolygon = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
-        polygonTokens.Tokenization.map(async (token: any) => {
+        polygonTokens.Tokenization.forEach(async (token: any) => {
             const contractPolygon = new Contract(contractsAddresses["Mumbai Testnet"][0]["r" + token.name], RTokenAbi, providerPolygon);
             const totalDeposit = await contractPolygon.totalSupply();
             token.deposits = parseFloat(ethers.utils.formatUnits(totalDeposit, token.decimal));
         })
 
     }
-    const getUserRTokenBalance = async () => {
+    useEffect(()=>{
         if (active) {
-            tokens.map((token: any) => {
+            tokens.forEach((token: any) => {
                 let contract = new Contract(contractsAddresses[currentNetwork.name][0]["r" + token.name], RTokenAbi, library?.getSigner());
                 contract.balanceOf(account).then((res: any) => {
                     console.log("user r token balance ", ethers.utils.formatUnits(res, token.decimal));
@@ -199,33 +207,13 @@ const Web3DataContext = ({ children }: any) => {
                     // props.updateTokens(ethers.utils.formatUnits(res._hex, props.token.decimal), props.token.name)
                 });
             })
-            
         }
-
-    }
-    useEffect(()=>{
-        getUserRTokenBalance()
-    }, [active])
+    })
    
-    const countTransactions = (isNative: boolean) => {
-        let countTransactions = 0;
-        if (addressesFromFile.length > 255) {
-            countTransactions = addressesFromFile.length / 255;
-        }
-        else {
-            countTransactions = 1;
-        }
-        if (!isNative) {
-            countTransactions = countTransactions + 1;
-        }
-        if(addressesFromFile.length === 0){
-            countTransactions = 0;
-        }
-        return countTransactions;
-    }
+
     const totalTokensToMultiSend = () =>{
         let totalTokens = 0;
-        addressesFromFile.map((element: any) => {
+        addressesFromFile.forEach((element: any) => {
             totalTokens = totalTokens + parseFloat(element.amount);
         })
         return totalTokens;
@@ -252,7 +240,6 @@ const Web3DataContext = ({ children }: any) => {
           const addresses = addressesFromFile.map((item: any) => { return item.address });
           addresses.unshift(contractsAddresses[currentNetwork.name][0].FeeShare);
           const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (addressesFromFile.length) + parseFloat(ammount.toString()) + parseFloat("0.0000000000000001");
-          const feeData = await library.getFeeData();
           const txInfo = {
               value: ethers.utils.parseEther(msgValue.toString()),
               maxFeePerGas: ethers.utils.parseUnits(speedNetwork, "gwei"),
@@ -261,12 +248,7 @@ const Web3DataContext = ({ children }: any) => {
               return ethers.utils.parseEther(item);
           });
           const units = await feeShare.estimateGas["multiSend(address[],uint256[])"](addresses, finalAmount, txInfo);
-          const txFee = ethers.utils.parseUnits(speedNetwork, "gwei").mul(units);
-          console.log("txFee", ethers.utils.formatEther(txFee));
-          return (parseFloat(ethers.utils.formatEther(txFee)) + parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (addressesFromFile.length)).toString();
-    }
-    const calculateApproveCostFeeTx = async (addressToken:any) =>{
-
+          setTxGasUnits(units);
     }
     const calculateApproximateFeeTokenNative = async (addressToken:any, decimal:any) =>{
         const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
@@ -288,26 +270,37 @@ const Web3DataContext = ({ children }: any) => {
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseEther(item);
         });
-        const feeData = await library.getFeeData();
         const rTokenContract = new Contract(addressToken, RTokenAbi, library?.getSigner());
         const allowance = await rTokenContract.allowance(account, contractsAddresses[currentNetwork.name][0].FeeShare);
             if (parseFloat(ethers.utils.formatUnits(allowance.toString(), decimal)) >= ammount) {
                 const gasUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](addressToken, addresses, finalAmount, txInfo);
-                const txFee = gasUsed.mul(feeData.gasPrice);
-                console.log(txFee, "txFee")
-              return ethers.utils.formatUnits(txFee, 'ether');
+                setTxGasUnits(gasUsed);
+                if(addressesFromFile.length < 254){
+                    setCountTransactions(1)
+                }
+                else {
+                    setCountTransactions(Math.ceil(addressesFromFile.length / 254))
+                }
+                
             }
             else {
                 const units = await rTokenContract.estimateGas.approve(contractsAddresses[currentNetwork.name][0].FeeShare, ethers.utils.parseUnits(ammount.toString(), decimal));
-                const txFee = units.mul(feeData.gasPrice);
-                return ethers.utils.formatUnits(txFee, 'ether');
+                if(addressesFromFile.length < 254){
+                    setCountTransactions(2)
+                }
+                else {
+                    setCountTransactions(Math.ceil(addressesFromFile.length / 254) + 1)
+                }
+                setTxGasUnits(units);
             }      
     }
    
-    const calculateApproximateFeeTokenToken = (addressToken:any) =>{
-        const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+    // const calculateApproximateFeeInToken = (addressToken:any) =>{
+    //     const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
 
-    }
+    // }
+
+ 
     const ConnectWallet = async (connectorName: string) => {
         activate(connectors[connectorName]);
     }
@@ -374,66 +367,63 @@ const Web3DataContext = ({ children }: any) => {
     getTotalDeposit();
 
     const sendTransactionToken = async (addressToken:any, decimal:any) => {
-        // console.log(isFeeInToken, "isFeeInToken");
         const feeShareContract = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-
         const arrayOfAmounts = addressesFromFile.map((item: any) => {
             return item.amount.toString().trim();
         });
         const feePerAddressNative = await feeShareContract["calculateFee()"]();
+        console.log(feePerAddressNative.toString());
         const amount = addressesFromFile.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b.amount), 0);
-        const feeData = await library.getFeeData();
+        console.log(amount, "amount");
         const addresses = addressesFromFile.map((item: any) => { return item.address });
-        const isRToken = await feeShareContract.getRTokenAddress(addressToken);
-        const msgValue = isRToken === null || undefined ?
-            parseFloat('0.2') * (addressesFromFile.length) + parseFloat("0.0000000000000001") :
-            parseFloat(feePerAddressNative!) * (addressesFromFile.length) + parseFloat("0.0000000000000001");
-        const maxFeePerGas = feeData.lastBaseFeePerGas.add(ethers.utils.parseUnits(average, "gwei"));
+        // const isRToken = await feeShareContract.getRTokenAddress(addressToken);
+        // const msgValue = isRToken === null || undefined ?
+        //     parseFloat('0.2') * (addressesFromFile.length) + parseFloat("0.0000000000000001") :
+        //     parseFloat(feePerAddressNative!) * (addressesFromFile.length) + parseFloat("0.0000000000000001");
+        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (addressesFromFile.length) + parseFloat(amount.toString()) + parseFloat("0.0000000000000001");
         const txInfo = {
-            value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18)),
-            maxFeePerGas: maxFeePerGas,
+            value: ethers.utils.parseUnits(msgValue.toString()),
+            maxFeePerGas: ethers.utils.parseUnits(speedNetwork, "gwei"),
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseUnits(item, decimal);
         });
-
+        console.log(finalAmount, "finalAmount");
         const rTokenContract = new Contract(addressToken, RTokenAbi, library?.getSigner());
         const allowance = await rTokenContract.allowance(account, contractsAddresses[currentNetwork.name][0].FeeShare);
-        // const feeData = await library.getFeeData();
+        console.log(ethers.utils.formatUnits(allowance.toString()), "allowance");
+        const idToast1 = toast.loading("Processing transaction please wait...")
         if (parseFloat(ethers.utils.formatUnits(allowance.toString(), decimal)) >= parseFloat(amount.toString())) {
-            const idToast = toast.loading("Please wait...")
             feeShareContract["multiSend(address,address[],uint256[])"](addressToken, addresses, finalAmount, txInfo)
                 .then((res: any) => {
                     res.wait().then((res: any) => {
-
+                        toast.success("Transaction sent successfully");
+                        console.log(res);
                     })
                 }).catch((err: any) => {
                     // console.log(err);
-                    toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+                    toast.update(idToast1, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
         }
         else {
-            const idToast = toast.loading("Please wait...")
-            rTokenContract.approve(contractsAddresses[currentNetwork.name][0].FeeShare, ethers.utils.parseUnits(amount.toFixed(6).toString(), decimal), { maxFeePerGas: maxFeePerGas })
+            rTokenContract.approve(contractsAddresses[currentNetwork.name][0].FeeShare, ethers.utils.parseUnits(amount.toFixed(6).toString(), decimal))
                 .then((res: any) => {
                     res.wait().then(async (res: any) => {
                         const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](addressToken, addresses, finalAmount, txInfo)
-                        console.log(units, "units");
-                        // const txFee = BigNumber.from(average).mul(units);
-                        // setApproximateCost(ethers.utils.formatEther(txFee) + parseFloat(msgValue.toString()).toFixed(18));
-                        toast.update(idToast, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-                        toast.update(idToast, { render: "Please wait...", isLoading: true });
+                        setTxGasUnits(units);
+                        toast.update(idToast1, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+                        toast.update(idToast1, { render: "Please wait...", isLoading: true });
                         feeShareContract["multiSend(address,address[],uint256[])"](addressToken, addresses, finalAmount, txInfo).then((res: any) => {
                             res.wait().then((res: any) => {
-                                toast.update(idToast, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+                                toast.update(idToast1, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
                                 console.log(res)
                             })
                         })
                     }).catch((err: any) => {
-                        toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+                        toast.update(idToast1, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
                     })
                 }).catch((err: any) => {
-                    toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false });
+                    toast.update(idToast1, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false });
                 });
         }
     }
@@ -444,17 +434,15 @@ const Web3DataContext = ({ children }: any) => {
             return item.amount.toString().trim();
         });
         const feePerAddressNative = await feeShareContract["calculateFee()"]();
-        const ammount = arrayOfAmounts.reduce((a: any, b: any) => {}, 0)
-        arrayOfAmounts.unshift(ammount.toString());
+        const amount = addressesFromFile.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b.amount), 0);
+        arrayOfAmounts.unshift(amount.toString());
+        console.log(amount, "amount");
         const addresses = addressesFromFile.map((item: any) => { return item.address });
         addresses.unshift(contractsAddresses[currentNetwork.name][0].FeeShare);
-        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (addressesFromFile.length) + parseFloat(ammount.toString()) + parseFloat("0.0000000000000001");
-        const feeData = await library.getFeeData();
-        const maxFeePerGas = ethers.utils.parseUnits(average, "gwei").add(feeData.lastBaseFeePerGas)
+        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (addressesFromFile.length) + parseFloat(amount.toString()) + parseFloat("0.0000000000000001");
         const txInfo = {
-            value: ethers.utils.parseEther(msgValue.toString()),
-            maxFeePerGas: maxFeePerGas,
-            maxPriorityFeePerGas: ethers.utils.parseUnits(average, "gwei")
+            value: ethers.utils.parseUnits(msgValue.toString(), 'ether'),
+            maxFeePerGas: ethers.utils.parseUnits(speedNetwork, "gwei"),
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseEther(item);
@@ -628,6 +616,8 @@ const Web3DataContext = ({ children }: any) => {
                   setSlow(ethers.utils.formatUnits(slow + baseFeePerGas, "gwei"));
                   setAverage(ethers.utils.formatUnits(average + baseFeePerGas, "gwei"));
                   setFast(ethers.utils.formatUnits(fast + baseFeePerGas, "gwei"));
+                  setBaseFeePerGas(ethers.utils.formatUnits(baseFeePerGas, "gwei"));
+                //   setSpeedNetwork(ethers.utils.formatUnits(average+baseFeePerGas, "gwei"));
                   console.log("Manual estimate:", {
                     slow: ethers.utils.formatUnits(slow + baseFeePerGas, "gwei"),
                     average: ethers.utils.formatUnits(average + baseFeePerGas, "gwei"),
@@ -637,11 +627,8 @@ const Web3DataContext = ({ children }: any) => {
         });
         setSpeedNetwork(average);
     }
-    useEffect(()=>{
-        if(active){
-            calculateGasLimit();
-        }
-    },[active])
+
+ 
     
 
 
@@ -674,9 +661,14 @@ const Web3DataContext = ({ children }: any) => {
             calculateApproximateFeeTokenNative,
             calculateApproximateFeeNative,
             totalAmount,
-            fast, slow, average,
+            fast, slow, average, baseFeePerGas,
             setSpeedNetwork,
             speedNetwork,
+            txGasUnits, setTxGasUnits,
+            sendTransactionToken,
+            sendTransactionNative,
+            sendTransactionAndPayFeeInToken,
+            calculateGasLimit
         }}>
             {children}
         </Web3Ctx.Provider>

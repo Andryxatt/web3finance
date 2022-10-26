@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { toast, ToastContainer } from "react-toastify";
+import {  useState } from "react";
+import {  ToastContainer } from "react-toastify";
 import { Web3State } from "../../Web3DataContext";
 import EditorFile from "./EditorFile";
 import 'react-toastify/dist/ReactToastify.css';
@@ -7,19 +7,21 @@ import EditorManual from "./EditorManual";
 import PreviewResult from "./PreviewResult";
 import DepositWithdraw from "./DepositWithdraw";
 const EditorAddresses = (props:any) => {
-    const {addressesFromFile} = Web3State();
+    const {addressesFromFile, calculateGasLimit} = Web3State();
     const [isManual, setIsManual] = useState(true);
     const [isPreview, setIsPreview] = useState(true);
+    
     const showNext = () =>{
+        calculateGasLimit();
         console.log("addressesFromFile", addressesFromFile);
         if(addressesFromFile.length > 0){
             setIsPreview(!isPreview);
         }
        else {
-            const idToast = toast( "No addresses and amounts added", {type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER })
+            // const idToast = toast( "No addresses and amounts added", {type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER })
        }
     }
-
+    
     const showPrev = () =>{
         setIsPreview(!isPreview);
     }
