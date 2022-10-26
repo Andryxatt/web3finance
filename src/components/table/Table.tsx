@@ -5,7 +5,7 @@ import TableHeader from "./TableHeader";
 const Table = () => {
     const { tokens, setTokens } = Web3State();
     const openElement = (nameAsset: string) => {
-        tokens.map((token: any) => {
+        tokens.forEach((token: any) => {
             if (token.name === nameAsset) {
                 token.isOpen = !token.isOpen
             }
