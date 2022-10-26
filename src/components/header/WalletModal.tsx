@@ -1,6 +1,5 @@
 import React from "react"
 import AccountBalanceWalletTwoToneIcon from '@mui/icons-material/AccountBalanceWalletTwoTone'
-import { Button } from "@material-tailwind/react"
 import WalletNetwork from "./WalletNetwork"
 import { Web3State } from "../../Web3DataContext"
 import bnbIcon from "../../images/bnb-modal.png"

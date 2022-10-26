@@ -56,7 +56,7 @@ const EditorManual = () => {
             setArrayOfAddressesFromEditor(arrayOfElementsWithoutEmpty);
             setAddressesFromFile(arrayOfElementsWithoutEmpty);
         }
-    }, [codeMirrorElement]);
+    }, [codeMirrorElement, setAddressesFromFile]);
     const deleteInvalid = useCallback(() => {
         let newElems = "";
         const validArray = [];
@@ -77,7 +77,7 @@ const EditorManual = () => {
         })
         setAddressesFromFile(validArray);
         setCodeMirrorElement(newElems)
-    }, [arrayOfAddressesFromEditor])
+    }, [arrayOfAddressesFromEditor, setAddressesFromFile])
 
     useEffect(() => {
         setContainer(editor.current);
@@ -106,6 +106,7 @@ const EditorManual = () => {
                                     </>
                                 )
                             }
+                            else return <></>
                         })
                     }
                 </div>

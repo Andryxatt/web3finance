@@ -5,7 +5,7 @@ import ListOfRecipients from "./multisend/ListOfRecipients";
 import Summary from "./multisend/Summary";
 
 const PreviewResult = (props:any) =>{
-    const {sendTransactionToken, sendTransactionNative, sendTransactionAndPayFeeInToken} = Web3State();
+    const {sendTransactionToken, sendTransactionNative} = Web3State();
     const sendTx = async () => {
         if (props.token.isNative) {
            sendTransactionNative();

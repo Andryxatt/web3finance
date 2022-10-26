@@ -1,4 +1,3 @@
-import { useState } from "react";
 import SocialNetworks from "../SocialNetworks";
 import Logo from "./Logo";
 import NavigationLink from "./NavigationLink";
@@ -19,7 +18,6 @@ const TopNavigation = () => {
             name: 'Help',
             link: '/help'
         }]
-        const [isModalOpen, setIsModalOpen] = useState(false);
     const logoParams = { logoName: "Finance", logoImg: "logo512.png" }
     const showModal = () =>{
         let elem = document.getElementById("navbar-default");

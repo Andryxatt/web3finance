@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { Web3State } from "../../Web3DataContext";
 import Row from "./Row";
 import TableHeader from "./TableHeader";
