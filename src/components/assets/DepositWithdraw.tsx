@@ -1,10 +1,18 @@
+import { useState } from "react";
+import { Web3State } from "../../Web3DataContext";
 
 
-const DepositWithdraw = () =>{
+const DepositWithdraw = (props:any) =>{
+    const {depositAmount, witdrawDeposit, userTokenBalance} = Web3State();
+    const [ammount, setAmmount] = useState(0);
+
     return (
         <div>
-            <button>Deposit</button>
-            <button>Withdraw</button>
+        <div className="flex flex-row mt-7 mb-4">
+            <button className="p-2 bg-neutral-800 text-white min-w-[100px] rounded-md mr-3" onClick={()=>{depositAmount(props.token, ammount)}}>Deposit</button>
+            <button className="p-2 bg-neutral-800 text-white min-w-[100px] rounded-md" onClick={()=>{witdrawDeposit(props.token, ammount)}}>Withdraw</button>
+        </div>
+        <input onChange={(e)=>{setAmmount(parseFloat(e.target.value))}} type="number" className="w-full  rounded-md p-2"/>
         </div>
     )
 }

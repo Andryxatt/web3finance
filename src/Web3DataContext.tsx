@@ -15,7 +15,6 @@ type ContextProps = {
     ConnectWallet?: (connectorName: string, chainId: any) => void,
     addressesFromFile: any,
     setAddressesFromFile: any,
-    getUserBalanceToken: any,
     nativeTokenFeePerAddress: string,
     isFeeInToken: boolean,
     setIsFeeInToken: any,
@@ -46,6 +45,8 @@ type ContextProps = {
     sendTransactionNative: ()=>void,
     sendTransactionAndPayFeeInToken:(addressToken:any, decimal:any)=>void,
     calculateGasLimit: ()=>void,
+    depositAmount: (token:any, amount:any) => void,
+    witdrawDeposit: (token:any, amount:any) => void,
 
 };
 const Web3Ctx = createContext<Partial<ContextProps>>({});
@@ -69,9 +70,9 @@ const Web3DataContext = ({ children }: any) => {
     const [isFeeInToken, setIsFeeInToken] = useState<boolean>(false);
     const [currentChainId, setCurrentChainId] = useState<any>("0x5");
     const [totalAmount, setTotalAmount] = useState<any>(0);
-    const [txGasUnits, setTxGasUnits] = useState<any>(0);
+    const [txGasUnits, setTxGasUnits] = useState<any>();
     const [countTransactions, setCountTransactions] = useState<any>(0);
-
+    const [isPricesLoaded, setIsPricesLoaded] = useState<boolean>(false);
     const [networks, setNetworks] = useState([
         {
             name: "Ethereum",
@@ -174,6 +175,63 @@ const Web3DataContext = ({ children }: any) => {
         });
 
     }
+    const depositAmount = async (token:any, amount:any) => {
+        console.log(amount, "amount");
+        let contract = new Contract(contractsAddresses[currentNetwork.name][0][token.name], RTokenAbi, library?.getSigner());
+        let checkAllowance = await contract.allowance(account, contractsAddresses[currentNetwork.name][0].FeeShare);
+        let feeShare = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+        console.log(parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)), "checkAllowance");
+        if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)) < amount!) {
+            const idToast = toast.loading("Approving please wait...")
+            await contract?.approve(contractsAddresses[currentNetwork.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 })
+                .then((res: any) => {
+                    res.wait().then(async (receipt: any) => {
+                        toast.update(idToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                        const idToast2 = toast.loading("Depositing please wait...")
+                        await feeShare.deposit(contractsAddresses[currentNetwork.name][0][token.name], ethers.utils.parseUnits(currentNetwork!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                            result.wait().then(async (recept: any) => {
+                                toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                            })
+                        }).catch((err: any) => {
+                            toast.update(idToast2, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                        })
+                    })
+                }).catch((err: any) => {
+                    toast.update(idToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                })
+        }
+        else {
+            const idToast2 = toast.loading("Depositing please wait...")
+            feeShare.deposit(contractsAddresses[currentNetwork.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                result.wait().then(async (recept: any) => {
+                    toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                })
+            }).catch((err: any) => {
+                toast.update(idToast2, { render: "Your transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            }).catch((err: any) => {
+                toast.update(idToast2, { render: "Your transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            })
+        }
+    }
+    const witdrawDeposit = async (token:any, amount:any) => {
+        let feeShare = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+        const idToast = toast.loading("Processing transaction please wait...")
+        if (amount! > parseFloat(token.userBalance) || amount! === undefined) {
+            toast.update(idToast, { render: "Input amount to withdraw", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+        }
+        else {
+            feeShare.withdraw(contractsAddresses[currentNetwork.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: "210000" }).then((result: any) => {
+                result.wait().then(async (recept: any) => {
+                    toast.update(idToast, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                }).catch((err: any) => {
+                    toast.update(idToast, { render: "Transaction rejected", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                })
+            }).catch((err: any) => {
+                toast.update(idToast, { render: "Transaction faild", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            });
+        }
+
+    }
     const getTotalDeposit = async () => {
         const providerInfura = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
         goerliTokens.Tokenization.forEach(async (token: any) => {
@@ -198,17 +256,21 @@ const Web3DataContext = ({ children }: any) => {
 
     }
     useEffect(()=>{
-        if (active) {
-            tokens.forEach((token: any) => {
+        if(active){
+            let newTokens = tokens.map((token: any) => {
                 let contract = new Contract(contractsAddresses[currentNetwork.name][0]["r" + token.name], RTokenAbi, library?.getSigner());
                 contract.balanceOf(account).then((res: any) => {
                     console.log("user r token balance ", ethers.utils.formatUnits(res, token.decimal));
                     token.userBalance = ethers.utils.formatUnits(res._hex, token.decimal);
                     // props.updateTokens(ethers.utils.formatUnits(res._hex, props.token.decimal), props.token.name)
+              
                 });
+                return token;
             })
+             setTokens([...newTokens]);
         }
-    })
+          
+    },[active])
    
 
     const totalTokensToMultiSend = () =>{
@@ -255,17 +317,20 @@ const Web3DataContext = ({ children }: any) => {
         const arrayOfAmounts = addressesFromFile.map((item: any) => {
             return item.amount.toString().trim();
         });
-        const feePerAddressNative = await feeShare["calculateFee()"]();
+        const feePerAddressNative = await feeShare["calculateFee(address)"](addressToken);
         const ammount = addressesFromFile.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b.amount), 0);
         setTotalAmount(ammount);
         arrayOfAmounts.unshift(ammount.toString());
         const addresses = addressesFromFile.map((item: any) => { return item.address });
         addresses.unshift(contractsAddresses[currentNetwork.name][0].FeeShare);
-        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (addressesFromFile.length) + parseFloat(ammount.toString()) + parseFloat("0.0000000000000001");
-       
+        // const isRToken = await feeShare.getRTokenAddress(addressToken);
+        console.log(ethers.utils.formatUnits(feePerAddressNative.mul(addressesFromFile.length)), "feePerAddressNative");
+        const adde = ethers.utils.parseEther('0.000000000000000001')
+        console.log(ethers.utils.formatUnits(feePerAddressNative.mul(addressesFromFile.length).add(adde)), "feePerAddressNativea");
+        const msgValue = feePerAddressNative.mul(addressesFromFile.length).add(adde);
+        console.log("msgValue", msgValue);
         const txInfo = {
-            value: ethers.utils.parseEther(msgValue.toString()),
-            maxFeePerGas: ethers.utils.parseUnits(speedNetwork, "gwei"),
+            value: msgValue,
         }
         const finalAmount = arrayOfAmounts.map((item: any) => {
             return ethers.utils.parseEther(item);
@@ -295,10 +360,10 @@ const Web3DataContext = ({ children }: any) => {
             }      
     }
    
-    // const calculateApproximateFeeInToken = (addressToken:any) =>{
-    //     const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-
-    // }
+    const calculateApproximateFeeInToken = (addressToken:any) =>{
+        const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+        
+    }
 
  
     const ConnectWallet = async (connectorName: string) => {
@@ -363,8 +428,15 @@ const Web3DataContext = ({ children }: any) => {
 
         setNetworks(newState);
     };
-    getAssetsPrices();
-    getTotalDeposit();
+    useEffect(() =>{
+        if(!isPricesLoaded){
+            getAssetsPrices();
+            getTotalDeposit();
+            setIsPricesLoaded(true);
+            UpdateNetwork(currentNetwork);
+        }
+    },[isPricesLoaded])
+   
 
     const sendTransactionToken = async (addressToken:any, decimal:any) => {
         const feeShareContract = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
@@ -668,7 +740,9 @@ const Web3DataContext = ({ children }: any) => {
             sendTransactionToken,
             sendTransactionNative,
             sendTransactionAndPayFeeInToken,
-            calculateGasLimit
+            calculateGasLimit,
+            depositAmount,
+            witdrawDeposit
         }}>
             {children}
         </Web3Ctx.Provider>

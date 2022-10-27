@@ -3,7 +3,6 @@ import sortDownIcon from '../../images/sort-down.png';
 import EditorAddresses from '../assets/EditorAddresses';
 import AnimatedDots from '../AnimatedDots';
 const Row = (props: any) => {
-
     return (
         <div className={
             (props.element.isOpen ?
