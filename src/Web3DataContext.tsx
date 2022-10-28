@@ -1,6 +1,6 @@
 import { useWeb3React } from "@web3-react/core";
 import { Contract, ethers, Wallet } from "ethers";
-import { useContext, createContext, useState, useEffect } from 'react';
+import { useContext, createContext, useState, useEffect, useCallback } from 'react';
 import { toast } from "react-toastify";
 import Web3 from "web3";
 import { connectors } from "./helpers/connectors";
@@ -29,7 +29,6 @@ type ContextProps = {
     setFilters: any,
     currentNetwork: any,
     setNetworks: any,
-    currentChainId: any,
     totalAmount:any,
     fast:any, slow:any, average: any, baseFeePerGas:any,
     countTransactions: any,
@@ -68,7 +67,6 @@ const Web3DataContext = ({ children }: any) => {
     const { activate, active, account, library, chainId } = useWeb3React();
     const [addressesFromFile, setAddressesFromFile] = useState<any[]>([]);
     const [isFeeInToken, setIsFeeInToken] = useState<boolean>(false);
-    const [currentChainId, setCurrentChainId] = useState<any>("0x5");
     const [totalAmount, setTotalAmount] = useState<any>(0);
     const [txGasUnits, setTxGasUnits] = useState<any>();
     const [countTransactions, setCountTransactions] = useState<any>(0);
@@ -188,7 +186,7 @@ const Web3DataContext = ({ children }: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(idToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         const idToast2 = toast.loading("Depositing please wait...")
-                        await feeShare.deposit(contractsAddresses[currentNetwork.name][0][token.name], ethers.utils.parseUnits(currentNetwork!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                        await feeShare.deposit(contractsAddresses[currentNetwork.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
                             result.wait().then(async (recept: any) => {
                                 toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                             })
@@ -362,7 +360,7 @@ const Web3DataContext = ({ children }: any) => {
    
     const calculateApproximateFeeInToken = (addressToken:any) =>{
         const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-        
+      
     }
 
  
@@ -402,7 +400,6 @@ const Web3DataContext = ({ children }: any) => {
         const newState = networks.map(obj => {
             if (obj.name === network.name) {
                 setCurrentNetwork(network);
-                setCurrentChainId(network.chainId);
                 switch (network.name) {
                     case "Ethereum":
                         setTokens(ethereumTokens.Tokenization);
@@ -700,8 +697,37 @@ const Web3DataContext = ({ children }: any) => {
         setSpeedNetwork(average);
     }
 
- 
-    
+    const calculateGasLimit2 = useCallback(() =>{
+        
+    },[library, average])
+    useEffect(() =>{
+        library?.on("block", (blockNumber:any) => {
+            const web3 = new Web3('https://eth-goerli.g.alchemy.com/v2/' + process.env.REACT_APP_ALCHEMY_GOERLY_KEY);
+            web3.eth.getFeeHistory(historicalBlocks, "pending", [25, 50, 75]).then((feeHistory) => {
+                const blocks = formatFeeHistory(feeHistory, false);
+                const slow    = avg(blocks.map(b => b.priorityFeePerGas[0]));
+                const average = avg(blocks.map(b => b.priorityFeePerGas[1]));
+                const fast    = avg(blocks.map(b => b.priorityFeePerGas[2]));
+
+                web3.eth.getBlock("pending").then((block) => {
+                  const baseFeePerGas = Number(block.baseFeePerGas);
+                  setSlow(ethers.utils.formatUnits(slow + baseFeePerGas, "gwei"));
+                  setAverage(ethers.utils.formatUnits(average + baseFeePerGas, "gwei"));
+                  setFast(ethers.utils.formatUnits(fast + baseFeePerGas, "gwei"));
+                  setBaseFeePerGas(ethers.utils.formatUnits(baseFeePerGas, "gwei"));
+                //   setSpeedNetwork(ethers.utils.formatUnits(average+baseFeePerGas, "gwei"));
+                  console.log("Manual estimate:", {
+                    slow: ethers.utils.formatUnits(slow + baseFeePerGas, "gwei"),
+                    average: ethers.utils.formatUnits(average + baseFeePerGas, "gwei"),
+                    fast: ethers.utils.formatUnits(fast + baseFeePerGas, "gwei"),
+                  });
+                });
+        });
+        })
+        return () => {
+            library?.removeAllListeners("block");
+        }
+    })
 
 
     return (
@@ -725,7 +751,6 @@ const Web3DataContext = ({ children }: any) => {
             UpdateNetwork,
             currentNetwork,
             setNetworks,
-            currentChainId,
             countTransactions,
             totalTokensToMultiSend,
             getUserTokenBalance,

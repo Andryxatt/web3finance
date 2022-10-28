@@ -3,14 +3,11 @@ import { ToastContainer } from "react-toastify";
 import { Web3State } from "../../../Web3DataContext";
 
 const GasFeeEstimator = () => {
-    const {fast,average, slow, setSpeedNetwork, speedNetwork} = Web3State();
+    const {fast, average, slow, setSpeedNetwork, speedNetwork} = Web3State();
     const inputRef = useRef(null);
-    useEffect(()=>{
-        if(average > 0){
+    useEffect(() => {
             setSpeedNetwork(average);
-        }
-        
-    }, [average, setSpeedNetwork])
+    },[average])
     return (
         <div className="w-full">
         <ToastContainer autoClose={2000} />
