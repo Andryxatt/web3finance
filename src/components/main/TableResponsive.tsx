@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Buffer } from 'buffer';
 import TableElement from "./TableElement";
 import sortIcon from "../../images/sort.svg";
@@ -7,7 +7,7 @@ import sortDescIcon from "../../images/desc.svg";
 import { Web3State } from "../../Web3DataContext";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
-    const { tokens, filters, networks, UpdateNetwork, setTokens, setFilters, currentNetwork} = Web3State();
+    const { tokens, filters, setTokens, setFilters, currentNetwork} = Web3State();
     const searchIcon = require("../../images/search.png");
     const [sortName, setSortName] = useState("");
     const [sortPrice, setSortPrice] = useState("");
@@ -15,7 +15,6 @@ const TableResponsive = () => {
     const [sortUserDeposit, setSortUserDeposit] = useState("");
     
     // const [tokens, setTokens] = useState(goerliTokens.Tokenization);
-  
     const updateState = (button: any) => {
         const newState = filters.map(obj => {
             if (obj.name === button.name) {
@@ -102,7 +101,10 @@ const TableResponsive = () => {
       
           setTokens(newState);
     }
-  
+    useEffect(() => {
+        
+    }, [tokens])
+    
     return (
         <div className="">
          

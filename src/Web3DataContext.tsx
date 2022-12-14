@@ -1,6 +1,6 @@
 import { useWeb3React } from "@web3-react/core";
 import { Contract, ethers, Wallet } from "ethers";
-import { useContext, createContext, useState, useEffect, useCallback } from 'react';
+import { useContext, createContext, useState, useEffect } from 'react';
 import { toast } from "react-toastify";
 import Web3 from "web3";
 import { connectors } from "./helpers/connectors";
@@ -171,14 +171,11 @@ const Web3DataContext = ({ children }: any) => {
             const polygonPrice = await contractMumbai.getAssetPrice(token.address);
             token.tokenPrice = ethers.utils.formatUnits(polygonPrice, 8);
         });
-
     }
     const depositAmount = async (token:any, amount:any) => {
-        console.log(amount, "amount");
         let contract = new Contract(contractsAddresses[currentNetwork.name][0][token.name], RTokenAbi, library?.getSigner());
         let checkAllowance = await contract.allowance(account, contractsAddresses[currentNetwork.name][0].FeeShare);
         let feeShare = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-        console.log(parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)), "checkAllowance");
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)) < amount!) {
             const idToast = toast.loading("Approving please wait...")
             await contract?.approve(contractsAddresses[currentNetwork.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 })
@@ -228,7 +225,6 @@ const Web3DataContext = ({ children }: any) => {
                 toast.update(idToast, { render: "Transaction faild", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
             });
         }
-
     }
     const getTotalDeposit = async () => {
         const providerInfura = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
@@ -265,9 +261,10 @@ const Web3DataContext = ({ children }: any) => {
                 });
                 return token;
             })
-             setTokens([...newTokens]);
+             setTokens(newTokens);
         }
           
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     },[active])
    
 
@@ -358,10 +355,10 @@ const Web3DataContext = ({ children }: any) => {
             }      
     }
    
-    const calculateApproximateFeeInToken = (addressToken:any) =>{
-        const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+    // const calculateApproximateFeeInToken = (addressToken:any) =>{
+    //     const feeShare  = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
       
-    }
+    // }
 
  
     const ConnectWallet = async (connectorName: string) => {
@@ -432,6 +429,7 @@ const Web3DataContext = ({ children }: any) => {
             setIsPricesLoaded(true);
             UpdateNetwork(currentNetwork);
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     },[isPricesLoaded])
    
 
@@ -697,9 +695,7 @@ const Web3DataContext = ({ children }: any) => {
         setSpeedNetwork(average);
     }
 
-    const calculateGasLimit2 = useCallback(() =>{
-        
-    },[library, average])
+ 
     useEffect(() =>{
         library?.on("block", (blockNumber:any) => {
             const web3 = new Web3('https://eth-goerli.g.alchemy.com/v2/' + process.env.REACT_APP_ALCHEMY_GOERLY_KEY);

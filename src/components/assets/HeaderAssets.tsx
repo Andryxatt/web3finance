@@ -71,7 +71,7 @@ const HeaderAssets = () => {
         setTokens(res);
     }
     return (
-        <div className="px-5 py-2 justify-between flex flex-row border-gray-300">
+        <div className="px-5 py-2 justify-between flex flex-row md:hidden border-gray-300">
             <div onClick={() => sortByName()} className="flex cursor-pointer justify-center w-[150px] font-lg">Asset
                 <img className="ml-2 w-[16px]" src={sortName === "" ? sortIcon : sortName === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>

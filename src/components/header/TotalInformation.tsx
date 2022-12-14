@@ -11,8 +11,8 @@ const TotalInformation = () => {
     const showPrice = (num: number) => {
         let number = num;
         let decimals = 2
-        let decpoint = '.' 
-        let thousand = ',' 
+        let decpoint = '.'
+        let thousand = ','
 
         let n = Math.abs(number).toFixed(decimals).split('.')
         n[0] = n[0].split('').reverse().map((c, i, a) =>
@@ -22,8 +22,8 @@ const TotalInformation = () => {
         return final
     }
 
-        updateCount()
-  
+    updateCount()
+
     return (
         <div className="lg:justify-center">
             <div className="text-gray-400 flex">Deposits: <span className="total-usd text-black text-xl font-extrabold ml-10 ">{showPrice(total)} USD</span></div>

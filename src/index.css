@@ -41,8 +41,8 @@ html {
 }
 .modal-content {
   overflow: auto;
-  width: 42%;
   max-height: 700px;
+  min-width:250px;
   background: rgba(0, 0, 0, 0)
     linear-gradient(rgb(218, 239, 240) 0%, rgba(218, 239, 240, 0.9) 100%) repeat
     scroll 0% 0%;
@@ -52,23 +52,22 @@ html {
 .active-network {
   background-color: rgb(128, 180, 209) !important;
 }
-.network_wrapper {
+/* .network_wrapper {
   cursor: pointer;
   display: flex;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  width: 50%;
-  padding: 25px 0px;
-}
-.network_wrapper img {
+} */
+/* .network_wrapper img {
   max-width: 50px;
 }
 .network_wrapper span {
   margin-top: 15px;
   font-weight: bold;
   font-size: 24px;
-}
+  text-align: center;
+} */
 .modal-title {
   font-weight: bold;
   margin-top: 10px;
@@ -169,7 +168,7 @@ html {
 @keyframes hideopen {
   0% {
     opacity: 0;
-  }
+  }modal-content
   100% {
     opacity: 1;
   }

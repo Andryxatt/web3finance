@@ -14,7 +14,7 @@ const Table = () => {
             }
             return token;
         })
-        setTokens([...updatedTokens])
+        setTokens(updatedTokens)
     }
  
     return (

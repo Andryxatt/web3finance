@@ -15,7 +15,7 @@ function App() {
       <Web3Context>
         <TopNavigation />
         <SocialNetworks class={"flex flex-col right-5 fixed lg:hidden"} />
-        <div className='mx-auto max-w-screen-xl max-w-[960px]'>
+        <div className='mx-auto max-w-screen-xl max-w-[960px] md:p-2'>
           <Routes>
             <Route path='/' element={<Main />} />
             <Route path='/stats' element={<Stats />} />

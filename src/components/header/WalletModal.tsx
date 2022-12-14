@@ -20,11 +20,13 @@ const WalletModal = () => {
 
   const [chainSelected, setChainSelected] = React.useState<any>(null)
   const changeNetwork = async (e: any) => {
-    document.querySelectorAll(".network_wrapper").forEach((el: any) => {
-      el.classList.remove("active-network");
-    })
-    const name = e.target.textContent;
-    e.currentTarget.className = "network_wrapper active-network";
+    let name = ""
+    if(e.target.tagName === 'DIV'){
+      name =   e.target.textContent;
+    }
+    else {
+      name = e.target.parentNode.textContent;
+    }
     const newState = networks.map((obj: any) => {
       if (obj.name === name) {
         setChainSelected(obj)
@@ -50,9 +52,9 @@ const WalletModal = () => {
         <AccountBalanceWalletTwoToneIcon />
         {account === null ? 'Connect Wallet' : account ? `${account.substring(0, 6)}...${account.substring(account.length - 4)}` : 'Connect Wallet'}
       </button>
-      <Modal shown={modalShown} close={() => { toggleModal(false) }}>
+      <Modal clas shown={modalShown} close={() => { toggleModal(false) }}>
         <h1 className="px-3 text-center modal-title">1. Choose Network</h1>
-        <div className="flex items-center flex-row flex-wrap">
+        <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
           {
             networks.map((network: any, index: number) => {
               return <WalletNetwork icon={network.icon} key={index} name={network.name} isActive={network.isActive} switchNetwork={changeNetwork} />
@@ -61,25 +63,25 @@ const WalletModal = () => {
 
         </div>
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
-        <div className="flex items-center flex-row flex-wrap">
-          <div className="network_wrapper hover:bg-blue-300"
+        <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
+          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300"
             onClick={() => { ConnectWallet?.("injected", chainSelected) }}>
-            <img alt="Metamask" src={metamaskIcon} />
+            <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={metamaskIcon} />
             <span>Metamask</span>
             <p>Connect to your MetaMask</p>
           </div>
-          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("coinbaseWallet", chainSelected)}>
-            <img alt="Coinbase" src={coinbaseIcon} />
+          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" onClick={() => ConnectWallet?.("coinbaseWallet", chainSelected)}>
+            <img className="sm:max-w-[50px] max-w-[100px]" alt="Coinbase" src={coinbaseIcon} />
             <span>Coinbase Wallet</span>
           </div>
-          <div className="network_wrapper hover:bg-blue-300" onClick={() => {
+          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" onClick={() => {
             ConnectWallet?.("bsc", chainSelected)
           }}>
-            <img alt="Binance" src={bnbIcon} />
+            <img className="sm:max-w-[50px] max-w-[100px]" alt="Binance" src={bnbIcon} />
             <span>Binance Chain Wallet</span>
           </div>
-          <div className="network_wrapper hover:bg-blue-300" onClick={() => ConnectWallet?.("walletConnect", chainSelected)}>
-            <img alt="Wallet Connect" src={walletConnectIcon} />
+          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" onClick={() => ConnectWallet?.("walletConnect", chainSelected)}>
+            <img className="sm:max-w-[50px] max-w-[100px]" alt="Wallet Connect" src={walletConnectIcon} />
             <span>Wallet Connect</span>
           </div>
         </div>

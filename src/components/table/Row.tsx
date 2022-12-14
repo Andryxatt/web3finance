@@ -7,8 +7,8 @@ const Row = (props: any) => {
         <div className={
             (props.element.isOpen ?
                 " bg-blue-100 rounded-lg" :
-                " hover:bg-blue-100 hover:rounded-lg cursor-pointer")
-            + " mx-2 my-1 py-1"
+                " hover:bg-blue-100 hover:rounded-xl cursor-pointer")
+            + " mx-2 my-1 py-1 mb-3"
         }>
             <div className="cursor-pointer items-center  mx-2 my-1 py-3 rounded-xl justify-between flex flex-row hover:bg-blue-100" onClick={(e) => { props.openElement(props.element.name); e.stopPropagation(); e.nativeEvent.stopImmediatePropagation(); }}>
                 <div className='flex justify-center items-center font-lg w-[150px]'>

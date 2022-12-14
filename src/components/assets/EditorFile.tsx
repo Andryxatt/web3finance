@@ -93,7 +93,7 @@ const EditorFile = () => {
     };
     return (
         <div>
-            <form onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()} className="bg-white cursor-pointer rounded-xl flex flex-col justify-center items-center w-full min-w-[480px] h-[200px]">
+            <form onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()} className="bg-white cursor-pointer rounded-xl flex flex-col justify-center items-center md:w-full w-full h-[200px]">
                 <input ref={inputRef} type="file" id="input-file-upload" multiple={true} onChange={handleChange} />
                 <label id="label-file-upload" htmlFor="input-file-upload">
                     <div className="flex flex-col justify-center items-center">

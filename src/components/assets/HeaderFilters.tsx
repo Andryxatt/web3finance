@@ -16,13 +16,13 @@ const HeaderFilters = () => {
     };
     return (
 
-        <div className="flex justify-between items-center mt-3 mb-3 px-3">
+        <div className="flex justify-between md:justify-center flex-wrap items-center mt-3 mb-3 px-3">
             {
                 filters.map((button, index) => {
                     return (
                         button.isActive ?
-                            <button key={index} className="min-w-[50px] px-2 h-[50px] mr-5 border-2 rounded-xl border-orange-400 bg-yellow-200">{button.name}</button> :
-                            <button key={index} onClick={() => updateFilter(button)} className="min-w-[50px] px-2 h-[50px] mr-5 border-2 rounded-xl border-gray-400 bg-white">{button.name}</button>
+                            <button key={index} className="min-w-[50px] px-2 h-[50px] mr-5 border-2 rounded-xl md:mb-2 border-orange-400 bg-yellow-200">{button.name}</button> :
+                            <button key={index} onClick={() => updateFilter(button)} className="min-w-[50px] md:mb-2 px-2 h-[50px] mr-5 border-2 rounded-xl border-gray-400 bg-white">{button.name}</button>
                     )
                 })
             }

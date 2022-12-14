@@ -18,6 +18,7 @@ const EditorManual = () => {
         extensions: [javascript({ jsx: true })],
         value: codeMirrorElement,
         height: "200px",
+        width: "100%",
         placeholder: "Enter your deposit address and amount",
         onChange: onChangeMirror,
     });
