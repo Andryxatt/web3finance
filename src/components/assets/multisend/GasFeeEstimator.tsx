@@ -7,6 +7,7 @@ const GasFeeEstimator = () => {
     const inputRef = useRef(null);
     useEffect(() => {
             setSpeedNetwork(average);
+            // eslint-disable-next-line react-hooks/exhaustive-deps
     },[average])
     return (
         <div className="w-full">

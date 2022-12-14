@@ -1,5 +1,5 @@
 import { Contract, ethers, Wallet } from "ethers";
-import { useCallback, useEffect, useState } from "react";
+import {  useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { Web3State } from "../../../Web3DataContext";
 import MultiSendError from "./MultiSendError";
@@ -25,10 +25,10 @@ const Summary = (props: any) => {
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState(false);
     const [totalAmount, setTotalAmount] = useState(0);
-    const [txGasUnits, setTxGasUnits] = useState<any>();
+    // const [txGasUnits, setTxGasUnits] = useState<any>();
     const [countTransactions, setCountTransactions] = useState(0);
     const contractsAddresses = require("./../../../contracts/AddressesContracts.json")
-    const OracleAbi = require("./../../../contracts/oracle/Oracle.json");
+    // const OracleAbi = require("./../../../contracts/oracle/Oracle.json");
     const FeeShareAbi = require("./../../../contracts/FeeShare.json");
     const RTokenAbi = require("./../../../contracts/RTokenAbi.json");
     const MinimalForwarderAbi = require("./../../../contracts/MinimalForwarderAbi.json");
@@ -90,7 +90,7 @@ const Summary = (props: any) => {
             // setFeeTx(ethers.utils.formatUnits(msgValue, 'ether'));
             setGasFee(ethers.utils.formatUnits(fee, 'ether'));
             setApproximateCostTx(ethers.utils.formatUnits(fee.add(msgValue), 'ether'));
-            setTxGasUnits(ethers.utils.formatUnits(fee, 'ether'));
+            // setTxGasUnits(ethers.utils.formatUnits(fee, 'ether'));
         }
     }
     const sendTransactionToken = async () => {
@@ -136,8 +136,8 @@ const Summary = (props: any) => {
             rTokenContract.approve(contractsAddresses[currentNetwork.name][0].FeeShare, ethers.utils.parseUnits(amount.toFixed(6).toString(), props.token.decimal))
                 .then((res: any) => {
                     res.wait().then(async (res: any) => {
-                        const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
-                        setTxGasUnits(units);
+                        // const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
+                        // setTxGasUnits(units);
                         toast.update(idToast1, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
                         toast.update(idToast1, { render: "Please wait...", isLoading: true });
                         feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo).then((res: any) => {
@@ -188,13 +188,13 @@ const Summary = (props: any) => {
         }
     }
     const calculateApproximateFeeInToken = () => {
-        const feeShareContract = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-        const minimalForwarderContract = new Contract(contractsAddresses[currentNetwork.name][0].MinimalForwarder, MinimalForwarderAbi, library?.getSigner());
-        const arrayOfAmounts = addressesFromFile.map((item: any) => {
-            return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
-        });
-        const addresses = addressesFromFile.map((item: any) => { return item.address });
-        const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts]);
+        // const feeShareContract = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+        // const minimalForwarderContract = new Contract(contractsAddresses[currentNetwork.name][0].MinimalForwarder, MinimalForwarderAbi, library?.getSigner());
+        // const arrayOfAmounts = addressesFromFile.map((item: any) => {
+        //     return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
+        // });
+        // const addresses = addressesFromFile.map((item: any) => { return item.address });
+        // const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts]);
 
     }
     const sendTransactionNative = async () => {
@@ -272,7 +272,7 @@ const Summary = (props: any) => {
         return signature
     }
     const sendTransactionAndPayFeeInToken = async () => {
-        const feeShareContract = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+        // const feeShareContract = new Contract(contractsAddresses[currentNetwork.name][0].FeeShare, FeeShareAbi, library?.getSigner());
         const minimalForwarderContract = new Contract(contractsAddresses[currentNetwork.name][0].MinimalForwarder, MinimalForwarderAbi, library?.getSigner());
         const arrayOfAmounts = addressesFromFile.map((item: any) => {
             return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
@@ -368,6 +368,7 @@ const Summary = (props: any) => {
             console.log("fee in native")
             calculateApproximateFeeTokenNative();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [speedNetwork, userNativeBalance, addressesFromFile, props.isNative])
     useEffect(() => {
 
