@@ -1,46 +1,25 @@
-import React from "react"
+import React, { useEffect } from "react"
 import AccountBalanceWalletTwoToneIcon from '@mui/icons-material/AccountBalanceWalletTwoTone'
 import WalletNetwork from "./WalletNetwork"
-import { Web3State } from "../../Web3DataContext"
 import bnbIcon from "../../images/bnb-modal.png"
 import metamaskIcon from "../../images/metamask-modal.svg"
 import coinbaseIcon from "../../images/coinbase-modal.png"
 import walletConnectIcon from "../../images/wallet-connect-modal.png"
 import Modal from "../ui/Modal"
+import { useWeb3Context } from "web3-react"
+import {  useAppSelector } from "../../store/hooks"
+import { currentNetwork, selectNetwork } from "../../store/network/networkSlice"
 window.Buffer = window.Buffer || require("buffer").Buffer
 
 const WalletModal = () => {
-  const {
-    account,
-    ConnectWallet,
-    SwitchNetwork,
-    networks,
-    setNetworks
-  } = Web3State();
+  const networks = useAppSelector(selectNetwork);
+  const selectedNetwork = useAppSelector(currentNetwork);
 
-  const [chainSelected, setChainSelected] = React.useState<any>(null)
-  const changeNetwork = async (e: any) => {
-    let name = ""
-    if(e.target.tagName === 'DIV'){
-      name =   e.target.textContent;
-    }
-    else {
-      name = e.target.parentNode.textContent;
-    }
-    const newState = networks.map((obj: any) => {
-      if (obj.name === name) {
-        setChainSelected(obj)
-        SwitchNetwork(obj);
-        return { ...obj, isActive: true };
-      }
-      else {
-        return { ...obj, isActive: false };
-      }
-    });
-    setNetworks(newState);
-  }
+  useEffect(() => {
+    console.log("selectedNetwork", selectedNetwork);
+  }, [selectedNetwork]);
+  const {account} = useWeb3Context();
   const [modalShown, toggleModal] = React.useState(false);
-
   return (
     <>
       <button
@@ -57,7 +36,7 @@ const WalletModal = () => {
         <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
           {
             networks.map((network: any, index: number) => {
-              return <WalletNetwork icon={network.icon} key={index} name={network.name} isActive={network.isActive} switchNetwork={changeNetwork} />
+              return <WalletNetwork icon={network.icon} key={index} name={network.name} isActive={network.isActive}/>
             })
           }
 
@@ -65,22 +44,20 @@ const WalletModal = () => {
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
         <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
           <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300"
-            onClick={() => { ConnectWallet?.("injected", chainSelected) }}>
+            >
             <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={metamaskIcon} />
             <span>Metamask</span>
             <p>Connect to your MetaMask</p>
           </div>
-          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" onClick={() => ConnectWallet?.("coinbaseWallet", chainSelected)}>
+          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300">
             <img className="sm:max-w-[50px] max-w-[100px]" alt="Coinbase" src={coinbaseIcon} />
             <span>Coinbase Wallet</span>
           </div>
-          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" onClick={() => {
-            ConnectWallet?.("bsc", chainSelected)
-          }}>
+          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300">
             <img className="sm:max-w-[50px] max-w-[100px]" alt="Binance" src={bnbIcon} />
             <span>Binance Chain Wallet</span>
           </div>
-          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" onClick={() => ConnectWallet?.("walletConnect", chainSelected)}>
+          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" >
             <img className="sm:max-w-[50px] max-w-[100px]" alt="Wallet Connect" src={walletConnectIcon} />
             <span>Wallet Connect</span>
           </div>

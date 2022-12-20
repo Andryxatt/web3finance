@@ -7,8 +7,6 @@
     "@codemirror/lang-javascript": "^6.0.2",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
-    "@ethersproject/providers": "^5.6.8",
-    "@headlessui/react": "^1.6.6",
     "@material-tailwind/react": "^1.0.6",
     "@material-ui/utils": "^4.11.3",
     "@mui/icons-material": "^5.8.4",
@@ -26,10 +24,8 @@
     "@web3-react/core": "^6.1.9",
     "@web3-react/injected-connector": "^6.0.7",
     "@web3-react/network-connector": "^6.2.9",
-    "@web3-react/types": "^6.0.7",
     "@web3-react/walletconnect-connector": "^6.2.13",
     "@web3-react/walletlink-connector": "^6.2.14",
-    "buffer": "^6.0.3",
     "ethers": "^5.6.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -42,10 +38,11 @@
     "styled-components": "^5.3.5",
     "typescript": "^4.7.4",
     "web-vitals": "^2.1.4",
-    "web3": "^1.8.0",
+    "web3": "^1.8.1",
     "web3-react": "^5.0.5",
     "xlsx": "^0.18.5"
   },
+
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
@@ -72,10 +69,19 @@
   },
   "devDependencies": {
     "@types/styled-components": "^5.1.25",
-    "autoprefixer": "^10.4.7",
-    "eslint-plugin-react-hooks": "^4.6.0",
     "postcss": "^8.4.14",
-    "tailwindcss": "^3.1.6"
+    "tailwindcss": "^3.1.6",
+    "assert": "^2.0.0",
+    "buffer": "^6.0.3",
+    "https-browserify": "^1.0.0",
+    "os-browserify": "^0.3.0",
+    "process": "^0.11.10",
+    "react-app-rewired": "^2.2.1",
+    "stream-browserify": "^3.0.0",
+    "crypto": "^1.0.1",
+    "crypto-browserify": "^3.12.0",
+    "stream-http": "^3.2.0",
+    "url": "^0.11.0"
   },
   "resolutions": {
     "styled-components": "^5"

@@ -11,6 +11,7 @@ function getLibrary(provider: any): Web3Provider {
   library.pollingInterval = 12000
   return library
 }
+
 const Web3ReactProviderPolygon = createWeb3ReactRoot('polygon')
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
