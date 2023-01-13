@@ -8,7 +8,6 @@
             "deposits": "0",
             "userBalance": "0",
             "userBalanceDeposit": "0",
-            "isNative": false,
             "isOpen": false
         },
         {
@@ -19,7 +18,6 @@
             "deposits": "0",
             "userBalance": "0",
             "userBalanceDeposit": "0",
-            "isNative": false,
             "isOpen": false
         }
     ]

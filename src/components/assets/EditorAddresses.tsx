@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { ToastContainer } from "react-toastify";
-import { Web3State } from "../../Web3DataContext";
 import EditorFile from "./EditorFile";
 import 'react-toastify/dist/ReactToastify.css';
 import EditorManual from "./EditorManual";
@@ -8,28 +7,27 @@ import PreviewResult from "./PreviewResult";
 import DepositWithdraw from "./DepositWithdraw";
 import ToogleFee from "./multisend/ToogleFee";
 const EditorAddresses = (props: any) => {
-    const { addressesFromFile } = Web3State();
-    const [isManual, setIsManual] = useState(true);
-    const [isPreview, setIsPreview] = useState(true);
-    const [isNativeFee, setIsNativeFee] = useState(false);
-    const showNext = () => {
-        if (addressesFromFile.length > 0) {
-            setIsPreview(!isPreview);
-        }
-        else {
-            // const idToast = toast( "No addresses and amounts added", {type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER })
-        }
-    }
-    const toogleNativeFee = () => {
-        setIsNativeFee(!isNativeFee);
-    }
+    // const [isManual, setIsManual] = useState(true);
+    // const [isPreview, setIsPreview] = useState(true);
+    // const [isNativeFee, setIsNativeFee] = useState(false);
+    // const showNext = () => {
+    //     if (addressesFromFile.length > 0) {
+    //         setIsPreview(!isPreview);
+    //     }
+    //     else {
+    //         // const idToast = toast( "No addresses and amounts added", {type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER })
+    //     }
+    // }
+    // const toogleNativeFee = () => {
+    //     setIsNativeFee(!isNativeFee);
+    // }
 
-    const showPrev = () => {
-        setIsPreview(!isPreview);
-    }
+    // const showPrev = () => {
+    //     setIsPreview(!isPreview);
+    // }
     return (
         <>
-            <ToastContainer />
+            {/* <ToastContainer />
             {
                 isPreview ? 
                 <div className="flex flex-row md:flex-col md:w-full"><div className="md:flex mr-5 md:mr-0 md:flex-col">
@@ -51,7 +49,7 @@ const EditorAddresses = (props: any) => {
                 </div> :
                 <PreviewResult isNativeFee={isNativeFee} token={props.token} isNative={props.isNative} showPrev={showPrev} />
 
-            }
+            } */}
 
         </>
     )

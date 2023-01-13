@@ -24,10 +24,10 @@ const Row = (props: any) => {
                     {props.element.tokenPrice === "0" ? <AnimatedDots/> : props.element.tokenPrice}
                 </div>
                 <div className='flex justify-center font-lg w-[150px]'>
-                   {props.element.deposits === "0" ? <AnimatedDots/> : props.element.deposits}
+                   {props.element.deposits === "0" ? <AnimatedDots/> : parseFloat(props.element.deposits).toFixed(2)}
                 </div>
                 <div className='flex justify-center font-lg w-[150px]'>
-                    {props.element.userBalance === "0" ? <AnimatedDots/> : props.element.userBalance}
+                    {props.element.userBalanceDeposit === "0" ? <AnimatedDots/> : props.element.userBalanceDeposit}
                 </div>
             </div>
             <div className={props.element.isOpen ? "isopen mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5 flex" : "hidden isopen"}>

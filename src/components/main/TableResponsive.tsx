@@ -4,110 +4,108 @@ import TableElement from "./TableElement";
 import sortIcon from "../../images/sort.svg";
 import sortAscIcon from "../../images/asc.svg";
 import sortDescIcon from "../../images/desc.svg";
-import { Web3State } from "../../Web3DataContext";
 Buffer.from('anything', 'base64');
 const TableResponsive = () => {
-    const { tokens, filters, setTokens, setFilters, currentNetwork} = Web3State();
-    const searchIcon = require("../../images/search.png");
-    const [sortName, setSortName] = useState("");
-    const [sortPrice, setSortPrice] = useState("");
-    const [sortDeposits, setSortDeposits] = useState("");
-    const [sortUserDeposit, setSortUserDeposit] = useState("");
+    // const searchIcon = require("../../images/search.png");
+    // const [sortName, setSortName] = useState("");
+    // const [sortPrice, setSortPrice] = useState("");
+    // const [sortDeposits, setSortDeposits] = useState("");
+    // const [sortUserDeposit, setSortUserDeposit] = useState("");
     
-    // const [tokens, setTokens] = useState(goerliTokens.Tokenization);
-    const updateState = (button: any) => {
-        const newState = filters.map(obj => {
-            if (obj.name === button.name) {
-                return { ...obj, isSelected: true };
-            }
-            else {
-                return { ...obj, isSelected: false };
-            }
-        });
-        setFilters(newState);
-    };
-    const sortByName = () => {
+    // // const [tokens, setTokens] = useState(goerliTokens.Tokenization);
+    // const updateState = (button: any) => {
+    //     const newState = filters.map(obj => {
+    //         if (obj.name === button.name) {
+    //             return { ...obj, isSelected: true };
+    //         }
+    //         else {
+    //             return { ...obj, isSelected: false };
+    //         }
+    //     });
+    //     setFilters(newState);
+    // };
+    // const sortByName = () => {
         
-        const res = [...tokens].sort((a: any, b: any) => {
-            if (sortName === "asc") {
-                return a.name > b.name ? 1 : -1;
-            }
-            else {
-                return a.name < b.name ? 1 : -1;
-            }
-        });
-        setSortPrice("");
-        setSortDeposits("");
-        setSortUserDeposit("");
-        setSortName(sortName === "asc" ? "desc" : "asc");
-        setTokens(res);
-    }
-    const sortByPrice = () => {
-        const res = tokens.sort((a: any, b: any) => {
-            if (sortPrice === "asc") {
-                return a.tokenPrice > b.tokenPrice ? 1 : -1;
-            }
-            else {
-                return a.tokenPrice < b.tokenPrice ? 1 : -1;
-            }
-        });
-        setSortName("");
-        setSortDeposits("");
-        setSortUserDeposit("");
-        setSortPrice(sortPrice === "asc" ? "desc" : "asc");
-        setTokens(res);
-    }
-    const sortByDeposits = () => {
-        const res = tokens.sort((a: any, b: any) => {
-            if (sortDeposits === "asc") {
-                return a.deposits > b.deposits ? 1 : -1;
-            }
-            else {
-                return a.deposits < b.deposits ? 1 : -1;
-            }
-        });
-        setSortPrice("");
-        setSortName("");
-        setSortUserDeposit("");
-        setSortDeposits(sortDeposits === "asc" ? "desc" : "asc");
-        setTokens(res);
-    }
-    const sortByUserDeposit = () => {
-        const res = tokens.sort((a: any, b: any) => {
-            if (sortUserDeposit === "asc") {
-                return a.userBalance > b.userBalance ? 1 : -1;
-            }
-            else {
-                return a.userBalance < b.userBalance ? 1 : -1;
-            }
-        });
-        setSortPrice("");
-        setSortName("");
-        setSortDeposits("");
-        setSortUserDeposit(sortUserDeposit === "asc" ? "desc" : "asc");
-        setTokens(res);
-    }
-    const updateTokens = (balance:any, tokenName:any) => {
-        console.log(balance, "balance");
-        const newState = tokens.map(obj => {
-            // 👇️ if id equals 2, update country property
-            if (obj.name === tokenName) {
-              return {...obj, userBalance: balance};
-            }
+    //     const res = [...tokens].sort((a: any, b: any) => {
+    //         if (sortName === "asc") {
+    //             return a.name > b.name ? 1 : -1;
+    //         }
+    //         else {
+    //             return a.name < b.name ? 1 : -1;
+    //         }
+    //     });
+    //     setSortPrice("");
+    //     setSortDeposits("");
+    //     setSortUserDeposit("");
+    //     setSortName(sortName === "asc" ? "desc" : "asc");
+    //     setTokens(res);
+    // }
+    // const sortByPrice = () => {
+    //     const res = tokens.sort((a: any, b: any) => {
+    //         if (sortPrice === "asc") {
+    //             return a.tokenPrice > b.tokenPrice ? 1 : -1;
+    //         }
+    //         else {
+    //             return a.tokenPrice < b.tokenPrice ? 1 : -1;
+    //         }
+    //     });
+    //     setSortName("");
+    //     setSortDeposits("");
+    //     setSortUserDeposit("");
+    //     setSortPrice(sortPrice === "asc" ? "desc" : "asc");
+    //     setTokens(res);
+    // }
+    // const sortByDeposits = () => {
+    //     const res = tokens.sort((a: any, b: any) => {
+    //         if (sortDeposits === "asc") {
+    //             return a.deposits > b.deposits ? 1 : -1;
+    //         }
+    //         else {
+    //             return a.deposits < b.deposits ? 1 : -1;
+    //         }
+    //     });
+    //     setSortPrice("");
+    //     setSortName("");
+    //     setSortUserDeposit("");
+    //     setSortDeposits(sortDeposits === "asc" ? "desc" : "asc");
+    //     setTokens(res);
+    // }
+    // const sortByUserDeposit = () => {
+    //     const res = tokens.sort((a: any, b: any) => {
+    //         if (sortUserDeposit === "asc") {
+    //             return a.userBalance > b.userBalance ? 1 : -1;
+    //         }
+    //         else {
+    //             return a.userBalance < b.userBalance ? 1 : -1;
+    //         }
+    //     });
+    //     setSortPrice("");
+    //     setSortName("");
+    //     setSortDeposits("");
+    //     setSortUserDeposit(sortUserDeposit === "asc" ? "desc" : "asc");
+    //     setTokens(res);
+    // }
+    // const updateTokens = (balance:any, tokenName:any) => {
+    //     console.log(balance, "balance");
+    //     const newState = tokens.map(obj => {
+    //         // 👇️ if id equals 2, update country property
+    //         if (obj.name === tokenName) {
+    //           return {...obj, userBalance: balance};
+    //         }
       
-            // 👇️ otherwise return object as is
-            return obj;
-          });
+    //         // 👇️ otherwise return object as is
+    //         return obj;
+    //       });
       
-          setTokens(newState);
-    }
-    useEffect(() => {
+    //       setTokens(newState);
+    // }
+    // useEffect(() => {
         
-    }, [tokens])
+    // }, [tokens])
     
     return (
         <div className="">
-         
+{/*          
             <div className="flex flex-row justify-between px-5 py-[15px] border-b-[1px] border-gray-300">
                 <div className="flex justify-between items-center">
                     {
@@ -152,7 +150,7 @@ const TableResponsive = () => {
                     )
                 })
             }
-          
+           */}
         </div>
     );
 }

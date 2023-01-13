@@ -2,15 +2,11 @@ import { useCodeMirror } from '@uiw/react-codemirror';
 import { javascript } from '@codemirror/lang-javascript';
 import { useCallback,  useEffect,  useRef, useState } from 'react';
 import { ethers } from 'ethers';
-import { Web3State } from '../../Web3DataContext';
 import ExampleManual from './ExampleManual';
 import Modal from '../ui/Modal';
 import React from 'react';
 function ManualDeposit(props: any){
-    const {
-        addressesFromFile,
-        setAddressesFromFile
-     } = Web3State();
+
 
     const [isValid, setIsValid] = useState<boolean>(true);
     const [modalShown, toggleModal] = React.useState(false);
@@ -105,34 +101,34 @@ function ManualDeposit(props: any){
         setElement(newElems)
         validate()
     },[arrayOfAddrAmounts, validate])
-    const filesUpdate = useCallback(() =>{
-        let newArr = [];
-        let newElems = "";
-        if(addressesFromFile.length > 0){
-            for (let index = 0; index < addressesFromFile.length; index++) {
-                if (index === addressesFromFile.length - 1) {
-                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1];
-                }
-                else {
-                    newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1] + "\n";
-                }
-                const newElement = {
-                    address: addressesFromFile[index][0],
-                    amount: addressesFromFile[index][1],
-                    errorAddress: !ethers.utils.isAddress(addressesFromFile[index][0]) ? "is not valid" : "",
-                    errorAmount: isNaN(addressesFromFile[index][1]) === true ? "is not valid" : "",
-                    row: index + 1
-                }
-                newArr.push(newElement);
-            }
-            localStorage.setItem("filteredLang", newElems);
-            setArrayOfAddrAmounts(newArr);
-            setElement(newElems);
-            setAddressesFromFile([]);
-        }
+    // const filesUpdate = useCallback(() =>{
+    //     let newArr = [];
+    //     let newElems = "";
+    //     if(addressesFromFile.length > 0){
+    //         for (let index = 0; index < addressesFromFile.length; index++) {
+    //             if (index === addressesFromFile.length - 1) {
+    //                 newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1];
+    //             }
+    //             else {
+    //                 newElems += addressesFromFile[index][0] + "," + addressesFromFile[index][1] + "\n";
+    //             }
+    //             const newElement = {
+    //                 address: addressesFromFile[index][0],
+    //                 amount: addressesFromFile[index][1],
+    //                 errorAddress: !ethers.utils.isAddress(addressesFromFile[index][0]) ? "is not valid" : "",
+    //                 errorAmount: isNaN(addressesFromFile[index][1]) === true ? "is not valid" : "",
+    //                 row: index + 1
+    //             }
+    //             newArr.push(newElement);
+    //         }
+    //         localStorage.setItem("filteredLang", newElems);
+    //         setArrayOfAddrAmounts(newArr);
+    //         setElement(newElems);
+    //         setAddressesFromFile([]);
+    //     }
         
-        deleteInvalid();
-    }, [addressesFromFile, deleteInvalid, setAddressesFromFile]);
+    //     deleteInvalid();
+    // }, [addressesFromFile, deleteInvalid, setAddressesFromFile]);
     // getListFromFile();
     const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
     const { setContainer } = useCodeMirror({
@@ -217,7 +213,7 @@ function ManualDeposit(props: any){
     // },[element, setContainer,validate]);
     return (
         <div className="px-5 py-5">
-            <div className="flex justify-between items-center mb-2">
+            {/* <div className="flex justify-between items-center mb-2">
                 <h3>Addresses with Amounts</h3> <span onClick={() => { props.switchDepoist(false) }} className="underline  cursor-pointer">Upload file</span>
             </div>
             <div>
@@ -255,7 +251,7 @@ function ManualDeposit(props: any){
                     props.changeModalContent(isValid, arrayOfAddrAmounts);
                 }    
                         
-            }} className={`text-white font-bold py-2 px-4 rounded-full ${arrayOfAddrAmounts.length <= 0 ? "bg-red-500" : "bg-slate-500"}  `}>Next</button>
+            }} className={`text-white font-bold py-2 px-4 rounded-full ${arrayOfAddrAmounts.length <= 0 ? "bg-red-500" : "bg-slate-500"}  `}>Next</button> */}
         </div>
     );
 }

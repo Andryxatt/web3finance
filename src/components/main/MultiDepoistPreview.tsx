@@ -1,7 +1,5 @@
-import { useWeb3React } from "@web3-react/core";
 import {  Contract, ethers, Wallet } from "ethers";
 import { useState } from "react";
-import { Web3State } from "../../Web3DataContext";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const MinimalForwarderAbi = require("../../contracts/MinimalForwarderAbi.json");
@@ -10,357 +8,354 @@ const RTokenAbi = require("../../contracts/RTokenAbi.json");
 const contractsAddresses = require("../../contracts/AddressesContracts.json");
 const BalanceOfAbi = require("../../contracts/balanceOfAbi.json");
 const MultiDepoistPreview = (props: any) => {
-    const { library, account } = useWeb3React();
-    const [userBalanceToken, setUserBalanceToken] = useState("0");
-    const [userBalanceNative, setUserBalanceNative] = useState("0");
-    const [feePerAddressNative, setFeePerAddressNative] = useState("0");
-    const [rTokenBalance, setRTokenBalance] = useState("0")
+    // const [userBalanceToken, setUserBalanceToken] = useState("0");
+    // const [userBalanceNative, setUserBalanceNative] = useState("0");
+    // const [feePerAddressNative, setFeePerAddressNative] = useState("0");
+    // const [rTokenBalance, setRTokenBalance] = useState("0")
 
-    // const [errorEstimate, setErrorEstimate] = useState(true)
-    const [networkSpeed, setNetworkSpeed] = useState("3");
-    const [txCount, setTxCount] = useState("0");
-    const [approximateCost, setApproximateCost] = useState("0");
-    const { isFeeInToken,
-        chainId
-    } = Web3State();
-    const summAmunt = () => {
-        let res = 0;
-        props.addressesAmount.forEach((element: any) => {
-            res += parseFloat(element?.amount);
-        })
-        return res;
-    }
-    // const getRTokenFeePerAddress = async (address: string) => {
-    //     const feeShareContract = new Contract(contractsAddresses[props.network.name].FeeShare, FeeShareAbi, library.getSigner());
-    //     const res = await feeShareContract["calculateFee(address)"](address);
-    //     setRTokenFee(res.toString());
+    // // const [errorEstimate, setErrorEstimate] = useState(true)
+    // const [networkSpeed, setNetworkSpeed] = useState("3");
+    // const [txCount, setTxCount] = useState("0");
+    // const [approximateCost, setApproximateCost] = useState("0");
+
+    // const summAmunt = () => {
+    //     let res = 0;
+    //     props.addressesAmount.forEach((element: any) => {
+    //         res += parseFloat(element?.amount);
+    //     })
+    //     return res;
     // }
-    const getUserBalanceNative = () => {
-        library?.getBalance(account).then((res: any) => {
-            setUserBalanceNative(ethers.utils.formatUnits(res._hex));
-        })
-    }
-    const getUserBalanceToken = async () => {
-        if (props.token.isNative) {
-            library?.getBalance(account).then((res: any) => {
-                // console.log(res)
-                setUserBalanceToken(ethers.utils.formatUnits(res._hex));
-            })
-        }
-        else {
-            const balanceOf = new Contract(props.token.address, BalanceOfAbi, library.getSigner());
-            const price = await balanceOf.balanceOf(account);
-            setUserBalanceToken(ethers.utils.formatUnits(price._hex, props.token.decimal));
-        }
+    // // const getRTokenFeePerAddress = async (address: string) => {
+    // //     const feeShareContract = new Contract(contractsAddresses[props.network.name].FeeShare, FeeShareAbi, library.getSigner());
+    // //     const res = await feeShareContract["calculateFee(address)"](address);
+    // //     setRTokenFee(res.toString());
+    // // }
+    // const getUserBalanceNative = () => {
+    //     library?.getBalance(account).then((res: any) => {
+    //         setUserBalanceNative(ethers.utils.formatUnits(res._hex));
+    //     })
+    // }
+    // const getUserBalanceToken = async () => {
+    //     if (props.token.isNative) {
+    //         library?.getBalance(account).then((res: any) => {
+    //             // console.log(res)
+    //             setUserBalanceToken(ethers.utils.formatUnits(res._hex));
+    //         })
+    //     }
+    //     else {
+    //         const balanceOf = new Contract(props.token.address, BalanceOfAbi, library.getSigner());
+    //         const price = await balanceOf.balanceOf(account);
+    //         setUserBalanceToken(ethers.utils.formatUnits(price._hex, props.token.decimal));
+    //     }
 
-    }
-    getUserBalanceNative();
-    getUserBalanceToken();
-    const calculateTxCostTokenFeeNative = async () => {
-        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-        const feePerAddressNative = await feeShareContract["calculateFee()"]();
-        setFeePerAddressNative(ethers.utils.formatEther(feePerAddressNative));
-        const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-        const arrayOfAmounts = props.addressesAmount.map((item: any) => {
-            return item.amount.toString().trim();
-        });
-        const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        const msgValue = isRToken === null || undefined ?
-            parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
-            parseFloat(ethers.utils.formatEther(feePerAddressNative)!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
-        const feeData = await library.getFeeData();
-        const txInfo = {
-            value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18), "ether"),
-            maxFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas),
-        }
-        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas);
-        const finalAmount = arrayOfAmounts.map((item: any) => {
-            return ethers.utils.parseUnits(item, props.token.decimal);
-        });
-        if (isFeeInToken) {
-            console.log("isFeeInToken")
-            const estimatedGas = await feeShareContract.estimateGas.multiSendFee(props.token.address, addresses, finalAmount, { gasLimit: "210000" }).catch((err) => {
-                const { code } = err;
-                if (code === "UNPREDICTABLE_GAS_LIMIT") {
-                    // setErrorEstimate(false);
-                }
-            });
-            const gasUsed = await feeShareContract.calculateTxfeeToken(props.token.address, feeData.gasPrice.mul(estimatedGas));
-            console.log(gasUsed.toString(), "gasUsed");
-            const sumTxCost = parseFloat(ethers.utils.formatUnits(gasUsed, props.token.decimal)) + summAmunt() + addresses.length * 10 + 0.5;
-            setApproximateCost(sumTxCost.toString());
-            const count = props.addressesAmount.length / 255;
-            setTxCount(parseFloat((1 + count).toString()).toFixed());
-        }
-        else {
-            const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
-            const allowance = await rTokenContract.allowance(account, contractsAddresses[props.network.name][0].FeeShare);
-            // const feeData = await library.getFeeData();
-            const count = props.addressesAmount.length / 255;
-            if (parseFloat(ethers.utils.formatUnits(allowance.toString(), props.token.decimal)) >= summAmunt()) {
-                const gasUsed = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo);
-                const txFee = gasUsed.mul(maxFeePerGas);
-                console.log(txFee, "txFee")
-                setApproximateCost(ethers.utils.formatUnits(txFee, 'ether'));
-                setTxCount(parseFloat((1 + count).toString()).toFixed());
-            }
-            else {
-                const units = await rTokenContract.estimateGas.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toString(), props.token.decimal), {maxFeePerGas: maxFeePerGas});
-                const txFee = units.mul(maxFeePerGas);
-                setApproximateCost(ethers.utils.formatUnits(txFee, 'ether'));
-                setTxCount(parseFloat((2 + count).toString()).toFixed());
-            }
-        }
-    }
-    const getRTokenBalance = async () => {
-        const rTokenContract = new Contract(contractsAddresses[props.network.name][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
-        const balanceOf = await rTokenContract.balanceOf(account);
-        // console.log(balanceOf, "balanceOf")
-        setRTokenBalance(ethers.utils.formatUnits(balanceOf, props.token.decimal));
-    }
-    getRTokenBalance();
-    const calculateTxCostNative = async () => {
-        // console.log("calculateTxCostNative");
-        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-        const arrayOfAmounts = props.addressesAmount.map((item: any) => {
-            return item.amount.toString().trim();
-        });
-        const feePerAddressNative = await feeShareContract["calculateFee()"]();
-        arrayOfAmounts.unshift(summAmunt().toString());
-        const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
-        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
-        const feeData = await library.getFeeData();
-        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas)
-        const txInfo = {
-            value: ethers.utils.parseEther(msgValue.toString()),
-            maxFeePerGas: maxFeePerGas,
-        }
-        const finalAmount = arrayOfAmounts.map((item: any) => {
-            return ethers.utils.parseEther(item);
-        });
-        const count = props.addressesAmount.length / 255;
-        const units = await feeShareContract.estimateGas["multiSend(address[],uint256[])"](addresses, finalAmount, txInfo);
-        const txFee = units.mul(maxFeePerGas);
-        setApproximateCost((parseFloat(ethers.utils.formatEther(txFee)) + parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length)).toString());
-        setTxCount(parseFloat((1 + count).toString()).toFixed());
-    }
-    if (props.token.isNative) {
-        calculateTxCostNative();
-    }
-    else {
-        if (isFeeInToken) {
+    // }
+    // getUserBalanceNative();
+    // getUserBalanceToken();
+    // const calculateTxCostTokenFeeNative = async () => {
+    //     const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+    //     const feePerAddressNative = await feeShareContract["calculateFee()"]();
+    //     setFeePerAddressNative(ethers.utils.formatEther(feePerAddressNative));
+    //     const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
+    //     const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+    //         return item.amount.toString().trim();
+    //     });
+    //     const addresses = props.addressesAmount.map((item: any) => { return item.address });
+    //     const msgValue = isRToken === null || undefined ?
+    //         parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
+    //         parseFloat(ethers.utils.formatEther(feePerAddressNative)!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
+    //     const feeData = await library.getFeeData();
+    //     const txInfo = {
+    //         value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18), "ether"),
+    //         maxFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas),
+    //     }
+    //     const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas);
+    //     const finalAmount = arrayOfAmounts.map((item: any) => {
+    //         return ethers.utils.parseUnits(item, props.token.decimal);
+    //     });
+    //     if (isFeeInToken) {
+    //         console.log("isFeeInToken")
+    //         const estimatedGas = await feeShareContract.estimateGas.multiSendFee(props.token.address, addresses, finalAmount, { gasLimit: "210000" }).catch((err) => {
+    //             const { code } = err;
+    //             if (code === "UNPREDICTABLE_GAS_LIMIT") {
+    //                 // setErrorEstimate(false);
+    //             }
+    //         });
+    //         const gasUsed = await feeShareContract.calculateTxfeeToken(props.token.address, feeData.gasPrice.mul(estimatedGas));
+    //         console.log(gasUsed.toString(), "gasUsed");
+    //         const sumTxCost = parseFloat(ethers.utils.formatUnits(gasUsed, props.token.decimal)) + summAmunt() + addresses.length * 10 + 0.5;
+    //         setApproximateCost(sumTxCost.toString());
+    //         const count = props.addressesAmount.length / 255;
+    //         setTxCount(parseFloat((1 + count).toString()).toFixed());
+    //     }
+    //     else {
+    //         const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
+    //         const allowance = await rTokenContract.allowance(account, contractsAddresses[props.network.name][0].FeeShare);
+    //         // const feeData = await library.getFeeData();
+    //         const count = props.addressesAmount.length / 255;
+    //         if (parseFloat(ethers.utils.formatUnits(allowance.toString(), props.token.decimal)) >= summAmunt()) {
+    //             const gasUsed = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo);
+    //             const txFee = gasUsed.mul(maxFeePerGas);
+    //             console.log(txFee, "txFee")
+    //             setApproximateCost(ethers.utils.formatUnits(txFee, 'ether'));
+    //             setTxCount(parseFloat((1 + count).toString()).toFixed());
+    //         }
+    //         else {
+    //             const units = await rTokenContract.estimateGas.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toString(), props.token.decimal), {maxFeePerGas: maxFeePerGas});
+    //             const txFee = units.mul(maxFeePerGas);
+    //             setApproximateCost(ethers.utils.formatUnits(txFee, 'ether'));
+    //             setTxCount(parseFloat((2 + count).toString()).toFixed());
+    //         }
+    //     }
+    // }
+    // const getRTokenBalance = async () => {
+    //     const rTokenContract = new Contract(contractsAddresses[props.network.name][0]["r" + props.token.name], RTokenAbi, library?.getSigner());
+    //     const balanceOf = await rTokenContract.balanceOf(account);
+    //     // console.log(balanceOf, "balanceOf")
+    //     setRTokenBalance(ethers.utils.formatUnits(balanceOf, props.token.decimal));
+    // }
+    // getRTokenBalance();
+    // const calculateTxCostNative = async () => {
+    //     // console.log("calculateTxCostNative");
+    //     const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+    //     const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+    //         return item.amount.toString().trim();
+    //     });
+    //     const feePerAddressNative = await feeShareContract["calculateFee()"]();
+    //     arrayOfAmounts.unshift(summAmunt().toString());
+    //     const addresses = props.addressesAmount.map((item: any) => { return item.address });
+    //     addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
+    //     const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
+    //     const feeData = await library.getFeeData();
+    //     const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas)
+    //     const txInfo = {
+    //         value: ethers.utils.parseEther(msgValue.toString()),
+    //         maxFeePerGas: maxFeePerGas,
+    //     }
+    //     const finalAmount = arrayOfAmounts.map((item: any) => {
+    //         return ethers.utils.parseEther(item);
+    //     });
+    //     const count = props.addressesAmount.length / 255;
+    //     const units = await feeShareContract.estimateGas["multiSend(address[],uint256[])"](addresses, finalAmount, txInfo);
+    //     const txFee = units.mul(maxFeePerGas);
+    //     setApproximateCost((parseFloat(ethers.utils.formatEther(txFee)) + parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length)).toString());
+    //     setTxCount(parseFloat((1 + count).toString()).toFixed());
+    // }
+    // if (props.token.isNative) {
+    //     calculateTxCostNative();
+    // }
+    // else {
+    //     if (isFeeInToken) {
 
-        }
-        else {
-            calculateTxCostTokenFeeNative();
-        }
+    //     }
+    //     else {
+    //         calculateTxCostTokenFeeNative();
+    //     }
 
-    }
-    const sendTransactionToken = async () => {
-        // console.log(isFeeInToken, "isFeeInToken");
-        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+    // }
+    // const sendTransactionToken = async () => {
+    //     // console.log(isFeeInToken, "isFeeInToken");
+    //     const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
 
-        const arrayOfAmounts = props.addressesAmount.map((item: any) => {
-            return item.amount.toString().trim();
-        });
-        const feeData = await library.getFeeData();
-        const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-        const msgValue = isRToken === null || undefined ?
-            parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
-            parseFloat(feePerAddressNative!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
-        const maxFeePerGas = feeData.lastBaseFeePerGas.add(ethers.utils.parseUnits(networkSpeed, "gwei"));
-        const txInfo = {
-            value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18)),
-            maxFeePerGas: maxFeePerGas,
-        }
-        const finalAmount = arrayOfAmounts.map((item: any) => {
-            return ethers.utils.parseUnits(item, props.token.decimal);
-        });
+    //     const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+    //         return item.amount.toString().trim();
+    //     });
+    //     const feeData = await library.getFeeData();
+    //     const addresses = props.addressesAmount.map((item: any) => { return item.address });
+    //     const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
+    //     const msgValue = isRToken === null || undefined ?
+    //         parseFloat('0.2') * (props.addressesAmount.length) + parseFloat("0.0000000000000001") :
+    //         parseFloat(feePerAddressNative!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
+    //     const maxFeePerGas = feeData.lastBaseFeePerGas.add(ethers.utils.parseUnits(networkSpeed, "gwei"));
+    //     const txInfo = {
+    //         value: ethers.utils.parseUnits(parseFloat(msgValue.toString()).toFixed(18)),
+    //         maxFeePerGas: maxFeePerGas,
+    //     }
+    //     const finalAmount = arrayOfAmounts.map((item: any) => {
+    //         return ethers.utils.parseUnits(item, props.token.decimal);
+    //     });
 
-        const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
-        const allowance = await rTokenContract.allowance(account, contractsAddresses[props.network.name][0].FeeShare);
-        // const feeData = await library.getFeeData();
-        if (parseFloat(ethers.utils.formatUnits(allowance.toString(), props.token.decimal)) >= parseFloat(summAmunt().toString())) {
-            const idToast = toast.loading("Please wait...")
-            feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
-                .then((res: any) => {
-                    res.wait().then((res: any) => {
+    //     const rTokenContract = new Contract(props.token.address, RTokenAbi, library?.getSigner());
+    //     const allowance = await rTokenContract.allowance(account, contractsAddresses[props.network.name][0].FeeShare);
+    //     // const feeData = await library.getFeeData();
+    //     if (parseFloat(ethers.utils.formatUnits(allowance.toString(), props.token.decimal)) >= parseFloat(summAmunt().toString())) {
+    //         const idToast = toast.loading("Please wait...")
+    //         feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
+    //             .then((res: any) => {
+    //                 res.wait().then((res: any) => {
 
-                    })
-                }).catch((err: any) => {
-                    // console.log(err);
-                    toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-                })
-        }
-        else {
-            const idToast = toast.loading("Please wait...")
-            rTokenContract.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal), { maxFeePerGas: maxFeePerGas })
-                .then((res: any) => {
-                    res.wait().then(async (res: any) => {
-                        const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
-                        console.log(units, "units");
-                        // const txFee = BigNumber.from(average).mul(units);
-                        // setApproximateCost(ethers.utils.formatEther(txFee) + parseFloat(msgValue.toString()).toFixed(18));
-                        toast.update(idToast, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-                        toast.update(idToast, { render: "Please wait...", isLoading: true });
-                        feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo).then((res: any) => {
-                            res.wait().then((res: any) => {
-                                toast.update(idToast, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-                                console.log(res)
-                            })
-                        })
-                    }).catch((err: any) => {
-                        toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-                    })
-                }).catch((err: any) => {
-                    toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false });
-                });
-        }
-    }
-    const sendTransactionNative = async () => {
-        const idToast = toast.loading("Processing transaction please wait...")
-        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
-        const arrayOfAmounts = props.addressesAmount.map((item: any) => {
-            return item.amount.toString().trim();
-        });
-        const feePerAddressNative = await feeShareContract["calculateFee()"]();
-        arrayOfAmounts.unshift(summAmunt().toString());
-        const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
-        const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
-        const feeData = await library.getFeeData();
-        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas)
-        const txInfo = {
-            value: ethers.utils.parseEther(msgValue.toString()),
-            maxFeePerGas: maxFeePerGas,
-            maxPriorityFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei")
-        }
-        const finalAmount = arrayOfAmounts.map((item: any) => {
-            return ethers.utils.parseEther(item);
-        });
-       feeShareContract['multiSend(address[],uint256[])'](addresses, finalAmount, txInfo).then((res:any) =>{
-            res.wait().then((res:any) =>{
-                toast.update(idToast, { render: "Transaction success", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-            }).catch((err:any) =>{
-                toast.update(idToast, { render: "Transaction error", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-            })
-        }).catch((err: any) => {
-            toast.update(idToast, { render: "Transaction rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
-        });
+    //                 })
+    //             }).catch((err: any) => {
+    //                 // console.log(err);
+    //                 toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+    //             })
+    //     }
+    //     else {
+    //         const idToast = toast.loading("Please wait...")
+    //         rTokenContract.approve(contractsAddresses[props.network.name][0].FeeShare, ethers.utils.parseUnits(summAmunt().toFixed(6).toString(), props.token.decimal), { maxFeePerGas: maxFeePerGas })
+    //             .then((res: any) => {
+    //                 res.wait().then(async (res: any) => {
+    //                     const units = await feeShareContract.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo)
+    //                     console.log(units, "units");
+    //                     // const txFee = BigNumber.from(average).mul(units);
+    //                     // setApproximateCost(ethers.utils.formatEther(txFee) + parseFloat(msgValue.toString()).toFixed(18));
+    //                     toast.update(idToast, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+    //                     toast.update(idToast, { render: "Please wait...", isLoading: true });
+    //                     feeShareContract["multiSend(address,address[],uint256[])"](props.token.address, addresses, finalAmount, txInfo).then((res: any) => {
+    //                         res.wait().then((res: any) => {
+    //                             toast.update(idToast, { render: "All is good", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+    //                             console.log(res)
+    //                         })
+    //                     })
+    //                 }).catch((err: any) => {
+    //                     toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+    //                 })
+    //             }).catch((err: any) => {
+    //                 toast.update(idToast, { render: "Rejected", type: "error", autoClose: 2000, isLoading: false });
+    //             });
+    //     }
+    // }
+    // const sendTransactionNative = async () => {
+    //     const idToast = toast.loading("Processing transaction please wait...")
+    //     const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+    //     const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+    //         return item.amount.toString().trim();
+    //     });
+    //     const feePerAddressNative = await feeShareContract["calculateFee()"]();
+    //     arrayOfAmounts.unshift(summAmunt().toString());
+    //     const addresses = props.addressesAmount.map((item: any) => { return item.address });
+    //     addresses.unshift(contractsAddresses[props.network.name][0].FeeShare);
+    //     const msgValue = parseFloat(ethers.utils.formatEther(feePerAddressNative!)) * (props.addressesAmount.length) + parseFloat(summAmunt().toString()) + parseFloat("0.0000000000000001");
+    //     const feeData = await library.getFeeData();
+    //     const maxFeePerGas = ethers.utils.parseUnits(networkSpeed, "gwei").add(feeData.lastBaseFeePerGas)
+    //     const txInfo = {
+    //         value: ethers.utils.parseEther(msgValue.toString()),
+    //         maxFeePerGas: maxFeePerGas,
+    //         maxPriorityFeePerGas: ethers.utils.parseUnits(networkSpeed, "gwei")
+    //     }
+    //     const finalAmount = arrayOfAmounts.map((item: any) => {
+    //         return ethers.utils.parseEther(item);
+    //     });
+    //    feeShareContract['multiSend(address[],uint256[])'](addresses, finalAmount, txInfo).then((res:any) =>{
+    //         res.wait().then((res:any) =>{
+    //             toast.update(idToast, { render: "Transaction success", type: "success", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+    //         }).catch((err:any) =>{
+    //             toast.update(idToast, { render: "Transaction error", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+    //         })
+    //     }).catch((err: any) => {
+    //         toast.update(idToast, { render: "Transaction rejected", type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER });
+    //     });
 
-    }
-    const signMetaTx = async (req: any) => {
-        // console.log(req, "req");
-        const msgParams = JSON.stringify({
-            domain: {
-                chainId: chainId,
-                name: 'FeeShare',
-                verifyingContract: contractsAddresses[props.network.name][0].MinimalForwarder,
-                version: '1.0.0',
-            },
-            // Defining the message signing data content.
-            message: req,
-            // Refers to the keys of the *types* object below.
-            primaryType: 'ForwardRequest',
-            types: {
-                // TODO: Clarify if EIP712Domain refers to the domain the contract is hosted on
-                EIP712Domain: [
-                    { name: 'name', type: 'string' },
-                    { name: 'version', type: 'string' },
-                    { name: 'chainId', type: 'uint256' },
-                    { name: 'verifyingContract', type: 'address' },
-                ],
-                // Refer to PrimaryType
-                ForwardRequest: [
-                    { name: 'from', type: 'address' },
-                    { name: 'to', type: 'address' },
-                    { name: 'value', type: 'uint256' },
-                    { name: 'gas', type: 'uint256' },
-                    { name: 'nonce', type: 'uint256' },
-                    { name: 'data', type: 'bytes' },
-                ],
-            },
-        })
-        var from = account
-        var params = [from, msgParams]
-        var method = 'eth_signTypedData_v4'
-        const signature = await library.provider.request({
-            method,
-            params,
-            from,
-        })
+    // }
+    // const signMetaTx = async (req: any) => {
+    //     // console.log(req, "req");
+    //     const msgParams = JSON.stringify({
+    //         domain: {
+    //             chainId: chainId,
+    //             name: 'FeeShare',
+    //             verifyingContract: contractsAddresses[props.network.name][0].MinimalForwarder,
+    //             version: '1.0.0',
+    //         },
+    //         // Defining the message signing data content.
+    //         message: req,
+    //         // Refers to the keys of the *types* object below.
+    //         primaryType: 'ForwardRequest',
+    //         types: {
+    //             // TODO: Clarify if EIP712Domain refers to the domain the contract is hosted on
+    //             EIP712Domain: [
+    //                 { name: 'name', type: 'string' },
+    //                 { name: 'version', type: 'string' },
+    //                 { name: 'chainId', type: 'uint256' },
+    //                 { name: 'verifyingContract', type: 'address' },
+    //             ],
+    //             // Refer to PrimaryType
+    //             ForwardRequest: [
+    //                 { name: 'from', type: 'address' },
+    //                 { name: 'to', type: 'address' },
+    //                 { name: 'value', type: 'uint256' },
+    //                 { name: 'gas', type: 'uint256' },
+    //                 { name: 'nonce', type: 'uint256' },
+    //                 { name: 'data', type: 'bytes' },
+    //             ],
+    //         },
+    //     })
+    //     var from = account
+    //     var params = [from, msgParams]
+    //     var method = 'eth_signTypedData_v4'
+    //     const signature = await library.provider.request({
+    //         method,
+    //         params,
+    //         from,
+    //     })
 
-        return signature
-    }
-    const sendTransactionAndPayFeeInToken = async () => {
-        // sendSignedTransaction();
-        const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
+    //     return signature
+    // }
+    // const sendTransactionAndPayFeeInToken = async () => {
+    //     // sendSignedTransaction();
+    //     const feeShareContract = new Contract(contractsAddresses[props.network.name][0].FeeShare, FeeShareAbi, library?.getSigner());
 
-        const minimalForwarderContract = new Contract(contractsAddresses[props.network.name][0].MinimalForwarder, MinimalForwarderAbi, library?.getSigner());
-        const arrayOfAmounts = props.addressesAmount.map((item: any) => {
-            return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
-        });
-        const addresses = props.addressesAmount.map((item: any) => { return item.address });
-        // const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
-        feeShareContract.on("feeDetails", function (amm1, amm2, amm3, amm4, amm5, amm6) {
-            console.log(amm1, amm2, amm3, amm4, amm5, amm6, "feeDetails")
-        });
-        feeShareContract.on("WhosignerRequest", function (address) {
-            console.log(address, "WhosignerRequest")
-        });
-        // const msgValue = parseFloat(rTokenFee!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
-        // console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
-        // const txInfo = {
-        //     value: ethers.utils.parseEther(msgValue.toString())
-        // }
-        const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts]);
-        // console.log(dataMessage, "dataMessage");
-        // const decoded = new ethers.utils.Interface(FeeShareAbi).decodeFunctionData("multiSendFee", dataMessage);
-        // console.log(decoded, "decoded");
+    //     const minimalForwarderContract = new Contract(contractsAddresses[props.network.name][0].MinimalForwarder, MinimalForwarderAbi, library?.getSigner());
+    //     const arrayOfAmounts = props.addressesAmount.map((item: any) => {
+    //         return ethers.utils.parseUnits(item.amount.trim().toString(), props.token.decimal);
+    //     });
+    //     const addresses = props.addressesAmount.map((item: any) => { return item.address });
+    //     // const isRToken = await feeShareContract.getRTokenAddress(props.token.address);
+    //     feeShareContract.on("feeDetails", function (amm1, amm2, amm3, amm4, amm5, amm6) {
+    //         console.log(amm1, amm2, amm3, amm4, amm5, amm6, "feeDetails")
+    //     });
+    //     feeShareContract.on("WhosignerRequest", function (address) {
+    //         console.log(address, "WhosignerRequest")
+    //     });
+    //     // const msgValue = parseFloat(rTokenFee!) * (props.addressesAmount.length) + parseFloat("0.0000000000000001");
+    //     // console.log(ethers.utils.parseEther(msgValue.toString()), "msgValue");
+    //     // const txInfo = {
+    //     //     value: ethers.utils.parseEther(msgValue.toString())
+    //     // }
+    //     const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addresses, arrayOfAmounts]);
+    //     // console.log(dataMessage, "dataMessage");
+    //     // const decoded = new ethers.utils.Interface(FeeShareAbi).decodeFunctionData("multiSendFee", dataMessage);
+    //     // console.log(decoded, "decoded");
 
-        const nonce = await minimalForwarderContract.getNonce(account);
-        // console.log(nonce, "nonce");
-        const values = {
-            from: account,
-            to: contractsAddresses[props.network.name][0].FeeShare,
-            value: 0,
-            gas: '21000000',
-            nonce: nonce.toString(),
-            data: dataMessage,
-        }
-        const signature = await signMetaTx(values);
+    //     const nonce = await minimalForwarderContract.getNonce(account);
+    //     // console.log(nonce, "nonce");
+    //     const values = {
+    //         from: account,
+    //         to: contractsAddresses[props.network.name][0].FeeShare,
+    //         value: 0,
+    //         gas: '21000000',
+    //         nonce: nonce.toString(),
+    //         data: dataMessage,
+    //     }
+    //     const signature = await signMetaTx(values);
 
-        const dataBuffer = { 'request': values, 'signature': signature }
-        localStorage.setItem('transaction', JSON.stringify(dataBuffer));
-        sendSignedTransaction();
+    //     const dataBuffer = { 'request': values, 'signature': signature }
+    //     localStorage.setItem('transaction', JSON.stringify(dataBuffer));
+    //     sendSignedTransaction();
 
-        // const multiSendUnsigned = await feeShareContract['multiSendFee(address,address[],uint256[])'](props.token.address, addresses, arrayOfAmounts, {gasLimit:"210000"});
-        //  console.log(multiSendUnsigned, "multiSendUnsigned");
-    }
+    //     // const multiSendUnsigned = await feeShareContract['multiSendFee(address,address[],uint256[])'](props.token.address, addresses, arrayOfAmounts, {gasLimit:"210000"});
+    //     //  console.log(multiSendUnsigned, "multiSendUnsigned");
+    // }
 
-    const sendSignedTransaction = async () => {
-        const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
-        const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
-        let walletSigner = walletPrivateKey.connect(provider)
-        const contractForwarder = new ethers.Contract(
-            contractsAddresses[props.network.name][0].MinimalForwarder,
-            MinimalForwarderAbi,
-            walletSigner
-        );
-        // console.log(contractForwarder)
-        // console.log(localStorage.getItem('transaction'))
-        const values = JSON.parse(localStorage.getItem('transaction')).request
-        const signature = JSON.parse(localStorage.getItem('transaction')).signature
-        // console.log(values)
-        // console.log(signature)
-        // const networkSpeed = await provider.getGasPrice();
+    // const sendSignedTransaction = async () => {
+    //     const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
+    //     const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
+    //     let walletSigner = walletPrivateKey.connect(provider)
+    //     const contractForwarder = new ethers.Contract(
+    //         contractsAddresses[props.network.name][0].MinimalForwarder,
+    //         MinimalForwarderAbi,
+    //         walletSigner
+    //     );
+    //     // console.log(contractForwarder)
+    //     // console.log(localStorage.getItem('transaction'))
+    //     const values = JSON.parse(localStorage.getItem('transaction')).request
+    //     const signature = JSON.parse(localStorage.getItem('transaction')).signature
+    //     // console.log(values)
+    //     // console.log(signature)
+    //     // const networkSpeed = await provider.getGasPrice();
 
-        const result = await contractForwarder.execute(values, signature);
-        console.log(result, "result");
-        localStorage.clear();
-    }
+    //     const result = await contractForwarder.execute(values, signature);
+    //     console.log(result, "result");
+    //     localStorage.clear();
+    // }
     // function formatOutput(data: any) {
     //     let avgGasFee = 0;
     //     let avgFill = 0;
@@ -493,13 +488,13 @@ const MultiDepoistPreview = (props: any) => {
     //     }
     //     // getEstimateGas();
     // })
-    const updateGasFee = (value: any) => {
-        setNetworkSpeed(value);
-    }
+    // const updateGasFee = (value: any) => {
+    //     setNetworkSpeed(value);
+    // }
 
     return (
         <div className="px-5 py-5">
-            <div className="w-full">
+            {/* <div className="w-full">
                 <ToastContainer autoClose={2000} />
                 <div>Network Speed {networkSpeed} Gwei </div>
                 <input className="w-full" type="range" onChange={(e) => { updateGasFee(e.target.value) }} defaultValue={3.0} min="1.0" step={0.1} max="5.0"></input>
@@ -573,7 +568,7 @@ const MultiDepoistPreview = (props: any) => {
                                 sendTransactionToken()
                     }}
                     className="bg-sky-900 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Send</button>
-            </div>
+            </div> */}
         </div>
     )
 

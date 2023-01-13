@@ -1,29 +1,60 @@
 import ReactDOM from 'react-dom/client';
 import { ThemeProvider } from "@material-tailwind/react";
 import { BrowserRouter } from "react-router-dom";
-import { Web3Provider } from '@ethersproject/providers';
-import { createWeb3ReactRoot, Web3ReactProvider } from '@web3-react/core';
-
+import { store } from './store/store'
+import { Provider } from 'react-redux'
+import { bscTestnet, polygonMumbai, mainnet, goerli } from 'wagmi/chains'
+import { WagmiConfig, createClient, configureChains } from 'wagmi'
+import { publicProvider } from 'wagmi/providers/public'
+import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
+import { InjectedConnector } from 'wagmi/connectors/injected'
+import { MetaMaskConnector } from 'wagmi/connectors/metaMask'
+import { WalletConnectConnector } from 'wagmi/connectors/walletConnect'
 import './index.css';
 import App from './App';
-function getLibrary(provider: any): Web3Provider {
-  const library = new Web3Provider(provider)
-  library.pollingInterval = 12000
-  return library
-}
 
-const Web3ReactProviderPolygon = createWeb3ReactRoot('polygon')
+const { chains, provider, webSocketProvider } = configureChains(
+  [mainnet, goerli, bscTestnet, polygonMumbai],
+  [publicProvider()],
+)
+const client = createClient({
+  autoConnect: true,
+  connectors: [
+    new MetaMaskConnector({ chains }),
+    new CoinbaseWalletConnector({
+      chains,
+      options: {
+        appName: 'wagmi',
+      },
+    }),
+    new WalletConnectConnector({
+      chains,
+      options: {
+        qrcode: true,
+      },
+    }),
+    new InjectedConnector({
+      chains,
+      options: {
+        name: 'Injected',
+        shimDisconnect: true,
+      },
+    }),
+  ],
+  provider,
+  webSocketProvider,
+})
 const root = ReactDOM.createRoot(
   document.getElementById('root') as HTMLElement
 );
 root.render(
+   <Provider store={store}>
   <ThemeProvider>
     <BrowserRouter>
-      <Web3ReactProvider getLibrary={getLibrary}>
-        <Web3ReactProviderPolygon getLibrary={getLibrary}>
+    <WagmiConfig client={client}>
           <App />
-        </Web3ReactProviderPolygon>
-      </Web3ReactProvider>
+    </WagmiConfig>
     </BrowserRouter>  
   </ThemeProvider>
+  </Provider>
 );

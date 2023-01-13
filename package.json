@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@binance-chain/bsc-connector": "^1.0.0",
     "@codemirror/lang-javascript": "^6.0.2",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",
+    "@headlessui/react": "^1.6.6",
     "@material-tailwind/react": "^1.0.6",
     "@material-ui/utils": "^4.11.3",
     "@mui/icons-material": "^5.8.4",
@@ -21,12 +21,7 @@
     "@types/react-dom": "^18.0.6",
     "@types/react-redux": "^7.1.24",
     "@uiw/react-codemirror": "^4.11.4",
-    "@web3-react/core": "^6.1.9",
-    "@web3-react/injected-connector": "^6.0.7",
-    "@web3-react/network-connector": "^6.2.9",
-    "@web3-react/walletconnect-connector": "^6.2.13",
-    "@web3-react/walletlink-connector": "^6.2.14",
-    "ethers": "^5.6.9",
+    "ethers": "^5.7.2",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.2",
@@ -34,19 +29,19 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^9.0.8",
     "react-transition-group": "^4.4.5",
+    "redux-devtools-extension": "^2.13.9",
+    "redux-thunk": "^2.4.2",
     "sass": "^1.56.2",
     "styled-components": "^5.3.5",
     "typescript": "^4.7.4",
+    "wagmi": "^0.10.2",
     "web-vitals": "^2.1.4",
-    "web3": "^1.8.1",
-    "web3-react": "^5.0.5",
     "xlsx": "^0.18.5"
   },
-
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
+    "start": "react-app-rewired start",
+    "build": "react-app-rewired build",
+    "test": "react-app-rewired test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -69,21 +64,26 @@
   },
   "devDependencies": {
     "@types/styled-components": "^5.1.25",
-    "postcss": "^8.4.14",
-    "tailwindcss": "^3.1.6",
     "assert": "^2.0.0",
+    "autoprefixer": "^10.4.7",
     "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "https-browserify": "^1.0.0",
     "os-browserify": "^0.3.0",
+    "postcss": "^8.4.14",
     "process": "^0.11.10",
     "react-app-rewired": "^2.2.1",
     "stream-browserify": "^3.0.0",
-    "crypto": "^1.0.1",
-    "crypto-browserify": "^3.12.0",
     "stream-http": "^3.2.0",
+    "tailwindcss": "^3.1.6",
     "url": "^0.11.0"
   },
   "resolutions": {
     "styled-components": "^5"
+  },
+  "browser": {
+    "stream": false,
+    "crypto": false
   }
 }

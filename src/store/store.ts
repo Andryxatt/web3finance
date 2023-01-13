@@ -1,8 +1,12 @@
 import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
-
+import  networkReducer  from '../store/network/networkSlice';
+import tokenReducer from '../store/token/tokenSlice';
 export const store = configureStore({
+  
   reducer: {
-
+    // Add your reducers here
+    network: networkReducer,
+    token: tokenReducer,
   },
 });
 
@@ -15,3 +19,6 @@ export type AppThunk<ReturnType = void> = ThunkAction<
   Action<string>
 >;
 
+
+
+export default store;

@@ -7,12 +7,10 @@ import Assets from './components/Assets';
 import TopNavigation from './components/header/TopNavigation';
 import SocialNetworks from './components/SocialNetworks';
 import Footer from './components/Footer';
-import Web3Context from './Web3DataContext';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 function App() {
   return (
     <div>
-      <Web3Context>
         <TopNavigation />
         <SocialNetworks class={"flex flex-col right-5 fixed lg:hidden"} />
         <div className='mx-auto max-w-screen-xl max-w-[960px] md:p-2'>
@@ -24,7 +22,6 @@ function App() {
           </Routes>
           <Footer />
         </div>
-      </Web3Context>
     </div>
   );
 }

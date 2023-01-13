@@ -1,13 +1,11 @@
-import { Web3State } from "../../../Web3DataContext";
 
 const ListOfRecipients = () => {
-    const { addressesFromFile, setAddressesFromFile } = Web3State();
-    const removeAsset = (asset: any) => {
-        setAddressesFromFile(addressesFromFile.filter((element: any) => element.address !== asset.address))
-    }
+    // const removeAsset = (asset: any) => {
+    //     setAddressesFromFile(addressesFromFile.filter((element: any) => element.address !== asset.address))
+    // }
     return (
         <div>
-            <h3>List of recipients</h3>
+            {/* <h3>List of recipients</h3>
             <div className="flex flex-col bg-whiterounded-md bg-white rounded-md">
             <div className="flex justify-between text-gray-600 p-2 border-b-2"><span>Address</span><span className="pr-[250px]  text-gray-600">Ammount</span></div>
             {
@@ -17,7 +15,7 @@ const ListOfRecipients = () => {
                         </div>
                 })
             }
-            </div>
+            </div> */}
            
         </div> 
     )
