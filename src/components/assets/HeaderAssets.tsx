@@ -20,7 +20,7 @@ const HeaderAssets = () => {
             <div onClick={() => dispatch(sortTokensByDeposit(network))} className="flex cursor-pointer justify-center w-[150px]">Total deposits ($)
                 <img className="ml-2 w-[16px]" src={sort !== "deposit" ? sortIcon : sortTypes === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
-            <div onClick={() => dispatch(sortTokensByUserBalanceDeposit(network))} className="flex cursor-pointer justify-center w-[150px]">Your balance
+            <div onClick={() => dispatch(sortTokensByUserBalanceDeposit(network))} className="flex cursor-pointer justify-center w-[150px]">Your deposit
                 <img className="ml-2 w-[16px]" src={sort !== "userBalanceDeposit" ? sortIcon : sortTypes === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
         </div>

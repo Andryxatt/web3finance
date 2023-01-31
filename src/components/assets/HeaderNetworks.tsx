@@ -1,9 +1,8 @@
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { selectNetwork, currentNetwork, changeSelectedNetwork } from "../../store/network/networkSlice";
+import { selectNetwork,  changeSelectedNetwork } from "../../store/network/networkSlice";
 
 const HeaderNetworks = () => {
     const networks = useAppSelector(selectNetwork);
-    const selectedNetwork = useAppSelector(currentNetwork);
     const dispatch = useAppDispatch();
     return (
         <div className="flex justify-between md:flex-col items-center border-b-[1px] border-gray-300">

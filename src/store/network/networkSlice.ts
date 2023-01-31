@@ -26,11 +26,11 @@ const initialState: NetworkState = {
         rpcUrl: 'https://rpc-mumbai.matic.today'
     },
     {
-        name: "Goerli Testnet",
+        name: "Goerli",
         icon: require("../../images/ethereum.png"),
         chainId: 5,
         isActive: true,
-        Currency: 'RETH',
+        Currency: 'WETH',
         rpcUrl: ''
     },
     {
@@ -44,11 +44,11 @@ const initialState: NetworkState = {
 ],
   status: 'idle',
   selectedNetwork: {
-    name: "Goerli Testnet",
+    name: "Goerli",
     icon: require("../../images/ethereum.png"),
     chainId: 5,
     isActive: true,
-    Currency: 'RETH',
+    Currency: 'WETH',
     rpcUrl: ''
 },
 };
@@ -58,8 +58,9 @@ export const networkSlice = createSlice({
   initialState,
   reducers: {
     changeSelectedNetwork: (state, action: PayloadAction<any>) => {
+      const  chainId  = action.payload;
       state.value = state.value.map((network: any) => {
-        if (network.chainId === action.payload) {
+        if (network.chainId === chainId) {
           state.selectedNetwork = network;
           return {
             ...network,

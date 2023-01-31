@@ -8,6 +8,8 @@ import { Contract, ethers } from 'ethers';
 import contractsAddresses from "../../contracts/AddressesContracts.json";
 import OracleAbi from "../../contracts/oracle/Oracle.json";
 import RTokenAbi from "../../contracts/RTokenAbi.json";
+import { currentNetwork } from '../network/networkSlice';
+import { stat } from 'fs';
 export interface TokenState {
   goerliTokens: Token[];
   // ethTokens: Token[];
@@ -16,16 +18,21 @@ export interface TokenState {
   status: 'idle' | 'loading' | 'failed';
   sortBy: string;
   sortType: string;
+  filterBy: string;
+  searchField: string;
 }
 export interface Token {
   name: string;
   address: string;
-  decimal: number;
+  decimals: number;
   tokenPrice: string;
   deposits: string;
   userBalance: string;
   userBalanceDeposit: string;
   isOpen: boolean;
+  isNative: boolean;
+  isStablecoin: boolean;
+  inactive: boolean;
 }
 
 const initialState: TokenState = {
@@ -36,6 +43,8 @@ const initialState: TokenState = {
   status: 'idle',
   sortBy: '',
   sortType: 'asc',
+  filterBy: 'All',
+  searchField: '',
 };
 
 export const tokenSlice = createSlice({
@@ -412,6 +421,54 @@ export const tokenSlice = createSlice({
         }
       }
     },
+    filterTokens: (state, action: PayloadAction<any>) => {
+      state.filterBy = action.payload.filter;
+    },
+    filterByName: (state, action: PayloadAction<any>) => {
+      state.searchField = action.payload.searchField;
+    },
+    openElement: (state, action: PayloadAction<any>) => {
+      const { chainId, name } = action.payload;
+      console.log(chainId, name);
+      switch (chainId) {
+        case 5: {
+          state.goerliTokens = state.goerliTokens.map((token: Token) => {
+            if (token.name === name) {
+              token.isOpen = !token.isOpen;
+            }
+            else {
+              token.isOpen = false;
+            }
+            return token;
+          });
+          break;
+        }
+        case 97: {
+          state.bscTokens = state.bscTokens.map((token: Token) => {
+            if (token.name === name) {
+              token.isOpen = !token.isOpen;
+            }
+            else {
+              token.isOpen = false;
+            }
+            return token;
+          });
+          break;
+        }
+        case 80001: {
+          state.polygonTokens = state.polygonTokens.map((token: Token) => {
+            if (token.name === name) {
+              token.isOpen = !token.isOpen;
+            }
+            else {
+              token.isOpen = false;
+            }
+            return token;
+          });
+          break;
+        }
+      }
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchTokensPricesGoerli.fulfilled, (state, action) => {
@@ -435,7 +492,10 @@ export const tokenSlice = createSlice({
   }
 });
 export const {
-  
+  openElement,
+  filterByName,
+  filterTokens,
+
   changeTokenByNetwork,
 
   getUserBalanceBsc,
@@ -445,7 +505,7 @@ export const {
   getTokensPricesBsc,
   getTokensPricesGoerli,
   getTokensPricesPolygon,
-  
+
   sortTokensByPrice,
   sortTokenByTokenName,
   sortTokensByDeposit,
@@ -458,13 +518,49 @@ export const currentTokensList = (state: RootState) => {
     //   return state.token.ethTokens;
     // }
     case 97: {
-      return state.token.bscTokens;
+      if(state.token.filterBy === "Stablecoins"){
+        return state.token.bscTokens.filter((token: Token) => {
+          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+        });
+      }
+      else if(state.token.filterBy === "Inactive"){
+        return state.token.bscTokens.filter((token: Token) => {
+          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+        });
+      }
+      else {
+        return state.token.bscTokens.filter((token: Token) => {return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())});
+      }
     }
     case 80001: {
-      return state.token.polygonTokens;
+      if(state.token.filterBy === "Stablecoins"){
+        return state.token.polygonTokens.filter((token: Token) => {
+          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+        });
+      }
+      else if(state.token.filterBy === "Inactive"){
+        return state.token.polygonTokens.filter((token: Token) => {
+          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+        });
+      }
+      else {
+        return state.token.polygonTokens.filter((token: Token) => {return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())});
+      }
     }
     case 5: {
-      return state.token.goerliTokens;
+      if(state.token.filterBy === "Stablecoins"){
+        return state.token.goerliTokens.filter((token: Token) => {
+          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+        });
+      }
+      else if(state.token.filterBy === "Inactive"){
+        return state.token.goerliTokens.filter((token: Token) => {
+          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+        });
+      }
+      else {
+        return state.token.goerliTokens.filter((token: Token) => {return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())});
+      }
     }
     default: {
       return state.token.goerliTokens;
@@ -476,9 +572,28 @@ export const currentTokensList = (state: RootState) => {
 export const bsc = (state: RootState) => { return state.token.bscTokens }
 export const polygon = (state: RootState) => { return state.token.polygonTokens }
 export const goerli = (state: RootState) => { return state.token.goerliTokens }
-
 export const sortBy = (state: RootState) => { return state.token.sortBy }
 export const sortType = (state: RootState) => { return state.token.sortType }
+export const nativeBalance  = (state: RootState) => { 
+  switch (state.network.selectedNetwork.chainId) {
+    case 97: {
+     //return token userBalance if token isNative is true
+     return state.token.bscTokens.filter((token: Token) => {
+        return token.isNative === true;
+      });
+  }
+  case 80001: {
+    return state.token.polygonTokens.filter((token: Token) => {
+      return token.isNative === true;
+    });
+  }
+  case 5: {
+    return state.token.goerliTokens.filter((token: Token) => {
+      return token.isNative === true;
+    });
+  }
+ }
+}
 export default tokenSlice.reducer;
 
 // Thunk to get data from blockchain
@@ -487,13 +602,20 @@ export const fetchTokensPricesGoerli = createAsyncThunk(
   async (args: any, { getState }) => {
     const state = getState() as any;
     const providerInfura = new ethers.providers.JsonRpcProvider('https://goerli.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
-    const contractGoerli = new Contract(contractsAddresses["Goerli Testnet"][0].PriceOracle, OracleAbi, providerInfura);
+    const contractGoerli = new Contract(contractsAddresses["Goerli"][0].PriceOracle, OracleAbi, providerInfura);
     const newGoerli = state.token.goerliTokens.map(async (token: any) => {
       const goerliPrice = await contractGoerli.getAssetPrice(token.address);
-      const tokenContract = new Contract(token.address, RTokenAbi, providerInfura);
-      const totalDeposits = await tokenContract.totalSupply();
-      const decimals = await tokenContract.decimals();
-      return { ...token, tokenPrice: ethers.utils.formatUnits(goerliPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+      if(token.isNative) {
+        return { ...token, tokenPrice: ethers.utils.formatUnits(goerliPrice, 8), deposits: "-" }
+      }
+      else {
+       
+        const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerInfura);
+        const totalDeposits = await tokenContract.totalSupply();
+        const decimals = await tokenContract.decimals();
+        return { ...token, tokenPrice: ethers.utils.formatUnits(goerliPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+      }
+     
     })
     return Promise.all(newGoerli);
   }
@@ -505,10 +627,11 @@ export const fetchTokensPricesPolygon = createAsyncThunk(
     const providerPolygon = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
     const contractMumbai = new Contract(contractsAddresses["Mumbai Testnet"][0].PriceOracle, OracleAbi, providerPolygon);
     const newPolygon = state.token.polygonTokens.map(async (token: any) => {
-      const tokenContract = new Contract(token.address, RTokenAbi, providerPolygon);
+      const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerPolygon);
+      const decimals = await tokenContract.decimals();
       const totalDeposits = await tokenContract.totalSupply();
       const polygonPrice = await contractMumbai.getAssetPrice(token.address);
-      return { ...token, tokenPrice: ethers.utils.formatUnits(polygonPrice, token.decimal), deposits: ethers.utils.formatUnits(totalDeposits, token.decimal) }
+      return { ...token, tokenPrice: ethers.utils.formatUnits(polygonPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
     });
 
     return Promise.all(newPolygon);
@@ -521,7 +644,7 @@ export const fetchTokensPricesBsc = createAsyncThunk(
     const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
     const contractBsc = new Contract(contractsAddresses["Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
     const newBsc = state.token.bscTokens.map(async (token: any) => {
-      const tokenContract = new Contract(token.address, RTokenAbi, providerBsc);
+      const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
       const totalDeposits = await tokenContract.totalSupply();
       const decimals = await tokenContract.decimals();
       const bscPrice = await contractBsc.getAssetPrice(token.address);
@@ -535,10 +658,20 @@ export const fetchUserBalanceGoerli = createAsyncThunk(
   async (data: any, { getState }) => {
     const state = getState() as any;
     const { provider, address } = data;
-    const newTokens = state.token.goerliTokens.map(async (token: any) => {
-      const contract = new Contract(token.address, RTokenAbi, provider);
-      const userBalanceDeposit = await contract.balanceOf(address);
-      return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimal) }
+    const newTokens = state.token.goerliTokens.map(async (token: Token) => {
+      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+      if(token.isNative) {
+       const userBalance = await provider.getBalance(address);
+       console.log(userBalance);
+        return { ...token, userBalanceDeposit: 0, userBalance: ethers.utils.formatEther(userBalance) }
+      }
+      else {
+        const contractToken = new Contract(token.address, RTokenAbi, provider);
+        const userBalanceToken = await contractToken.balanceOf(address);
+        const userBalanceDeposit = await contractRToken.balanceOf(address);
+        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
+      }
+      
     })
     return Promise.all(newTokens);
   }
@@ -549,9 +682,11 @@ export const fetchUserBalanceBsc = createAsyncThunk(
     const state = getState() as any;
     const { provider, address } = data;
     const newTokens = state.token.bscTokens.map(async (token: any) => {
-      const contract = new Contract(token.address, RTokenAbi, provider);
-      const userBalanceDeposit = await contract.balanceOf(address);
-      return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimal) }
+      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+      const contractToken = new Contract(token.address, RTokenAbi, provider);
+      const userBalanceToken = await contractToken.balanceOf(address);
+      const userBalanceDeposit = await contractRToken.balanceOf(address);
+      return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimal), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimal) }
     })
     return Promise.all(newTokens);
   }
@@ -561,10 +696,19 @@ export const fetchUserBalancePolygon = createAsyncThunk(
   async (data: any, { getState }) => {
     const state = getState() as any;
     const { provider, address } = data;
-    const newTokens = state.token.polygonTokens.map(async (token: any) => {
-      const contract = new Contract(token.address, RTokenAbi, provider);
-      const userBalanceDeposit = await contract.balanceOf(address);
-      return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimal) }
+    console.log('network', state.network.selectedNetwork.name)
+    const newTokens = state.token.polygonTokens.map(async (token: Token) => {
+      if(token.isNative){
+        return { ...token, userBalanceDeposit: "-", userBalance: "-" }
+      }
+      else {
+        const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+        const contractToken = new Contract(token.address, RTokenAbi, provider);
+        const userBalanceToken = await contractToken.balanceOf(address);
+        const userBalanceDeposit = await contractRToken.balanceOf(address);
+        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
+      }
+     
     })
     return Promise.all(newTokens);
   }

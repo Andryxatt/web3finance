@@ -1,15 +1,15 @@
 {
-    "Goerli Testnet": [
+    "Goerli": [
         {
             "PriceOracle": "0x3d6Eb257c86Cce7E77D77F19D4e1E3e9889975db",
             "FeeShare": "0x9d0a9fC0ef5f85c9753C40bBDa993120403539EB",
             "MinimalForwarder": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
             "rLINK": "0x7d8d228a8F9190c4DB3B3Dd168E231e25F816a9D",
             "rWETH": "0x735c25E9D59Aa0fBA9445770864213d13027fD23",
-            "rRETH": "0x735c25E9D59Aa0fBA9445770864213d13027fD23",
+            "rETH": "0x735c25E9D59Aa0fBA9445770864213d13027fD23",
             "LINK": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "WETH": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
-            "RETH": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
+            "ETH": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
         }
     ],
     "Mumbai Testnet": [
