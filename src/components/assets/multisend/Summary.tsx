@@ -210,28 +210,28 @@ export function Summary(props: any) {
         const txFeeInEthPerAddress = await feeShare["calculateFee(address)"](props.token.address);
         console.log(ethers.utils.formatEther(txFeeInEthPerAddress), "txFeeInEthPerAddress");
         const txFeeInToken = await feeShare["calculateTxfeeToken(address,uint256)"](props.token.address, txFeeInEthPerAddress);
-        console.log(ethers.utils.formatUnits(txFeeInToken, props.token.decimals), "txFeeInToken");
-        const estimateGasPrice = await provider.getGasPrice();
-        console.log(estimateGasPrice, "estimateGasPrice");
-        const estimateGas = await feeShare.estimateGas["multiSendFee(address,address[],uint256[])"](props.token.address, addressesToSendd, finalAmount);
-        console.log(estimateGasPrice.mul(estimateGas), "estimateGasPrice.mul(estimateGas)");
-        const totalAmount = txFeeInToken.mul(addressesAndAmounts.length).add('1000000000000000000').add(ethers.utils.parseEther(totalAmmountTokens.toString()));
+        console.log(ethers.utils.formatUnits(txFeeInToken, "wei"), "txFeeInToken");
+        // const estimateGasPrice = await provider.getGasPrice();
+        // console.log(estimateGasPrice, "estimateGasPrice");
+        // const estimateGas = await feeShare.estimateGas["multiSendFee(address,address[],uint256[])"](props.token.address, addressesToSendd, finalAmount);
+        // console.log(estimateGasPrice.mul(estimateGas), "estimateGasPrice.mul(estimateGas)");
+        // const totalAmount = txFeeInToken.mul(addressesAndAmounts.length).add('1000000000000000000').add(ethers.utils.parseEther(totalAmmountTokens.toString()));
         const minimalForwarderContract = new Contract(contractsAddresses[network.name][0].MinimalForwarder, MinimalForwarderAbi, signer);
         
         const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesToSendd, finalAmount]) as any;
-        if(totalAmount > props.token.userBalanceDeposit){
-            setError(true);
-            setErrorMessage("You don't have enough balance token to pay the fee")
-        }
+        // if(totalAmount > props.token.userBalanceDeposit){
+        //     setError(true);
+        //     setErrorMessage("You don't have enough balance token to pay the fee")
+        // }
        const nonce = await minimalForwarderContract.getNonce(address);
        // console.log(nonce, "nonce");
        const values = {
            from: address,
            to: contractsAddresses[network.name][0].FeeShare,
-           value: "0",
+           value: 0,
            gas: 210000,
            nonce: nonce.toString(),
-           dataMessage,
+           data:dataMessage,
        }
        setSignedTxToSend(values);
     }
@@ -269,7 +269,7 @@ export function Summary(props: any) {
                value: ethers.BigNumber.from("0"),
                gas: ethers.BigNumber.from("210000"),
                nonce: req.nonce.toString(),
-               data: req.dataMessage.toString(),
+               data: req.data.toString(),
             },
           })
           return signature;
@@ -278,7 +278,6 @@ export function Summary(props: any) {
     const sendSignedTransaction = async () => {
         const signature = await signMetaTx(signedTxToSend);
         const dataBuffer = { 'request': signedTxToSend, 'signature': signature }
-        localStorage.setItem('transaction', JSON.stringify(dataBuffer));
         const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
         const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
         let walletSigner = walletPrivateKey.connect(provider)
@@ -287,12 +286,11 @@ export function Summary(props: any) {
             MinimalForwarderAbi,
             walletSigner
         );
-        const values = JSON.parse(localStorage.getItem('transaction')).request
-        const result = await contractForwarder.execute(values, signature);
+        const result = await contractForwarder.execute(dataBuffer.request, dataBuffer.signature);
         console.log(result, "result");
     }
   useEffect(() => {
-    console.log(props, "props")
+    if(props.token.isOpen){
         if (props.isNative) {
             calculateNative()
         }
@@ -303,6 +301,8 @@ export function Summary(props: any) {
             console.log("calculateTokenAndPayToken", balanceNative )
             calculateTokenAndPayToken()
         }
+    }
+       
 
     }, []) // eslint-disable-line react-hooks/exhaustive-deps
     const sendTransaction = async () => {

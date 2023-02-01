@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-import ethereumTokens from "../../tokens/ethereum.json";
 import bscTokens from "../../tokens/bsc.json";
 import polygonTokens from "../../tokens/polygon.json";
 import goerliTokens from "../../tokens/goerli.json";
@@ -8,8 +7,6 @@ import { Contract, ethers } from 'ethers';
 import contractsAddresses from "../../contracts/AddressesContracts.json";
 import OracleAbi from "../../contracts/oracle/Oracle.json";
 import RTokenAbi from "../../contracts/RTokenAbi.json";
-import { currentNetwork } from '../network/networkSlice';
-import { stat } from 'fs';
 export interface TokenState {
   goerliTokens: Token[];
   // ethTokens: Token[];
@@ -20,6 +17,7 @@ export interface TokenState {
   sortType: string;
   filterBy: string;
   searchField: string;
+  isDepositsOnly: boolean;
 }
 export interface Token {
   name: string;
@@ -45,6 +43,7 @@ const initialState: TokenState = {
   sortType: 'asc',
   filterBy: 'All',
   searchField: '',
+  isDepositsOnly: false
 };
 
 export const tokenSlice = createSlice({
@@ -427,6 +426,10 @@ export const tokenSlice = createSlice({
     filterByName: (state, action: PayloadAction<any>) => {
       state.searchField = action.payload.searchField;
     },
+    filterDepositedOnly: (state, action: PayloadAction<any>) => {
+      console.log(action.payload.isDepositsOnly, "isDepositsOnly");
+      state.isDepositsOnly = action.payload.isDepositsOnly;
+    },
     openElement: (state, action: PayloadAction<any>) => {
       const { chainId, name } = action.payload;
       console.log(chainId, name);
@@ -495,6 +498,7 @@ export const {
   openElement,
   filterByName,
   filterTokens,
+  filterDepositedOnly,
 
   changeTokenByNetwork,
 
@@ -518,48 +522,102 @@ export const currentTokensList = (state: RootState) => {
     //   return state.token.ethTokens;
     // }
     case 97: {
-      if(state.token.filterBy === "Stablecoins"){
+      if (state.token.filterBy === "Stablecoins") {
         return state.token.bscTokens.filter((token: Token) => {
-          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          if(state.token.isDepositsOnly){
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          }
+          
         });
       }
-      else if(state.token.filterBy === "Inactive"){
+      else if (state.token.filterBy === "Inactive") {
         return state.token.bscTokens.filter((token: Token) => {
-          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          if(state.token.isDepositsOnly){
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          }
         });
       }
       else {
-        return state.token.bscTokens.filter((token: Token) => {return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())});
+        return state.token.bscTokens.filter((token: Token) => { 
+          if(state.token.isDepositsOnly){
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
+          }
+        });
       }
     }
     case 80001: {
-      if(state.token.filterBy === "Stablecoins"){
+      if (state.token.filterBy === "Stablecoins") {
         return state.token.polygonTokens.filter((token: Token) => {
-          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          if(state.token.isDepositsOnly){
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          }
+          
         });
       }
-      else if(state.token.filterBy === "Inactive"){
+      else if (state.token.filterBy === "Inactive") {
         return state.token.polygonTokens.filter((token: Token) => {
-          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          if(state.token.isDepositsOnly){
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          }
         });
       }
       else {
-        return state.token.polygonTokens.filter((token: Token) => {return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())});
+        return state.token.polygonTokens.filter((token: Token) => { 
+          if(state.token.isDepositsOnly){
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
+          }
+        });
       }
     }
     case 5: {
-      if(state.token.filterBy === "Stablecoins"){
+      if (state.token.filterBy === "Stablecoins") {
         return state.token.goerliTokens.filter((token: Token) => {
-          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          if(state.token.isDepositsOnly){
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          }
+          
         });
       }
-      else if(state.token.filterBy === "Inactive"){
+      else if (state.token.filterBy === "Inactive") {
         return state.token.goerliTokens.filter((token: Token) => {
-          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          if(state.token.isDepositsOnly){
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          }
         });
       }
       else {
-        return state.token.goerliTokens.filter((token: Token) => {return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())});
+        return state.token.goerliTokens.filter((token: Token) => { 
+          if(state.token.isDepositsOnly){
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+          }
+          else {
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
+          }
+        });
       }
     }
     default: {
@@ -574,25 +632,25 @@ export const polygon = (state: RootState) => { return state.token.polygonTokens 
 export const goerli = (state: RootState) => { return state.token.goerliTokens }
 export const sortBy = (state: RootState) => { return state.token.sortBy }
 export const sortType = (state: RootState) => { return state.token.sortType }
-export const nativeBalance  = (state: RootState) => { 
+export const nativeBalance = (state: RootState) => {
   switch (state.network.selectedNetwork.chainId) {
     case 97: {
-     //return token userBalance if token isNative is true
-     return state.token.bscTokens.filter((token: Token) => {
+      //return token userBalance if token isNative is true
+      return state.token.bscTokens.filter((token: Token) => {
         return token.isNative === true;
       });
+    }
+    case 80001: {
+      return state.token.polygonTokens.filter((token: Token) => {
+        return token.isNative === true;
+      });
+    }
+    case 5: {
+      return state.token.goerliTokens.filter((token: Token) => {
+        return token.isNative === true;
+      });
+    }
   }
-  case 80001: {
-    return state.token.polygonTokens.filter((token: Token) => {
-      return token.isNative === true;
-    });
-  }
-  case 5: {
-    return state.token.goerliTokens.filter((token: Token) => {
-      return token.isNative === true;
-    });
-  }
- }
 }
 export default tokenSlice.reducer;
 
@@ -605,17 +663,15 @@ export const fetchTokensPricesGoerli = createAsyncThunk(
     const contractGoerli = new Contract(contractsAddresses["Goerli"][0].PriceOracle, OracleAbi, providerInfura);
     const newGoerli = state.token.goerliTokens.map(async (token: any) => {
       const goerliPrice = await contractGoerli.getAssetPrice(token.address);
-      if(token.isNative) {
+      if (token.isNative) {
         return { ...token, tokenPrice: ethers.utils.formatUnits(goerliPrice, 8), deposits: "-" }
       }
       else {
-       
         const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerInfura);
         const totalDeposits = await tokenContract.totalSupply();
         const decimals = await tokenContract.decimals();
         return { ...token, tokenPrice: ethers.utils.formatUnits(goerliPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
       }
-     
     })
     return Promise.all(newGoerli);
   }
@@ -628,10 +684,15 @@ export const fetchTokensPricesPolygon = createAsyncThunk(
     const contractMumbai = new Contract(contractsAddresses["Mumbai Testnet"][0].PriceOracle, OracleAbi, providerPolygon);
     const newPolygon = state.token.polygonTokens.map(async (token: any) => {
       const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerPolygon);
-      const decimals = await tokenContract.decimals();
-      const totalDeposits = await tokenContract.totalSupply();
       const polygonPrice = await contractMumbai.getAssetPrice(token.address);
-      return { ...token, tokenPrice: ethers.utils.formatUnits(polygonPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+      if (token.isNative) {
+        return { ...token, tokenPrice: ethers.utils.formatUnits(polygonPrice, 8), deposits: "-" }
+      }
+      else {
+        const decimals = await tokenContract.decimals();
+        const totalDeposits = await tokenContract.totalSupply();
+        return { ...token, tokenPrice: ethers.utils.formatUnits(polygonPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+      }
     });
 
     return Promise.all(newPolygon);
@@ -645,10 +706,15 @@ export const fetchTokensPricesBsc = createAsyncThunk(
     const contractBsc = new Contract(contractsAddresses["Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
     const newBsc = state.token.bscTokens.map(async (token: any) => {
       const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
-      const totalDeposits = await tokenContract.totalSupply();
-      const decimals = await tokenContract.decimals();
       const bscPrice = await contractBsc.getAssetPrice(token.address);
-      return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+      if (token.isNative) {
+        return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: "-" }
+      }
+      else {
+        const totalDeposits = await tokenContract.totalSupply();
+        const decimals = await tokenContract.decimals();
+        return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+      }
     })
     return Promise.all(newBsc);
   }
@@ -660,10 +726,10 @@ export const fetchUserBalanceGoerli = createAsyncThunk(
     const { provider, address } = data;
     const newTokens = state.token.goerliTokens.map(async (token: Token) => {
       const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
-      if(token.isNative) {
-       const userBalance = await provider.getBalance(address);
-       console.log(userBalance);
-        return { ...token, userBalanceDeposit: 0, userBalance: ethers.utils.formatEther(userBalance) }
+      if (token.isNative) {
+        const userBalance = await provider.getBalance(address);
+        console.log(userBalance);
+        return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatEther(userBalance) }
       }
       else {
         const contractToken = new Contract(token.address, RTokenAbi, provider);
@@ -671,7 +737,7 @@ export const fetchUserBalanceGoerli = createAsyncThunk(
         const userBalanceDeposit = await contractRToken.balanceOf(address);
         return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
       }
-      
+
     })
     return Promise.all(newTokens);
   }
@@ -683,10 +749,16 @@ export const fetchUserBalanceBsc = createAsyncThunk(
     const { provider, address } = data;
     const newTokens = state.token.bscTokens.map(async (token: any) => {
       const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
-      const contractToken = new Contract(token.address, RTokenAbi, provider);
-      const userBalanceToken = await contractToken.balanceOf(address);
-      const userBalanceDeposit = await contractRToken.balanceOf(address);
-      return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimal), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimal) }
+      if (token.isNative) {
+        const userBalance = await provider.getBalance(address);
+        return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatUnits(userBalance) }
+      }
+      else {
+        const contractToken = new Contract(token.address, RTokenAbi, provider);
+        const userBalanceToken = await contractToken.balanceOf(address);
+        const userBalanceDeposit = await contractRToken.balanceOf(address);
+        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
+      }
     })
     return Promise.all(newTokens);
   }
@@ -698,8 +770,8 @@ export const fetchUserBalancePolygon = createAsyncThunk(
     const { provider, address } = data;
     console.log('network', state.network.selectedNetwork.name)
     const newTokens = state.token.polygonTokens.map(async (token: Token) => {
-      if(token.isNative){
-        return { ...token, userBalanceDeposit: "-", userBalance: "-" }
+      if (token.isNative) {
+        return { ...token, userBalanceDeposit: "0", userBalance: "-" }
       }
       else {
         const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
@@ -708,7 +780,6 @@ export const fetchUserBalancePolygon = createAsyncThunk(
         const userBalanceDeposit = await contractRToken.balanceOf(address);
         return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
       }
-     
     })
     return Promise.all(newTokens);
   }

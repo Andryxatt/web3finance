@@ -18,6 +18,7 @@
             "FeeShare": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
             "MinimalForwarder": "0x3d6Eb257c86Cce7E77D77F19D4e1E3e9889975db",
             "rWMATIC": "0xb4CDcae1e7775407b8FdBeb7adb502d405c88F3F",
+            "rMATIC": "0xb4CDcae1e7775407b8FdBeb7adb502d405c88F3F",
             "rUSDC": "0xd6e73ceD7d13fB1EF29c4ae209788777A9B1BF07"
         }
     ],
@@ -27,7 +28,8 @@
             "FeeShare": "0x4D637771E5c28858a031ddaf669b984b45258D18",
             "MinimalForwarder": "0xd6e73ceD7d13fB1EF29c4ae209788777A9B1BF07",
             "rLINK": "0x86C7A97e32b57A97f978001451E553067b72F5d1",
-            "rWBNB": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46"
+            "rWBNB": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46",
+            "rBNB": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46"
         }
     ]
 }
