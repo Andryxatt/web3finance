@@ -1,4 +1,4 @@
-import { configureStore, ThunkAction, Action, AnyAction } from '@reduxjs/toolkit';
+import { configureStore, ThunkAction, Action } from '@reduxjs/toolkit';
 import  networkReducer  from '../store/network/networkSlice';
 import tokenReducer from '../store/token/tokenSlice';
 import multiDepositReducer from './multiDeposit/multiDepositSlice';

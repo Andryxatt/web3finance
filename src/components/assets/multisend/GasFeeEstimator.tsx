@@ -1,5 +1,3 @@
-import { useEffect, useRef } from "react";
-import { ToastContainer } from "react-toastify";
 
 const GasFeeEstimator = () => {
     // const inputRef = useRef(null);

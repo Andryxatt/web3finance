@@ -44,6 +44,7 @@ const DepositWithdraw = (props: any) => {
                     feeShare.deposit(contractsAddresses[network.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
                         result.wait().then(async (recept: any) => {
                             toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                            
                         })
                     }).catch((err: any) => {
                         toast.update(idToast2, { render: "Your transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
