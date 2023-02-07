@@ -31,11 +31,11 @@ const WalletModal = () => {
   }
   const getChainId = () => {
     switch(selectedNetwork.name){
-      case "Smart Chain Testnet":
+      case "Binance Smart Chain Testnet":
         return 97;
       case "Ethereum":
         return 1;
-      case "Mumbai Testnet":
+      case "Polygon Mumbai":
         return 80001;
       case "Goerli":
         return 5;
@@ -63,7 +63,7 @@ const WalletModal = () => {
         <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
           {
             networks.map((network: any, index: number) => {
-              return <WalletNetwork icon={network.icon} key={index} chainId={network.chainId} name={network.name} isActive={network.isActive} />
+              return <WalletNetwork icon={network.icon} key={index} chainId={network.id} name={network.name} isActive={network.isActive} />
             })
           }
         </div>

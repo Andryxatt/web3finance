@@ -21,7 +21,12 @@ module.exports = {
       // => @media (max-width: 639px) { ... }
       'xs': {'max': '480px'},
     },
-    extend: {},
+    extend: {
+      backgroundImage:{
+        "arrowUp": "url('../public/icons/sort-up.png')",
+        "arrowDown": "url('../public/icons/sort-down.png')",
+      }
+    },
   },
   plugins: [],
 }

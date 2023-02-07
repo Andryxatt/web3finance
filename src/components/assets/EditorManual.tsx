@@ -2,9 +2,10 @@ import { javascript } from "@codemirror/lang-javascript";
 import { useCodeMirror } from "@uiw/react-codemirror";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useAppDispatch } from "../../store/hooks";
-import { updateAddressesToSend } from "../../store/multiDeposit/multiDepositSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { updateAddressesToSend, addressesToSend } from "../../store/multiDeposit/multiDepositSlice";
 const EditorManual = () => {
+    const addressesFromStore = useAppSelector(addressesToSend);
     const dispatch = useAppDispatch();
     const editor = useRef() as React.MutableRefObject<HTMLInputElement>;
     const [codeMirrorElement, setCodeMirrorElement] = useState<string>("");
@@ -30,7 +31,7 @@ const EditorManual = () => {
     const validate = useCallback(() => {
         const arrayOfElements = codeMirrorElement!.split("\n")[0] === "" ? [] : codeMirrorElement!.split("\n");
         const arrayOfElementsWithoutEmpty: { address: string; amount: number; errorAddress: string; errorAmount: string; }[] = [];
-        const regx = /^\d{1,5}$|(?=^.{1,5}$)^\d+\.\d{0,2}$/;
+        const regx = /^[+-]?((\d+(\.\d*)?)|(\.\d+))$/;
         if (arrayOfElements.length > 0) {
             arrayOfElements.forEach(async (element: any, index: number) => {
                 const newElement = {
@@ -82,7 +83,26 @@ const EditorManual = () => {
         setCodeMirrorElement(newElems)
         //  eslint-disable-next-line react-hooks/exhaustive-deps
     }, [arrayOfAddressesFromEditor])
-
+    const getFromStore = useCallback(() => {
+        let newElems = "";
+        console.log(addressesFromStore)
+        addressesFromStore.forEach((element: any, index: number) => {
+            if (index === addressesFromStore.length - 1) {
+                newElems += element.address + "," + element.amount;
+            }
+            else {
+                newElems += element.address + "," + element.amount + "\n";
+            }
+        })
+        setCodeMirrorElement(newElems)
+        // eslint-disable-next-line react-hooks/exhaustive-deps 
+    }, [addressesFromStore])
+   useEffect(() => {
+    if(addressesFromStore.length > 0 ){
+        getFromStore();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [])
     useEffect(() => {
         setContainer(editor.current);
         validate();
@@ -90,13 +110,12 @@ const EditorManual = () => {
     return (
         <div>
             <div className='w-full rounded' ref={editor}></div>
-            <div className="flex justify-between mt-1">
-                <span className="text-sm text-gray-500">The address and amount are separated by commas</span>
-                <span onClick={() => showExample()} className="underline cursor-pointer text-gray-500 text-sm">Example files</span>
+            <div className="flex mt-2 justify-between">
+                <span className="text-sm">The address and amount are separated by commas</span>
+                <span onClick={() => showExample()} className="underline cursor-pointer pl-1 text-right text-gray-400 hover:text-gray-900 text-sm">Example files</span>
             </div>
-            <div className="mt-1">
-                <div className="mb-1">
-
+            <div>
+                <div>
                     {!isValid && <div className="flex justify-between"> <span className="text-red-600">The below addresses cannot be processed</span> <button className="text-red-600 underline" onClick={() => { deleteInvalid() }}>Delete them</button></div>}
                 </div>
                 <div className={!isValid ? "flex flex-col rounded-xl bg-white border-2 border-red-400 p-3 mb-1" : "hidden"}>

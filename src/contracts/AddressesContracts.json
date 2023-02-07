@@ -2,33 +2,33 @@
     "Goerli": [
         {
             "PriceOracle": "0x3d6Eb257c86Cce7E77D77F19D4e1E3e9889975db",
-            "FeeShare": "0x9d0a9fC0ef5f85c9753C40bBDa993120403539EB",
+            "FeeShare": "0xaB1b43e97D9D078f7e7417802930Dda6e00C1Da1",
             "MinimalForwarder": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
-            "rLINK": "0x7d8d228a8F9190c4DB3B3Dd168E231e25F816a9D",
-            "rWETH": "0x735c25E9D59Aa0fBA9445770864213d13027fD23",
+            "rLINK": "0x5CEb179640375a9911103ECfCC4e644a2cf7e79d",
+            "rWETH": "0xa2Cc3bE5Cc1f3dFCE1f4a2E6717AbF34d3B17c64",
             "rETH": "0x735c25E9D59Aa0fBA9445770864213d13027fD23",
             "LINK": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "WETH": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
             "ETH": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6"
         }
     ],
-    "Mumbai Testnet": [
+    "Polygon Mumbai": [
         {
             "PriceOracle": "0x7Bf2260Af87Dd4b52e12790A3AD210840F96eE8C",
-            "FeeShare": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
+            "FeeShare": "0x86C7A97e32b57A97f978001451E553067b72F5d1",
             "MinimalForwarder": "0x3d6Eb257c86Cce7E77D77F19D4e1E3e9889975db",
-            "rWMATIC": "0xb4CDcae1e7775407b8FdBeb7adb502d405c88F3F",
+            "rWMATIC": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46",
             "rMATIC": "0xb4CDcae1e7775407b8FdBeb7adb502d405c88F3F",
-            "rUSDC": "0xd6e73ceD7d13fB1EF29c4ae209788777A9B1BF07"
+            "rUSDC": "0x485b8Ad358f7b2FcB054ce37A41d777A6759952F"
         }
     ],
-    "Smart Chain Testnet": [
+    "Binance Smart Chain Testnet": [
         {
             "PriceOracle": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
-            "FeeShare": "0x4D637771E5c28858a031ddaf669b984b45258D18",
+            "FeeShare": "0x6b79bc016172Df0e1644b58fa6c723Cb2B742f3d",
             "MinimalForwarder": "0xd6e73ceD7d13fB1EF29c4ae209788777A9B1BF07",
-            "rLINK": "0x86C7A97e32b57A97f978001451E553067b72F5d1",
-            "rWBNB": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46",
+            "rLINK": "0x9d0a9fC0ef5f85c9753C40bBDa993120403539EB",
+            "rWBNB": "0x9d1a5AcF590ea0462FCDc31aeB8E2eB16b12E212",
             "rBNB": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46"
         }
     ]

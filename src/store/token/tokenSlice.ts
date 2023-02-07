@@ -98,7 +98,7 @@ export const tokenSlice = createSlice({
     },
     sortTokensByPrice: (state, action: PayloadAction<any>) => {
       state.sortBy = "price";
-      switch (action.payload.chainId) {
+      switch (action.payload.id) {
         // case 1: {
         //   //sort tokens by price asc and desc
         //   if (state.sortType === "asc") {
@@ -179,7 +179,7 @@ export const tokenSlice = createSlice({
     },
     sortTokensByDeposit: (state, action: PayloadAction<any>) => {
       state.sortBy = "deposit";
-      switch (action.payload.chainId) {
+      switch (action.payload.id) {
         // case 1: {
         //   //sort tokens by deposit asc and desc
         //   if (state.sortType === "asc") {
@@ -260,7 +260,7 @@ export const tokenSlice = createSlice({
     },
     sortTokensByUserBalanceDeposit: (state, action: PayloadAction<any>) => {
       state.sortBy = "userBalanceDeposit";
-      switch (action.payload.chainId) {
+      switch (action.payload.id) {
         // case 1: {
         //   //sort tokens by userBalanceDeposit asc and desc
         //   if (state.sortType === "asc") {
@@ -341,7 +341,7 @@ export const tokenSlice = createSlice({
     },
     sortTokenByTokenName: (state, action: PayloadAction<any>) => {
       state.sortBy = "name";
-      switch (action.payload.chainId) {
+      switch (action.payload.id) {
         // case 1: {
         //   if (state.sortType === "asc") {
         //     state.ethTokens = state.ethTokens.sort((a: Token, b: Token) => {
@@ -517,7 +517,7 @@ export const {
 
 export const currentTokensList = (state: RootState) => {
   //return selected network tokens list
-  switch (state.network.selectedNetwork.chainId) {
+  switch (state.network.selectedNetwork.id) {
     // case 1: {
     //   return state.token.ethTokens;
     // }
@@ -525,7 +525,7 @@ export const currentTokensList = (state: RootState) => {
       if (state.token.filterBy === "Stablecoins") {
         return state.token.bscTokens.filter((token: Token) => {
           if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
@@ -536,7 +536,7 @@ export const currentTokensList = (state: RootState) => {
       else if (state.token.filterBy === "Inactive") {
         return state.token.bscTokens.filter((token: Token) => {
           if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
@@ -546,7 +546,7 @@ export const currentTokensList = (state: RootState) => {
       else {
         return state.token.bscTokens.filter((token: Token) => { 
           if(state.token.isDepositsOnly){
-            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
@@ -558,7 +558,7 @@ export const currentTokensList = (state: RootState) => {
       if (state.token.filterBy === "Stablecoins") {
         return state.token.polygonTokens.filter((token: Token) => {
           if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
@@ -569,7 +569,7 @@ export const currentTokensList = (state: RootState) => {
       else if (state.token.filterBy === "Inactive") {
         return state.token.polygonTokens.filter((token: Token) => {
           if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
@@ -579,7 +579,7 @@ export const currentTokensList = (state: RootState) => {
       else {
         return state.token.polygonTokens.filter((token: Token) => { 
           if(state.token.isDepositsOnly){
-            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
@@ -591,7 +591,7 @@ export const currentTokensList = (state: RootState) => {
       if (state.token.filterBy === "Stablecoins") {
         return state.token.goerliTokens.filter((token: Token) => {
           if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
@@ -602,7 +602,7 @@ export const currentTokensList = (state: RootState) => {
       else if (state.token.filterBy === "Inactive") {
         return state.token.goerliTokens.filter((token: Token) => {
           if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
@@ -612,7 +612,7 @@ export const currentTokensList = (state: RootState) => {
       else {
         return state.token.goerliTokens.filter((token: Token) => { 
           if(state.token.isDepositsOnly){
-            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0";
+            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
           }
           else {
             return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
@@ -633,7 +633,7 @@ export const goerli = (state: RootState) => { return state.token.goerliTokens }
 export const sortBy = (state: RootState) => { return state.token.sortBy }
 export const sortType = (state: RootState) => { return state.token.sortType }
 export const nativeBalance = (state: RootState) => {
-  switch (state.network.selectedNetwork.chainId) {
+  switch (state.network.selectedNetwork.id) {
     case 97: {
       //return token userBalance if token isNative is true
       return state.token.bscTokens.filter((token: Token) => {
@@ -681,7 +681,7 @@ export const fetchTokensPricesPolygon = createAsyncThunk(
   async (args: any, { getState }) => {
     const state = getState() as any;
     const providerPolygon = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
-    const contractMumbai = new Contract(contractsAddresses["Mumbai Testnet"][0].PriceOracle, OracleAbi, providerPolygon);
+    const contractMumbai = new Contract(contractsAddresses["Polygon Mumbai"][0].PriceOracle, OracleAbi, providerPolygon);
     const newPolygon = state.token.polygonTokens.map(async (token: any) => {
       const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerPolygon);
       const polygonPrice = await contractMumbai.getAssetPrice(token.address);
@@ -703,7 +703,7 @@ export const fetchTokensPricesBsc = createAsyncThunk(
   async (args: any, { getState }) => {
     const state = getState() as any;
     const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
-    const contractBsc = new Contract(contractsAddresses["Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
+    const contractBsc = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
     const newBsc = state.token.bscTokens.map(async (token: any) => {
       const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
       const bscPrice = await contractBsc.getAssetPrice(token.address);
@@ -771,7 +771,8 @@ export const fetchUserBalancePolygon = createAsyncThunk(
     console.log('network', state.network.selectedNetwork.name)
     const newTokens = state.token.polygonTokens.map(async (token: Token) => {
       if (token.isNative) {
-        return { ...token, userBalanceDeposit: "0", userBalance: "-" }
+        const userBalance = await provider.getBalance(address);
+        return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatUnits(userBalance) }
       }
       else {
         const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);

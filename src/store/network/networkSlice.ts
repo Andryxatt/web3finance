@@ -12,15 +12,15 @@ const initialState: NetworkState = {
     {
         name: "Ethereum",
         icon: require("../../images/ethereum.png"),
-        chainId: 1,
+        id: 1,
         isActive: false,
         rpcUrl: '',
         Currency: "ETH"
     },
     {
-        name: "Mumbai Testnet",
+        name: "Polygon Mumbai",
         icon: require("../../images/polygon.png"),
-        chainId: 80001,
+        id: 80001,
         isActive: false,
         Currency: 'MATIC',
         rpcUrl: 'https://rpc-mumbai.matic.today'
@@ -28,15 +28,15 @@ const initialState: NetworkState = {
     {
         name: "Goerli",
         icon: require("../../images/ethereum.png"),
-        chainId: 5,
+        id: 5,
         isActive: true,
         Currency: 'WETH',
         rpcUrl: ''
     },
     {
         icon: require("../../images/binance.png"),
-        name: "Smart Chain Testnet",
-        chainId: 97,
+        name: "Binance Smart Chain Testnet",
+        id: 97,
         isActive: false,
         Currency: 'tBNB',
         rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
@@ -46,7 +46,7 @@ const initialState: NetworkState = {
   selectedNetwork: {
     name: "Goerli",
     icon: require("../../images/ethereum.png"),
-    chainId: 5,
+    id: 5,
     isActive: true,
     Currency: 'WETH',
     rpcUrl: ''
@@ -58,9 +58,9 @@ export const networkSlice = createSlice({
   initialState,
   reducers: {
     changeSelectedNetwork: (state, action: PayloadAction<any>) => {
-      const  chainId  = action.payload;
+      const  chainId  = action.payload.id;
       state.value = state.value.map((network: any) => {
-        if (network.chainId === chainId) {
+        if (network.id === chainId) {
           state.selectedNetwork = network;
           return {
             ...network,

@@ -13,6 +13,7 @@ export interface MultiDepositState {
   userTokenBalance: number;
   userNativeBalance: number;
   transactionFee: number;
+  totalTransactions: number;
   status: 'idle' | 'loading' | 'failed';
 }
 
@@ -22,6 +23,7 @@ const initialState: MultiDepositState = {
   userNativeBalance: 0,
   transactionFee: 0,
   status: 'idle',
+  totalTransactions: 0
 };
 
 export const multiDepositSlice = createSlice({
@@ -31,7 +33,11 @@ export const multiDepositSlice = createSlice({
     updateAddressesToSend: (state, action) => {
       state.addressesToSend = action.payload;
     },
-   
+    removeSendedAddress: (state, action) => {
+      //delete 10 elements from start of array
+     state.addressesToSend.splice(0, action.payload);
+      
+    },
     calculateUserTokenBalance: (state, action) => {
       state.userTokenBalance = action.payload;
     },
@@ -46,12 +52,12 @@ export const multiDepositSlice = createSlice({
 
 export const { 
   updateAddressesToSend,
-  calculateTransactionFee
+  calculateTransactionFee,
+  removeSendedAddress
 
 } = multiDepositSlice.actions;
 export const currentNetwork = (state: RootState) => state.network.value.filter((network: any) => network.isActive)[0];
 export const totalAddresses = (state: RootState) => state.multiDeposit.addressesToSend.length;
-export const totalTransactions = (state: RootState) => state.multiDeposit.addressesToSend.length / 254 === 0 ? 1 : Math.ceil(state.multiDeposit.addressesToSend.length / 254);
 export const calculateTotalAmountTokens = (state: RootState) => state.multiDeposit.addressesToSend.reduce((acc: number, asset: Asset) => acc + parseFloat(asset.amount), 0);
 
 export const addressesToSend = (state: RootState) => state.multiDeposit.addressesToSend;
@@ -63,7 +69,7 @@ export const getUserTokenBalamce = createAsyncThunk(
   async (args: any, { getState }) => {
     const state = getState() as any;
     const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
-    const contractBsc = new Contract(contractsAddresses["Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
+    const contractBsc = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
     const newBsc = state.token.bscTokens.map(async (token: any) => {
       const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
       const totalDeposits = await tokenContract.totalSupply();

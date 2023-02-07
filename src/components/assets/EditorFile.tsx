@@ -4,8 +4,7 @@ import ExampleFiles from "../main/ExampleFiles";
 import Modal from "../ui/Modal";
 import { useAppDispatch } from "../../store/hooks";
 import { updateAddressesToSend } from "../../store/multiDeposit/multiDepositSlice";
-const EditorFile = () => {
-
+const EditorFile = (props:any) => {
     const dispatch = useAppDispatch();
     var XLSX = require("xlsx");
     const uploadIcon = require("../../images/upload.png");
@@ -45,6 +44,7 @@ const EditorFile = () => {
         }
     };
     const txtcsvFileRead = (filesFromEvent: any) => {
+        console.log("txt");
         var files = filesFromEvent, f = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -54,21 +54,23 @@ const EditorFile = () => {
             allTextLines.pop();
             const res = allTextLines.reduce((acc: any, line: any) => {
                 const [address, amount] = line.split(',');
-                acc.push([address, amount]);
+                acc.push({address, amount});
                 return acc;
             }, []);
-            if (res.length >= 255) {
-                alert("Maximum 255 addresses can be added at a time");
+            if (res.length >= 10000) {
+                alert("Maximum 10000 addresses can be added at a time");
             }
             else {
+                console.log(res);
                 dispatch(updateAddressesToSend(res));
-                // props.switchDepoist(true);
+                props.showManual()
             }
 
         };
         reader.readAsText(f);
     }
     const excelFileRead = (filesFromEvent: any) => {
+        console.log("excel");
         var files = filesFromEvent, f = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -84,7 +86,18 @@ const EditorFile = () => {
                 alert("Maximum 255 addresses can be added at a time");
             }
             else {
-               dispatch(updateAddressesToSend(dataParse));
+                //convert array element to object in parseData array 
+
+              const result = dataParse.map(element => {
+                    const newElem = {
+                        address: element[0],
+                        amount: element[1]
+                    }
+                    return newElem;
+                });
+                console.log(result);
+               dispatch(updateAddressesToSend(result));
+               props.showManual()
             }
         };
         reader.readAsBinaryString(f);
@@ -94,10 +107,10 @@ const EditorFile = () => {
     };
     return (
         <div>
-            <form onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()} className="bg-white cursor-pointer rounded-xl flex flex-col justify-center items-center md:w-full w-full h-[200px]">
+            <form onDragEnter={handleDrag} onSubmit={(e) => e.preventDefault()} className="bg-white underline text-gray-400 hover:text-gray-900 text-sm cursor-pointer rounded-[50px] flex flex-col justify-center items-center md:w-full w-full h-[200px]">
                 <input ref={inputRef} type="file" id="input-file-upload" multiple={true} onChange={handleChange} />
-                <label id="label-file-upload" htmlFor="input-file-upload">
-                    <div className="flex flex-col justify-center items-center">
+                <label id="label-file-upload" htmlFor="input-file-upload ">
+                    <div className="flex flex-col justify-center items-center  text-gray-400 hover:text-gray-900">
                         <img className="w-[46px] h-[46px]" src={uploadIcon} alt="upload" />
                         <p>Drag and drop your file here or</p>
                         <button onClick={() => { onButtonClick() }} className="upload-button">Upload a file</button>
@@ -105,7 +118,7 @@ const EditorFile = () => {
                 </label>
                 {dragActive && <div id="drag-file-element" onDragEnter={handleDrag} onDragLeave={handleDrag} onDragOver={handleDrag} onDrop={handleDrop}></div>}
             </form>
-            <div className="mt-2 flex flex-row justify-between"><span>Accepted: CSV / Excel / Txt</span><span onClick={() => toggleModal(!modalShown)} className="underline cursor-pointer">Example files</span>
+            <div className="mt-2 flex flex-row justify-between"><span className="text-sm">Accepted: CSV / Excel / Txt </span><span onClick={() => toggleModal(!modalShown)} className="underline cursor-pointer pl-1 text-gray-400 hover:text-gray-900 text-sm">Example files</span>
                 <Modal shown={modalShown} close={() => { toggleModal(false); }}>
                     <ExampleFiles close={() => { toggleModal(false) }} />
                 </Modal>

@@ -1,6 +1,6 @@
 import Row from "./Row";
 import TableHeader from "./TableHeader";
-import { useAccount, useProvider } from "wagmi";
+import { useAccount, useNetwork, useProvider } from "wagmi";
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
@@ -12,8 +12,9 @@ import {
     fetchUserBalanceGoerli,
     fetchUserBalancePolygon
 } from "../../store/token/tokenSlice";
-import {  currentNetwork } from "../../store/network/networkSlice";
+import {  currentNetwork, changeSelectedNetwork } from "../../store/network/networkSlice";
 const Table = () => {
+    const { chain } = useNetwork()
     const dispatch = useAppDispatch();
     const { address, isConnected } = useAccount()
     const tokens = useAppSelector(currentTokensList)
@@ -21,23 +22,28 @@ const Table = () => {
     const provider = useProvider()
     useEffect(() => {
         dispatch(fetchTokensPricesGoerli({})).then(() => {
-            if (isConnected && network.chainId === 5) {
+            if (isConnected && network.id === 5) {
                 dispatch(fetchUserBalanceGoerli({ provider, address }))
             }
         })
         dispatch(fetchTokensPricesBsc({})).then(() => {
-            if (isConnected && network.chainId === 97) {
+            if (isConnected && network.id === 97) {
                 dispatch(fetchUserBalanceBsc({ provider, address }))
             }
         })
         dispatch(fetchTokensPricesPolygon({})).then(() => {
-            if (isConnected && network.chainId === 80001) {
+            if (isConnected && network.id === 80001) {
                 dispatch(fetchUserBalancePolygon({ provider, address }))
             }
         })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isConnected, network, address])
- 
+    useEffect(() =>{
+        if(chain !== undefined){
+            dispatch(changeSelectedNetwork(chain))
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    },[chain])
     return (
         <>
             <TableHeader />
