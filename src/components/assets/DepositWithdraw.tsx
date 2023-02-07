@@ -69,7 +69,6 @@ const DepositWithdraw = (props: any) => {
         let contract = new Contract(contractsAddresses[network.name][0][token.name], RTokenAbi, signer);
         let checkAllowance = await contract.allowance(address, contractsAddresses[network.name][0].FeeShare);
         let feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
-        console.log(feeShare, "feeShare")
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)) < amount!) {
             const idToast = toast.loading("Approving please wait...")
             await contract?.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 })
