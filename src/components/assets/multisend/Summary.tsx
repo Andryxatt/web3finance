@@ -34,7 +34,6 @@ export function Summary(props: any) {
     const provider = useProvider();
     const { chain } = useNetwork();
     const { address, isConnected } = useAccount();
-
     //Preloader
     const [loading, setLoading] = useState(true);
     //Balance Native currency
