@@ -25,9 +25,7 @@ const Row = (props: any) => {
             >
                 <div className='flex justify-left items-center pl-[25px] font-lg w-[25%]'>
                     <button className={`${ props.token.isOpen === true ? "bg-arrowUp" : "bg-arrowDown"} w-[15px] h-[15px] mr-2 bg-[length:15px_15px] rounded `}>
-                        {/* <img alt="img"
-                            className={`${props.token.isOpen ? "bg-orange-600" : ""} w-[17px] h-[17px] mr-2 hover:bg-orange-600 rounded`}
-                            src={props.token.isOpen ? sortUpIcon : sortDownIcon} /> */}
+                     
                     </button>
                     <img className='w-[35px] h-[35px]' src={require(`../../images/icons/${props.token.name}.png`)} alt={props.token.name} />
                    <span className='pl-2'>{props.token.name}</span> 

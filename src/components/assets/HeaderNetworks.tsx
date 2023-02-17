@@ -5,7 +5,7 @@ const HeaderNetworks = () => {
     const networks = useAppSelector(selectNetwork);
     const dispatch = useAppDispatch();
     return (
-        <div className="flex justify-between md:flex-col items-center border-b-[1px] border-gray-300">
+        <div className="flex justify-between md:flex-col items-center border-b-[1px] h-[80px] border-gray-300">
         {
             networks.map((network: any, index: number) => {
                 return (

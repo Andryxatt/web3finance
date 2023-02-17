@@ -1,5 +1,5 @@
 import { Contract, ethers } from "ethers";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import contractsAddresses from '../../contracts/AddressesContracts.json';
 import RTokenAbi from '../../contracts/RTokenAbi.json';
@@ -16,8 +16,14 @@ const DepositWithdraw = (props: any) => {
     const [ammount, setAmmount] = useState(0);
     //provider wagmi
     const { address, isConnected } = useAccount();
+    const [feeShareAddress, setFeeShareAddress] = useState()
+    useEffect(() => {
+        if(network){
+            setFeeShareAddress(contractsAddresses[network.name][0].FeeShare)
+        }
+    }, [network])
     useContractEvent({
-        address: contractsAddresses[network.name][0].FeeShare,
+        address:  feeShareAddress,
         abi: FeeShareAbi,
         eventName: 'Deposit',
         listener(node, label, owner) {
@@ -41,7 +47,7 @@ const DepositWithdraw = (props: any) => {
         once: true,
     })
     useContractEvent({
-        address: contractsAddresses[network.name][0].FeeShare,
+        address: feeShareAddress,
         abi: FeeShareAbi,
         eventName: 'Withdraw',
         listener(node, label, owner) {
@@ -70,22 +76,22 @@ const DepositWithdraw = (props: any) => {
         let checkAllowance = await contract.allowance(address, contractsAddresses[network.name][0].FeeShare);
         let feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)) < amount!) {
-            const idToast = toast.loading("Approving please wait...")
-            await contract?.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 })
+            const idToastApprove = toast.loading("Approving please wait...")
+            await contract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 })
                 .then((res: any) => {
                     res.wait().then(async (receipt: any) => {
-                        toast.update(idToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                        const idToast2 = toast.loading("Depositing please wait...")
+                        toast.update(idToastApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                        const idToastDepositApprove = toast.loading("Depositing please wait...")
                         await feeShare.deposit(contractsAddresses[network.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
                             result.wait().then(async (recept: any) => {
-                                toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                                toast.update(idToastDepositApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                             })
                         }).catch((err: any) => {
-                            toast.update(idToast2, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                            toast.update(idToastDepositApprove, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         })
                     })
                 }).catch((err: any) => {
-                    toast.update(idToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                    toast.update(idToastApprove, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
         }
         else {
@@ -105,20 +111,20 @@ const DepositWithdraw = (props: any) => {
     const witdrawDeposit = async (token: any, amount: any) => {
         const signer = await fetchSigner()
         let feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
-        const idToast = toast.loading("Processing transaction please wait...")
+        const idToastWithdraw = toast.loading("Processing transaction please wait...")
         console.log(amount, token.userBalanceDeposit)
         if (amount! > parseFloat(token.userBalanceDeposit) || amount! === undefined || amount! === 0) {
-            toast.update(idToast, { render: "Input correct amount", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            toast.update(idToastWithdraw, { render: "Input correct amount", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
         }
         else {
             feeShare.withdraw(contractsAddresses[network.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: "210000" }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
-                    toast.update(idToast, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                    toast.update(idToastWithdraw, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 }).catch((err: any) => {
-                    toast.update(idToast, { render: "Transaction rejected", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                    toast.update(idToastWithdraw, { render: "Transaction rejected", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
             }).catch((err: any) => {
-                toast.update(idToast, { render: "Transaction faild", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                toast.update(idToastWithdraw, { render: "Transaction faild", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
             });
         }
     }

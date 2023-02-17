@@ -8,12 +8,21 @@ export interface Asset {
     address: string;
     amount: string;
 }
+export interface SpeedNetwork {
+  acceptance:number;
+  maxFeePerGas:number;
+  maxPriorityFeePerGas:number;
+  baseFee:number;
+  estimatedFee:number
+}
 export interface MultiDepositState {
   addressesToSend: Asset[];
   userTokenBalance: number;
   userNativeBalance: number;
   transactionFee: number;
   totalTransactions: number;
+  networkPriority:[];
+  selectedPriority:SpeedNetwork;
   status: 'idle' | 'loading' | 'failed';
 }
 
@@ -23,7 +32,9 @@ const initialState: MultiDepositState = {
   userNativeBalance: 0,
   transactionFee: 0,
   status: 'idle',
-  totalTransactions: 0
+  networkPriority:[],
+  totalTransactions: 0,
+  selectedPriority: undefined
 };
 
 export const multiDepositSlice = createSlice({
@@ -36,7 +47,6 @@ export const multiDepositSlice = createSlice({
     removeSendedAddress: (state, action) => {
       //delete 10 elements from start of array
      state.addressesToSend.splice(0, action.payload);
-      
     },
     calculateUserTokenBalance: (state, action) => {
       state.userTokenBalance = action.payload;
@@ -46,6 +56,12 @@ export const multiDepositSlice = createSlice({
     },
     calculateTransactionFee: (state, action) => {
       state.transactionFee = action.payload;
+    },
+    getNetworkPriority: (state, action) =>{
+      state.networkPriority = action.payload;
+    },
+    setSelectedPriority: (state, action) =>{
+      state.selectedPriority = action.payload;
     }
   },
 });
@@ -53,13 +69,16 @@ export const multiDepositSlice = createSlice({
 export const { 
   updateAddressesToSend,
   calculateTransactionFee,
-  removeSendedAddress
+  removeSendedAddress,
+  getNetworkPriority,
+  setSelectedPriority
 
 } = multiDepositSlice.actions;
 export const currentNetwork = (state: RootState) => state.network.value.filter((network: any) => network.isActive)[0];
 export const totalAddresses = (state: RootState) => state.multiDeposit.addressesToSend.length;
 export const calculateTotalAmountTokens = (state: RootState) => state.multiDeposit.addressesToSend.reduce((acc: number, asset: Asset) => acc + parseFloat(asset.amount), 0);
-
+export const networkSpeedsArray = (state: RootState) => state.multiDeposit.networkPriority;
+export const selectedSpeed = (state: RootState) => state.multiDeposit.selectedPriority;
 export const addressesToSend = (state: RootState) => state.multiDeposit.addressesToSend;
 export const arrayOfAmounts = (state: RootState) => state.multiDeposit.addressesToSend.map((asset: Asset) => asset.amount.toString().trim());
 export const arrayOfAddresses = (state: RootState) => state.multiDeposit.addressesToSend.map((asset: Asset) => asset.address.trim());

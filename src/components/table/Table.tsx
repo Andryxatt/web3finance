@@ -21,21 +21,24 @@ const Table = () => {
     const network = useAppSelector(currentNetwork)
     const provider = useProvider()
     useEffect(() => {
-        dispatch(fetchTokensPricesGoerli({})).then(() => {
-            if (isConnected && network.id === 5) {
-                dispatch(fetchUserBalanceGoerli({ provider, address }))
-            }
-        })
-        dispatch(fetchTokensPricesBsc({})).then(() => {
-            if (isConnected && network.id === 97) {
-                dispatch(fetchUserBalanceBsc({ provider, address }))
-            }
-        })
-        dispatch(fetchTokensPricesPolygon({})).then(() => {
-            if (isConnected && network.id === 80001) {
-                dispatch(fetchUserBalancePolygon({ provider, address }))
-            }
-        })
+        if(network){
+            dispatch(fetchTokensPricesGoerli({})).then(() => {
+                if (isConnected && network.id === 5) {
+                    dispatch(fetchUserBalanceGoerli({ provider, address }))
+                }
+            })
+            dispatch(fetchTokensPricesBsc({})).then(() => {
+                if (isConnected && network.id === 97) {
+                    dispatch(fetchUserBalanceBsc({ provider, address }))
+                }
+            })
+            dispatch(fetchTokensPricesPolygon({})).then(() => {
+                if (isConnected && network.id === 80001) {
+                    dispatch(fetchUserBalancePolygon({ provider, address }))
+                }
+            })
+        }
+    
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [isConnected, network, address])
     useEffect(() =>{
