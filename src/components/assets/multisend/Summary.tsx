@@ -58,6 +58,7 @@ export function Summary(props: any) {
 
 
     const calculateNative = async () => {
+        
         setIsCalculated(false)
         setError(false);
         setErrorMessage('');
@@ -264,6 +265,7 @@ export function Summary(props: any) {
     const calculateTokenAndPayNative = async () => {
         console.log("calculateTokenAndPayNative")
         setIsCalculated(false);
+        setLoading(false);
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const feePerAddressNative = await feeShare["calculateFee()"]();
@@ -378,6 +380,7 @@ export function Summary(props: any) {
                     setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
                 }
             }
+            setLoading(false);
         }
 
     }
@@ -694,6 +697,7 @@ export function Summary(props: any) {
         });
     }
     useEffect(() => {
+        console.log(networkSpeed, "networkSpeed")
         if (props.token.isOpen && networkSpeed) {
 
             if (props.isNative) {

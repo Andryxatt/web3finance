@@ -7,11 +7,11 @@ import WalletModal from "./WalletModal";
 const TopNavigation = () => {
     const links = [
         {
-            name: 'Assets',
-            link: '/assets'
+            name: 'Main',
+            link: '/'
         },
         {
-            name: 'Stats',
+            name: 'User History',
             link: '/stats'
         },
         {

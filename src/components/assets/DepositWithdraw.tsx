@@ -134,10 +134,11 @@ const DepositWithdraw = (props: any) => {
                 <button className="p-2 bg-neutral-800 text-white min-w-[100px] rounded-md mr-3 md:mr-0 md:mb-3" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button>
                 <button className="p-2 bg-neutral-800 text-white min-w-[100px] rounded-md" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button>
             </div>
+            <span>Token balance: </span>
             <input onChange={(e) => { setAmmount(parseFloat(e.target.value)) }} type="number" className="w-full  rounded-md p-2" />
             <div>
-                <span>Your token balance: </span>
-                <span className="text-lg">{parseFloat(props.token.userBalance).toFixed(5)} - {props.token.name}</span>
+                
+                <span className="text-lg">{parseFloat(props.token.userBalance).toFixed(3)} - {props.token.name}</span>
             </div>
 
         </div>

@@ -79,6 +79,7 @@ const GasFeeEstimator = (props: any) => {
         else {
           speeds = speeds.map((speed, index) => {
             if(selectedSpeed === speed.speedName){
+              dispatch(setSelectedPriority(speed))
               return {...speed, selected: true}
              
             }else {
@@ -168,12 +169,12 @@ const GasFeeEstimator = (props: any) => {
           feeCalculate()
         }
       })
-      if(!subscribed){
-        subscription.unsubscribe(function (error, success) {
-          if (success)
-            console.log('Successfully unsubscribed!');
-        });
-      }
+      // if(!subscribed){
+      //   subscription.unsubscribe(function (error, success) {
+      //     if (success)
+      //       console.log('Successfully unsubscribed!');
+      //   });
+      // }
       return () => {
         subscription.unsubscribe(function (error, success) {
           if (success)
