@@ -1,5 +1,5 @@
 import { Contract, ethers, Wallet } from "ethers";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import MultiSendError from "./MultiSendError";
 import {
     addressesToSend,
@@ -10,7 +10,7 @@ import {
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
 import { fetchUserBalanceGoerli, fetchUserBalancePolygon, fetchUserBalanceBsc } from "../../../store/token/tokenSlice";
-import { useAccount, useProvider, useNetwork, useContractEvent } from "wagmi";
+import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner, signTypedData } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
 import FeeShareAbi from "./../../../contracts/FeeShare.json";

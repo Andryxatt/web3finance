@@ -3,7 +3,7 @@ import { ethers } from "ethers";
 import Web3 from "web3";
 import { useNetwork } from "wagmi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getNetworkPriority, networkSpeedsArray, setSelectedPriority, selectedSpeed, updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
+import { getNetworkPriority, networkSpeedsArray, setSelectedPriority,  updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
 const GasFeeEstimator = (props: any) => {
   const speeds = useAppSelector(networkSpeedsArray);
   const dispatch = useAppDispatch();
@@ -168,6 +168,12 @@ const GasFeeEstimator = (props: any) => {
           feeCalculate()
         }
       })
+      if(!subscribed){
+        subscription.unsubscribe(function (error, success) {
+          if (success)
+            console.log('Successfully unsubscribed!');
+        });
+      }
       return () => {
         subscription.unsubscribe(function (error, success) {
           if (success)
@@ -175,7 +181,8 @@ const GasFeeEstimator = (props: any) => {
         });
       }
     }
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subscribed])
 
 const selectPriority =async (e: any) => {
   setSelectedSpeed(e.speedName);
@@ -207,8 +214,6 @@ const selectPriority =async (e: any) => {
               )
             })
           }
-
-
         </div>
       </div>
 

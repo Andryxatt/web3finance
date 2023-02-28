@@ -1,7 +1,6 @@
 
 import GasFeeEstimator from "./multisend/GasFeeEstimator";
 import ListOfRecipients from "./multisend/ListOfRecipients";
-import NetworkSpeed from "./multisend/NetworkSpeed";
 import Summary from "./multisend/Summary";
 const PreviewResult = (props:any) =>{
     return (

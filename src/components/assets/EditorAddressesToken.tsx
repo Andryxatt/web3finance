@@ -2,9 +2,6 @@ import { useState } from "react";
 import EditorFile from "./EditorFile";
 import 'react-toastify/dist/ReactToastify.css';
 import EditorManual from "./EditorManual";
-import PreviewResult from "./PreviewResult";
-import DepositWithdraw from "./DepositWithdraw";
-import ToogleFee from "./multisend/ToogleFee";
 import { addressesToSend } from "../../store/multiDeposit/multiDepositSlice";
 import PreviewResultToken from "./PreviewResultToken";
 const EditorAddressesToken = (props: any) => {

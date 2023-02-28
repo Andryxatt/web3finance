@@ -42,7 +42,7 @@ const TxHistory = () => {
                 <thead>
                     <tr>
                         <th>Transaction name</th>
-                        <th>Link</th>
+                        <th>Txn Hash</th>
                         <th>Year</th>
                     </tr>
                 </thead>
@@ -51,7 +51,7 @@ const TxHistory = () => {
                         return (
                             <tr key={tx.blockNumber}>
                                 <td>{tx.event}</td>
-                                <td><a className='text-blue-900 hover:underline ' href={`https://goerli.etherscan.io/tx/${tx.transactionHash}`} target="_blank" rel="noreferrer">{`https://goerli.etherscan.io/tx/${tx.transactionHash}`.substring(0, 50)}...{`https://goerli.etherscan.io/tx/${tx.transactionHash}`.substring(`https://goerli.etherscan.io/tx/${tx.transactionHash}`.length - 4)}`{}</a></td>
+                                <td><a className='text-blue-900 hover:underline ' href={`https://goerli.etherscan.io/tx/${tx.transactionHash}`} target="_blank" rel="noreferrer">{`${tx.transactionHash}`.substring(0, 20)}...{`${tx.transactionHash}`.substring(`${tx.transactionHash}`.length - 4)}`{}</a></td>
                                 <td>{tx.blockNumber}</td>
                             </tr>
                         )
