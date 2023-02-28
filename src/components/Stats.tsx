@@ -1,8 +1,9 @@
+import TxHistory from "./users/TxHistory";
 
 const Stats = () => {
     return (
         <div> 
-            Stats Page
+          <TxHistory/>
         </div>
     )
 }

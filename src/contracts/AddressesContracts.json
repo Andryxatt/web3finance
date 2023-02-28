@@ -2,10 +2,10 @@
     "Goerli": [
         {
             "PriceOracle": "0x3d6Eb257c86Cce7E77D77F19D4e1E3e9889975db",
-            "FeeShare": "0xaB1b43e97D9D078f7e7417802930Dda6e00C1Da1",
+            "FeeShare": "0x30D004661751d18b539Ac5F05181fcC90d528449",
             "MinimalForwarder": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
-            "rLINK": "0x5CEb179640375a9911103ECfCC4e644a2cf7e79d",
-            "rWETH": "0xa2Cc3bE5Cc1f3dFCE1f4a2E6717AbF34d3B17c64",
+            "rLINK": "0x1ef1582B385E94b6Ab0bAE677D030dAAA72E8207",
+            "rWETH": "0x8644085BEfe6fDa45Ed1853a700A30e267155fFA",
             "rETH": "0x735c25E9D59Aa0fBA9445770864213d13027fD23",
             "LINK": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "WETH": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",

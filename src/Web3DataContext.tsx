@@ -1,6 +1,6 @@
 // import { useWeb3React } from "@web3-react/core";
 // import { Contract, ethers, Wallet } from "ethers";
- import { useContext, createContext, useState, useEffect } from 'react';
+ import { useContext, createContext } from 'react';
 // import { toast } from "react-toastify";
 // import Web3 from "web3/dist/web3.min.js";
 // import { connectors } from "./helpers/connectors";
@@ -49,7 +49,7 @@
 
  };
 const Web3Ctx = createContext<Partial<ContextProps>>({});
-const Web3DataContext = ({ children }: any) => {
+const Web3DataContext = () => {
 //     const contractsAddresses = require("./contracts/AddressesContracts.json")
 //     const goerliTokens = require("./tokens/goerli.json");
 //     const ethereumTokens = require("./tokens/ethereum.json");
@@ -617,7 +617,7 @@ const Web3DataContext = ({ children }: any) => {
 //     }
 
 //     const sendSignedTransaction = async () => {
-//         const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
+//         const walletPrivateKey = new Wallet("");
 //         const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
 //         let walletSigner = walletPrivateKey.connect(provider)
 //         const contractForwarder = new ethers.Contract(

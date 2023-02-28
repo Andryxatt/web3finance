@@ -13,6 +13,8 @@ import {
     fetchUserBalancePolygon
 } from "../../store/token/tokenSlice";
 import {  currentNetwork, changeSelectedNetwork } from "../../store/network/networkSlice";
+import { ToastContainer } from "react-toastify";
+import RowToken from "./RowToken";
 const Table = () => {
     const { chain } = useNetwork()
     const dispatch = useAppDispatch();
@@ -49,11 +51,12 @@ const Table = () => {
     },[chain])
     return (
         <>
+        <ToastContainer/>
             <TableHeader />
             {tokens && tokens.map((token: any, index: number) => {
                 return <Row key={index} token={token} />
             })}
-         
+            <RowToken/>
         </>
     )
 }

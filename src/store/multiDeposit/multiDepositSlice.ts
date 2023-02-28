@@ -9,11 +9,14 @@ export interface Asset {
     amount: string;
 }
 export interface SpeedNetwork {
-  acceptance:number;
-  maxFeePerGas:number;
-  maxPriorityFeePerGas:number;
-  baseFee:number;
-  estimatedFee:number
+  "speedName": string;
+  "maxPriorityFeePerGas": number;
+  "baseFeePerGas": number;
+  "baseFeeFloat": string;
+  "maxPriorityFeePerGasFloat": string;
+  "maxFeePerGas": number;
+  "maxFeePerGasFloat": string;
+  "selected": boolean;
 }
 export interface MultiDepositState {
   addressesToSend: Asset[];
@@ -21,7 +24,7 @@ export interface MultiDepositState {
   userNativeBalance: number;
   transactionFee: number;
   totalTransactions: number;
-  networkPriority:[];
+  networkPriority: SpeedNetwork[];
   selectedPriority:SpeedNetwork;
   status: 'idle' | 'loading' | 'failed';
 }
@@ -62,6 +65,13 @@ export const multiDepositSlice = createSlice({
     },
     setSelectedPriority: (state, action) =>{
       state.selectedPriority = action.payload;
+    },
+    updateSpeedSelected: (state, action) =>{
+      console.log(action.payload, "action.payload");
+      //update state array with selected speed
+      const newState = state.networkPriority.map((speed:SpeedNetwork) => speed.speedName === action.payload ? {...speed, selected: true} : {...speed, selected: false}); 
+      state.selectedPriority = newState.filter((speed:SpeedNetwork) => speed.selected)[0];
+      state.networkPriority = newState;
     }
   },
 });
@@ -71,7 +81,8 @@ export const {
   calculateTransactionFee,
   removeSendedAddress,
   getNetworkPriority,
-  setSelectedPriority
+  setSelectedPriority,
+  updateSpeedSelected 
 
 } = multiDepositSlice.actions;
 export const currentNetwork = (state: RootState) => state.network.value.filter((network: any) => network.isActive)[0];
@@ -84,6 +95,22 @@ export const arrayOfAmounts = (state: RootState) => state.multiDeposit.addresses
 export const arrayOfAddresses = (state: RootState) => state.multiDeposit.addressesToSend.map((asset: Asset) => asset.address.trim());
 export default multiDepositSlice.reducer;
 export const getUserTokenBalamce = createAsyncThunk(
+  'multiDeposit/calculateUserTokenBalance',
+  async (args: any, { getState }) => {
+    const state = getState() as any;
+    const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
+    const contractBsc = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
+    const newBsc = state.token.bscTokens.map(async (token: any) => {
+      const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
+      const totalDeposits = await tokenContract.totalSupply();
+      const decimals = await tokenContract.decimals();
+      const bscPrice = await contractBsc.getAssetPrice(token.address);
+      return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+    })
+    return Promise.all(newBsc);
+  }
+)
+export const getNetworkSpeeds = createAsyncThunk(
   'multiDeposit/calculateUserTokenBalance',
   async (args: any, { getState }) => {
     const state = getState() as any;

@@ -1,6 +1,5 @@
 import {  Contract, ethers, Wallet } from "ethers";
 import { useState } from "react";
-import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const MinimalForwarderAbi = require("../../contracts/MinimalForwarderAbi.json");
 const FeeShareAbi = require("../../contracts/FeeShare.json");
@@ -335,15 +334,7 @@ const MultiDepoistPreview = (props: any) => {
     //     //  console.log(multiSendUnsigned, "multiSendUnsigned");
     // }
 
-    // const sendSignedTransaction = async () => {
-    //     const walletPrivateKey = new Wallet("2c920d0376137f6cd630bb0150fe994b9cb8b5907a35969373e2b35f0bc2940d");
-    //     const provider = new ethers.providers.JsonRpcProvider("https://goerli.infura.io/v3/87cafc6624c74b7ba31a95ddb642cf43");
-    //     let walletSigner = walletPrivateKey.connect(provider)
-    //     const contractForwarder = new ethers.Contract(
-    //         contractsAddresses[props.network.name][0].MinimalForwarder,
-    //         MinimalForwarderAbi,
-    //         walletSigner
-    //     );
+
     //     // console.log(contractForwarder)
     //     // console.log(localStorage.getItem('transaction'))
     //     const values = JSON.parse(localStorage.getItem('transaction')).request
