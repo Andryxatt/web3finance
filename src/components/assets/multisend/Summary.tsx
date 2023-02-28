@@ -687,10 +687,10 @@ export function Summary(props: any) {
         contractForwarder.execute(dataBuffer.values, dataBuffer.signature).then((result: any) => {
             result.wait().then((receipt: any) => {
                 console.log(receipt, "receipt")
-                toast.update(toastSendSigned, { render: "Transaction sent", type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER })
+                toast.update(toastSendSigned, { render: "Transaction sent", type: "success", isLoading: false, autoClose:2000, position: toast.POSITION.TOP_CENTER })
             })
         }).catch((error: any) => {
-            toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER })
+            toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose:2000, position: toast.POSITION.TOP_CENTER })
         });
     }
     useEffect(() => {
