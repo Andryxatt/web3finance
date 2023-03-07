@@ -189,7 +189,7 @@ export function Summary(props: any) {
                 return item.amount.toString().trim();
             });
         }
-        setTotalAddressesPerTx(addressesArray.length);
+        setTotalAddressesPerTx(addressesArray.length + 1);
         const totalTokensToSend = addressesArray.length;
         const totalAmmountTokens = amountsArray.reduce((acc: any, b: any) => (acc + +b), 0.0);
         const finalAmount = amountsArray.map((item: any) => {
