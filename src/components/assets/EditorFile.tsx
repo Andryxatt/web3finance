@@ -43,7 +43,6 @@ const EditorFile = (props:any) => {
         }
     };
     const txtcsvFileRead = (filesFromEvent: any) => {
-        console.log("txt");
         var files = filesFromEvent, f = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -60,16 +59,13 @@ const EditorFile = (props:any) => {
                 alert("Maximum 10000 addresses can be added at a time");
             }
             else {
-                console.log(res);
                 dispatch(updateAddressesToSend(res));
                 props.showManual()
             }
-
         };
         reader.readAsText(f);
     }
     const excelFileRead = (filesFromEvent: any) => {
-        console.log("excel");
         var files = filesFromEvent, f = files[0];
         var reader = new FileReader();
         reader.onload = function (e) {
@@ -77,7 +73,6 @@ const EditorFile = (props:any) => {
             let readedData = XLSX.read(data, { type: 'binary' });
             const wsname = readedData.SheetNames[0];
             const ws = readedData.Sheets[wsname];
-
             /* Convert array to json*/
             const dataParse = XLSX.utils.sheet_to_json(ws, { header: 1 });
             dataParse.shift();
@@ -86,7 +81,6 @@ const EditorFile = (props:any) => {
             }
             else {
                 //convert array element to object in parseData array 
-
               const result = dataParse.map(element => {
                     const newElem = {
                         address: element[0],
@@ -94,7 +88,6 @@ const EditorFile = (props:any) => {
                     }
                     return newElem;
                 });
-                console.log(result);
                dispatch(updateAddressesToSend(result));
                props.showManual()
             }

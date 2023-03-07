@@ -2,10 +2,11 @@ import {  createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
 export interface TransactionInfo {
-    txHash: string;
-    txStatus: string;
-    txType: string;
+  transactionHash: string;
+  event: string;
     blockNumber: number;
+    timestamp: number;
+    data: string;
 }
 export interface HistoryState {
     transactions: TransactionInfo[];
@@ -26,9 +27,12 @@ export const userSlice = createSlice({
     loadTransactionHistory: (state, action: PayloadAction<TransactionInfo[]>) => {
         state.transactions = action.payload;
         state.isLoading = false;
+    },
+    sortByDate: (state) => {
+        state.transactions = state.transactions.sort((a, b) => {
+            return a.timestamp - b.timestamp;
+        });
     }
-
-  
   },
   extraReducers: (builder) => {
    

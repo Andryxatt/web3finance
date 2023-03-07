@@ -2,10 +2,10 @@
     "Goerli": [
         {
             "PriceOracle": "0x3d6Eb257c86Cce7E77D77F19D4e1E3e9889975db",
-            "FeeShare": "0x30D004661751d18b539Ac5F05181fcC90d528449",
+            "FeeShare": "0x8093821e50c5Ab988D65c4dC56b1b727C09446B8",
             "MinimalForwarder": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
-            "rLINK": "0x1ef1582B385E94b6Ab0bAE677D030dAAA72E8207",
-            "rWETH": "0x8644085BEfe6fDa45Ed1853a700A30e267155fFA",
+            "rLINK": "0xAa909DEb3E2D381F1Cf3C36012A42Eb87F047b45",
+            "rWETH": "0x54D21Ffc100919B6BC2e2408c8567563b8f4FB82",
             "rETH": "0x735c25E9D59Aa0fBA9445770864213d13027fD23",
             "LINK": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
             "WETH": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
@@ -15,20 +15,20 @@
     "Polygon Mumbai": [
         {
             "PriceOracle": "0x7Bf2260Af87Dd4b52e12790A3AD210840F96eE8C",
-            "FeeShare": "0x86C7A97e32b57A97f978001451E553067b72F5d1",
+            "FeeShare": "0xA34Af87407CD8176d7a05401770C345040d93fd9",
             "MinimalForwarder": "0x3d6Eb257c86Cce7E77D77F19D4e1E3e9889975db",
-            "rWMATIC": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46",
+            "rWMATIC": "0x8b02F2ad4822fb17873F422eAFDD2d219BD5739D",
             "rMATIC": "0xb4CDcae1e7775407b8FdBeb7adb502d405c88F3F",
-            "rUSDC": "0x485b8Ad358f7b2FcB054ce37A41d777A6759952F"
+            "rUSDC": "0x42b95217e2467589D39d763Ec1f75EC83691A900"
         }
     ],
     "Binance Smart Chain Testnet": [
         {
             "PriceOracle": "0x07Fdd6e102F984F88c3e65409d5C88DD0D9d7Bab",
-            "FeeShare": "0x6b79bc016172Df0e1644b58fa6c723Cb2B742f3d",
+            "FeeShare": "0x8b02F2ad4822fb17873F422eAFDD2d219BD5739D",
             "MinimalForwarder": "0xd6e73ceD7d13fB1EF29c4ae209788777A9B1BF07",
-            "rLINK": "0x9d0a9fC0ef5f85c9753C40bBDa993120403539EB",
-            "rWBNB": "0x9d1a5AcF590ea0462FCDc31aeB8E2eB16b12E212",
+            "rLINK": "0x42b95217e2467589D39d763Ec1f75EC83691A900",
+            "rWBNB": "0x554e8ef34A2C9B872aC0FE66De603E2909eC21a7",
             "rBNB": "0xA542875143fC4976dd24424CE6272e6c4c0BCd46"
         }
     ]

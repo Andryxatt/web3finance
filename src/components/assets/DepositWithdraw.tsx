@@ -27,7 +27,6 @@ const DepositWithdraw = (props: any) => {
         abi: FeeShareAbi,
         eventName: 'Deposit',
         listener(node, label, owner) {
-            console.log("listener")
             if (isConnected && network.id === 5) {
                 dispatch(fetchTokensPricesGoerli({})).then(() => {
                     dispatch(fetchUserBalanceGoerli({ provider, address }))
@@ -51,7 +50,6 @@ const DepositWithdraw = (props: any) => {
         abi: FeeShareAbi,
         eventName: 'Withdraw',
         listener(node, label, owner) {
-            console.log("Withdraw")
             if (isConnected && network.id === 5) {
                 dispatch(fetchTokensPricesGoerli({})).then(() => {
                     dispatch(fetchUserBalanceGoerli({ provider, address }))
@@ -112,7 +110,6 @@ const DepositWithdraw = (props: any) => {
         const signer = await fetchSigner()
         let feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const idToastWithdraw = toast.loading("Processing transaction please wait...")
-        console.log(amount, token.userBalanceDeposit)
         if (amount! > parseFloat(token.userBalanceDeposit) || amount! === undefined || amount! === 0) {
             toast.update(idToastWithdraw, { render: "Input correct amount", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
         }
@@ -137,7 +134,6 @@ const DepositWithdraw = (props: any) => {
             <span>Token balance: </span>
             <input onChange={(e) => { setAmmount(parseFloat(e.target.value)) }} type="number" className="w-full  rounded-md p-2" />
             <div>
-                
                 <span className="text-lg">{parseFloat(props.token.userBalance).toFixed(3)} - {props.token.name}</span>
             </div>
 

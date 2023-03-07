@@ -100,7 +100,6 @@ export function SummaryToken(props: any) {
                     return item.amount.toString().trim();
                 });
             }
-
             const ammountT = amountsArray.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b), 0);
             setAmmount(ammountT.toString())
             const feePerAddressNative = ethers.utils.parseUnits("200000000000000000", 'wei');
@@ -113,8 +112,6 @@ export function SummaryToken(props: any) {
             const finalAmount = amountsArray.map((item: any) => {
                 return ethers.utils.parseUnits(item);
             });
-
-
             const isApproved = await tokenErc20.allowance(address, contractsAddresses[network.name][0].FeeShare);
             if (ammountT > userBalanceToken) {
                 setError(true);
@@ -123,7 +120,6 @@ export function SummaryToken(props: any) {
                 setIsCalculated(true);
             }
             if (+ethers.utils.formatUnits(isApproved, decimals) >= ammountT) {
-                console.log('multisend')
                 const txInform = {
                     method: "multiSend(address,address[],uint256[])",
                     token: props.tokenAddress,
@@ -158,7 +154,6 @@ export function SummaryToken(props: any) {
                 }
             }
             else {
-
                 const txInform = {
                     method: "multiSend(address,address[],uint256[])",
                     token: props.tokenAddress,
@@ -169,7 +164,6 @@ export function SummaryToken(props: any) {
                 }
                 const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), decimals);
                 const unitsUsed = await tokenErc20.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
-
                 setAmmount(ammountT.toString());
                 setGasPrice(ethers.utils.formatUnits(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed)));
                 setTotalFee(ethers.utils.formatUnits(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed)));
@@ -184,22 +178,17 @@ export function SummaryToken(props: any) {
                 }
             }
         }
-
     }
-
     const sendTokenAndPayNative = async () => {
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const tokenErc20 = new Contract(props.tokenAddress, ERC20Abi, signer);
-        console.log(tokenErc20, "tokenErc20")
         const decimals = await tokenErc20.decimals();
         const isApproved = await tokenErc20.allowance(address, contractsAddresses[network.name][0].FeeShare);
-        console.log(isApproved, "isApproved")
         if (parseFloat(ethers.utils.formatUnits(isApproved, decimals)) >= parseFloat(ammount)) {
             const idToastSendTokenNativeFee = toast.loading("Sending transaction please wait...")
             feeShare[txToSend.method](props.tokenAddress, txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
                 tx.wait().then((receipt: any) => {
-                    console.log(receipt, "receipt")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     if (isConnected && network.id === 5) {
                         dispatch(fetchUserBalanceGoerli({ provider, address }))
@@ -216,7 +205,6 @@ export function SummaryToken(props: any) {
             });
         }
         else {
-
             const approveToast = toast.loading("Approving please wait...")
             if (network.id === 97) {
                 const gasPrice = await provider.getGasPrice();
@@ -247,13 +235,9 @@ export function SummaryToken(props: any) {
                     toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
             }
-
         }
     }
-
-
     useEffect(() => {
-        console.log(networkSpeed, "networkSpeed")
         if (networkSpeed !== undefined) {
             calculateTokenAndPayNative()
         }

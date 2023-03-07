@@ -69,7 +69,6 @@ const EditorManual = () => {
 
                 validArray.push(element);
             }
-
         })
         validArray.forEach((element: any, index: number) => {
             if (index === validArray.length - 1) {
@@ -85,7 +84,6 @@ const EditorManual = () => {
     }, [arrayOfAddressesFromEditor])
     const getFromStore = useCallback(() => {
         let newElems = "";
-        console.log(addressesFromStore)
         addressesFromStore.forEach((element: any, index: number) => {
             if (index === addressesFromStore.length - 1) {
                 newElems += element.address + "," + element.amount;

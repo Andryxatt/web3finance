@@ -3,23 +3,25 @@ import { ethers } from "ethers";
 import Web3 from "web3";
 import { useNetwork } from "wagmi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import { getNetworkPriority, networkSpeedsArray, setSelectedPriority,  updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
+import { getNetworkPriority, networkSpeedsArray, setSelectedPriority, updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
 const GasFeeEstimator = (props: any) => {
   const speeds = useAppSelector(networkSpeedsArray);
   const dispatch = useAppDispatch();
   const { chain } = useNetwork();
-  const historicalBlocks = 20;
   const [selectedSpeed, setSelectedSpeed] = useState("Average");
   const [subscribed, setSubscribed] = useState(false);
-
+  const historicalBlocks = 20;
+  const infuraApiKey = process.env.REACT_APP_INFURA_KEY;
   async function feeCalculate() {
+    
     let provider;
     switch (chain.id) {
       case 5:
-        provider = new Web3.providers.HttpProvider("https://goerli.infura.io/v3/9aa3d95b3bc440fa88ea12eaa4456161");
+       
+        provider = new Web3.providers.HttpProvider(`https://goerli.infura.io/v3/${infuraApiKey}`);
         break;
       case 80001: {
-        provider = new Web3.providers.HttpProvider("https://polygon-mumbai.g.alchemy.com/v2/kUD0CYUsUShpNT0qf8rQVu6vtUXMm0mo");
+        provider = new Web3.providers.HttpProvider(`https://polygon-mumbai.infura.io/v3/${infuraApiKey}`);
         break;
       }
       case 97: {
@@ -36,7 +38,7 @@ const GasFeeEstimator = (props: any) => {
       const fast = avg(blocks.map(b => b.priorityFeePerGas[2]));
       web3.eth.getBlock("pending").then((block) => {
         const baseFee = Number(block.baseFeePerGas);
-        let speeds = [ {
+        let speeds = [{
           "speedName": "Low",
           "maxPriorityFeePerGas": slow,
           "baseFeePerGas": baseFee,
@@ -66,24 +68,22 @@ const GasFeeEstimator = (props: any) => {
           "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(baseFee + fast, 'gwei')).toFixed(2),
           "selected": false
         }];
-        if(setSelectedSpeed === undefined){
-           //update speeds array with selected speed as true and others as false 
+        if (setSelectedSpeed === undefined) {
           speeds = speeds.map((speed, index) => {
-            if(index === 1){
-              return {...speed, selected: true}
-            }else {
-              return {...speed, selected: false}
+            if (index === 1) {
+              return { ...speed, selected: true }
+            } else {
+              return { ...speed, selected: false }
             }
           })
         }
         else {
           speeds = speeds.map((speed, index) => {
-            if(selectedSpeed === speed.speedName){
+            if (selectedSpeed === speed.speedName) {
               dispatch(setSelectedPriority(speed))
-              return {...speed, selected: true}
-             
-            }else {
-              return {...speed, selected: false}
+              return { ...speed, selected: true }
+            } else {
+              return { ...speed, selected: false }
             }
           })
         }
@@ -134,27 +134,27 @@ const GasFeeEstimator = (props: any) => {
         "selected": false
       },
       {
-      "speedName": "Average",
-      "maxPriorityFeePerGas": 5,
-      "baseFeePerGas": 0,
-      "baseFeeFloat": "0",
-      "maxPriorityFeePerGasFloat": "5",
-      "maxFeePerGas": 5,
-      "maxFeePerGasFloat": "5",
-      "selected": true
-    },
-    {
-      "speedName": "Fast",
-      "maxPriorityFeePerGas": 5,
-      "baseFeePerGas": 0,
-      "baseFeeFloat": "0",
-      "maxPriorityFeePerGasFloat": "5",
-      "maxFeePerGas": 5,
-      "maxFeePerGasFloat": "5",
-      "selected": false
-    },
-   
-  ]
+        "speedName": "Average",
+        "maxPriorityFeePerGas": 5,
+        "baseFeePerGas": 0,
+        "baseFeeFloat": "0",
+        "maxPriorityFeePerGasFloat": "5",
+        "maxFeePerGas": 5,
+        "maxFeePerGasFloat": "5",
+        "selected": true
+      },
+      {
+        "speedName": "Fast",
+        "maxPriorityFeePerGas": 5,
+        "baseFeePerGas": 0,
+        "baseFeeFloat": "0",
+        "maxPriorityFeePerGasFloat": "5",
+        "maxFeePerGas": 5,
+        "maxFeePerGasFloat": "5",
+        "selected": false
+      },
+
+    ]
     if (chain.id === 97) {
       dispatch(getNetworkPriority(speeds))
       dispatch(setSelectedPriority(speeds[1]));
@@ -163,8 +163,7 @@ const GasFeeEstimator = (props: any) => {
       feeCalculate();
       const web3 = new Web3(Web3.givenProvider);
       var subscription = web3.eth.subscribe('newBlockHeaders', function (error, result) {
-        if (!error)
-          {
+        if (!error) {
           setSubscribed(true)
           feeCalculate()
         }
@@ -185,39 +184,34 @@ const GasFeeEstimator = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [subscribed])
 
-const selectPriority =async (e: any) => {
-  setSelectedSpeed(e.speedName);
-  dispatch(updateSpeedSelected(e.speedName));
-}
+  const selectPriority = async (e: any) => {
+    setSelectedSpeed(e.speedName);
+    dispatch(updateSpeedSelected(e.speedName));
+  }
   return (
     <div className="w-full">
       <div>Network Speed  Gwei </div>
-
       <div>
         <div className="flex justify-between">
-
           {
-           speeds && speeds.map((speed: any, index: number) => {
+            speeds && speeds.map((speed: any, index: number) => {
               return (
-                <div className={`${speed.speedName === selectedSpeed ? "bg-slate-400":"bg-white" } flex items-center flex-col cursor-pointer border-2 p-2  shadow-md`} onClick={() => selectPriority(speed)} key={index}>
+                <div className={`${speed.speedName === selectedSpeed ? "bg-slate-400" : "bg-white"} flex items-center flex-col cursor-pointer border-2 p-2  shadow-md`} onClick={() => selectPriority(speed)} key={index}>
                   <span>{speed.speedName}</span>
                   <div><span className={`
                   ${speed.speedName === "Low" ? " text-green-500" :
-                  speed.speedName === "Average" ? "text-yellow-500" : "text-red-500"
-                   }`}>{
-                    (parseFloat(speed.baseFeeFloat) + parseFloat(speed.maxPriorityFeePerGasFloat)).toFixed(1)
-                    
+                      speed.speedName === "Average" ? "text-yellow-500" : "text-red-500"
+                    }`}>{
+                      (parseFloat(speed.baseFeeFloat) + parseFloat(speed.maxPriorityFeePerGasFloat)).toFixed(1)
                     } </span><span>gwei</span></div>
-                  <span>base: {parseFloat(speed.baseFeeFloat).toFixed(1)} | Priority: { parseFloat(speed.maxPriorityFeePerGasFloat).toFixed(1)}</span>
+                  <span>base: {parseFloat(speed.baseFeeFloat).toFixed(1)} | Priority: {parseFloat(speed.maxPriorityFeePerGasFloat).toFixed(1)}</span>
                   <span>price</span>
-                 
                 </div>
               )
             })
           }
         </div>
       </div>
-
     </div>
   )
 }

@@ -23,7 +23,6 @@ const HeaderFilters = () => {
     const updateFilter= (button: any) => {
         const newState = filters.map((obj:any) => {
             if (obj.name === button.name) {
-                console.log(button.name);
                 dispatch(filterTokens({filter:button.name}));
                 return { ...obj, isSelected: true };
             }

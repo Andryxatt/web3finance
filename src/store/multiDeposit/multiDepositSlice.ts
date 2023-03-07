@@ -51,6 +51,11 @@ export const multiDepositSlice = createSlice({
       //delete 10 elements from start of array
      state.addressesToSend.splice(0, action.payload);
     },
+    removeSingleAddress: (state, action) => {
+      //remove single address from array
+      console.log(action.payload)
+      state.addressesToSend = state.addressesToSend.filter((asset: Asset) => asset.address !== action.payload.address);
+    },
     calculateUserTokenBalance: (state, action) => {
       state.userTokenBalance = action.payload;
     },
@@ -67,7 +72,6 @@ export const multiDepositSlice = createSlice({
       state.selectedPriority = action.payload;
     },
     updateSpeedSelected: (state, action) =>{
-      console.log(action.payload, "action.payload");
       //update state array with selected speed
       const newState = state.networkPriority.map((speed:SpeedNetwork) => speed.speedName === action.payload ? {...speed, selected: true} : {...speed, selected: false}); 
       state.selectedPriority = newState.filter((speed:SpeedNetwork) => speed.selected)[0];
@@ -82,7 +86,8 @@ export const {
   removeSendedAddress,
   getNetworkPriority,
   setSelectedPriority,
-  updateSpeedSelected 
+  updateSpeedSelected,
+  removeSingleAddress
 
 } = multiDepositSlice.actions;
 export const currentNetwork = (state: RootState) => state.network.value.filter((network: any) => network.isActive)[0];

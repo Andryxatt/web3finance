@@ -427,12 +427,10 @@ export const tokenSlice = createSlice({
       state.searchField = action.payload.searchField;
     },
     filterDepositedOnly: (state, action: PayloadAction<any>) => {
-      console.log(action.payload.isDepositsOnly, "isDepositsOnly");
       state.isDepositsOnly = action.payload.isDepositsOnly;
     },
     openElement: (state, action: PayloadAction<any>) => {
       const { chainId, name } = action.payload;
-      console.log(chainId, name);
       switch (chainId) {
         case 5: {
           state.goerliTokens = state.goerliTokens.map((token: Token) => {
@@ -728,7 +726,6 @@ export const fetchUserBalanceGoerli = createAsyncThunk(
       const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
       if (token.isNative) {
         const userBalance = await provider.getBalance(address);
-        console.log(userBalance);
         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatEther(userBalance) }
       }
       else {
@@ -768,7 +765,6 @@ export const fetchUserBalancePolygon = createAsyncThunk(
   async (data: any, { getState }) => {
     const state = getState() as any;
     const { provider, address } = data;
-    console.log('network', state.network.selectedNetwork.name)
     const newTokens = state.token.polygonTokens.map(async (token: Token) => {
       if (token.isNative) {
         const userBalance = await provider.getBalance(address);
