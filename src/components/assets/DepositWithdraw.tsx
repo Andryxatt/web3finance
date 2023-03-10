@@ -18,12 +18,12 @@ const DepositWithdraw = (props: any) => {
     const { address, isConnected } = useAccount();
     const [feeShareAddress, setFeeShareAddress] = useState()
     useEffect(() => {
-        if(network){
+        if (network) {
             setFeeShareAddress(contractsAddresses[network.name][0].FeeShare)
         }
     }, [network])
     useContractEvent({
-        address:  feeShareAddress,
+        address: feeShareAddress,
         abi: FeeShareAbi,
         eventName: 'Deposit',
         listener(node, label, owner) {
@@ -127,14 +127,16 @@ const DepositWithdraw = (props: any) => {
     }
     return (
         <div>
-            <div className="flex flex-row md:flex-col mt-3 mb-4">
-                <button className="p-2 bg-neutral-800 text-white min-w-[100px] rounded-md mr-3 md:mr-0 md:mb-3" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button>
-                <button className="p-2 bg-neutral-800 text-white min-w-[100px] rounded-md" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button>
+            <div className={!props.isNativeFee ? "hidden" : "block"}>
+            <div className='font-bold text-center'>To send token and pay fee in token make a deposit!</div>
+                <div className="flex flex-row md:flex-col mt-3 mb-4">
+                    <button className="p-2 bg-neutral-800 text-white w-full rounded-md mr-3 md:mr-0 md:mb-3" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button>
+                    <button className="p-2 bg-neutral-800 text-white w-full rounded-md" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button>
+                </div>
+                <input onChange={(e) => { setAmmount(parseFloat(e.target.value)) }} type="number" className="w-full  rounded-md p-2" />
             </div>
-            <span>Token balance: </span>
-            <input onChange={(e) => { setAmmount(parseFloat(e.target.value)) }} type="number" className="w-full  rounded-md p-2" />
             <div>
-                <span className="text-lg">{parseFloat(props.token.userBalance).toFixed(3)} - {props.token.name}</span>
+                <span>Token balance: </span> <span className="text-lg font-bold">{parseFloat(props.token.userBalance).toFixed(3)} {props.token.name}</span>
             </div>
 
         </div>

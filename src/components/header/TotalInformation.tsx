@@ -26,8 +26,8 @@ const TotalInformation = () => {
 
     return (
         <div className="lg:justify-center">
-            <div className="text-gray-400 flex">Deposits: <span className="total-usd text-black text-xl font-extrabold ml-10 ">{showPrice(total)} USD</span></div>
-            <div className="text-gray-400">FARM Price: <span className="text-black text-xl font-extrabold  ml-4">44.55 USD</span></div>
+            <div className="flex flex-row"><span className="text-gray-600 text-md pt-1">Deposits:</span> <span className="total-usd text-black text-xl font-extrabold ml-10 w-[135px]">{showPrice(total)}</span> <span className="text-black text-xl font-extrabold">USD</span></div>
+            <div className="flex flex-row"><span className="text-gray-600 text-md pt-1">FARM Price:</span> <span className="total-usd text-black text-xl font-extrabold ml-4">44.55 USD</span></div>
         </div>
     )
 }

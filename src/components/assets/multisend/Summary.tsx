@@ -309,6 +309,9 @@ export function Summary(props: any) {
             const ammountT = amountsArray.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b), 0);
             setAmmount(ammountT.toString())
             const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
+            const gasPrice = await provider.getFeeData();
+            console.log(ethers.utils.formatUnits(gasPrice.lastBaseFeePerGas))
+            console.log(networkSpeed.baseFeeFloat)
             const txInfo = {
                 value: msgValue,
                 "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei'),

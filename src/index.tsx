@@ -15,7 +15,9 @@ import App from './App';
 
 const { chains, provider, webSocketProvider } = configureChains(
   [mainnet, goerli, bscTestnet, polygonMumbai],
-  [publicProvider()],
+  [
+    publicProvider()
+  ],
 )
 const client = createClient({
   autoConnect: true,

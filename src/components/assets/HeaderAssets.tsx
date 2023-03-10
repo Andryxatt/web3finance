@@ -14,10 +14,10 @@ const HeaderAssets = () => {
             <div onClick={() => dispatch(sortTokenByTokenName(network))} className="flex cursor-pointer justify-center w-[150px] font-lg">Asset
                 <img className="ml-2 w-[16px]" src={sort !== "name" ? sortIcon : sortTypes === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
-            <div onClick={() => dispatch(sortTokensByPrice(network))} className="flex cursor-pointer justify-center w-[150px] ">Token price
+            <div onClick={() => dispatch(sortTokensByPrice(network))} className="flex cursor-pointer justify-center w-[150px] ">Token price ($)
                 <img className="ml-2 w-[16px]" src={sort !== "price" ? sortIcon : sortTypes === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
-            <div onClick={() => dispatch(sortTokensByDeposit(network))} className="flex cursor-pointer justify-center w-[150px]">Total deposits ($)
+            <div onClick={() => dispatch(sortTokensByDeposit(network))} className="flex cursor-pointer justify-center w-[150px]">Total deposits 
                 <img className="ml-2 w-[16px]" src={sort !== "deposit" ? sortIcon : sortTypes === "asc" ? sortAscIcon : sortDescIcon} alt="icon" />
             </div>
             <div onClick={() => dispatch(sortTokensByUserBalanceDeposit(network))} className="flex cursor-pointer justify-center w-[150px]">Your deposit

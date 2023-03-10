@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 body {
-  font-family: "Montserrat", "Helvetica", sans-serif;
+  font-family: "Raleway";
 }
 html {
   background-image: url("images/background-sky.png"),
@@ -87,7 +87,7 @@ html {
   padding: 0.25rem;
   font-size: 1rem;
   border: none;
-  font-family: 'Oswald', sans-serif;
+  font-family: 'Raleway';
   background-color: transparent;
 }
 

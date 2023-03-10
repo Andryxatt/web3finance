@@ -47,15 +47,13 @@ const EditorAddresses = (props: any) => {
                             </div>
                         </div>
                         {props.token.isNative ? <></> :
-                            <div>
-                                <div
-                                    className="flex-row"
-                                >
+                            <div className="w-[380px]">
+                                <div className="flex-row">
                                     <div className="flex-col">
-                                        <div className='font-bold text-center'>To send token and pay fee in token make a deposit!</div>
+                                      
                                         <ToogleFee tokenName={props.token.name} isNativeFee={isNativeFee} setIsNativeFee={toogleNativeFee} />
                                     </div>
-                                    <DepositWithdraw token={props.token} />
+                                    <DepositWithdraw isNativeFee={isNativeFee}  token={props.token} />
                                 </div>
                             </div>
 
