@@ -1,7 +1,7 @@
 import SocialNetworks from "../SocialNetworks";
 import Logo from "./Logo";
 import NavigationLink from "./NavigationLink";
-import TotalInformation from "./TotalInformation";
+// import TotalInformation from "./TotalInformation";
 import WalletModal from "./WalletModal";
 
 const TopNavigation = () => {

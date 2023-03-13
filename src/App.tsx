@@ -5,7 +5,7 @@ import Stats from './components/Stats';
 import Help from './components/Help';
 import Assets from './components/Assets';
 import TopNavigation from './components/header/TopNavigation';
-import SocialNetworks from './components/SocialNetworks';
+// import SocialNetworks from './components/SocialNetworks';
 import Footer from './components/Footer';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 function App() {

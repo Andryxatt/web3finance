@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import {  useState } from "react";
 import searchIcon from "../../images/search.png";
 import { useAppDispatch } from "../../store/hooks";
 import {filterByName,
