@@ -13,7 +13,7 @@ const TxHistory = () => {
     const { chain } = useNetwork()
     const [loading, setLoading] = useState(true);
     const infuraApiKey = process.env.REACT_APP_INFURA_KEY;
-    const getWithdrawHistory = async () => {
+    const getTxHistory = async () => {
         const txArray = [];
         let provider = undefined;
         switch (chain.id) {
@@ -51,8 +51,11 @@ const TxHistory = () => {
         setLoading(false)
     }
     useEffect(() => {
-        if (chain !== undefined && address !== undefined) {
-            getWithdrawHistory()
+        if (chain !== undefined && address !== undefined && txHistory.length === 0) {
+            getTxHistory()
+        }
+        else {
+            setLoading(false)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [address, chain])
@@ -83,7 +86,7 @@ const TxHistory = () => {
                         {currentItems.map((tx: any) => {
                             return (
                                 <tr className='class="bg-white border-b dark:bg-gray-800 dark:border-gray-700"' key={tx.blockNumber}>
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{tx.event}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{tx.event === "FeeDetails" ? "MultiSendFee": tx.event}</td>
                                     <td className='class="px-6 py-4"'><a className='text-blue-900 hover:underline ' href={`https://goerli.etherscan.io/tx/${tx.transactionHash}`} target="_blank" rel="noreferrer">{`${tx.transactionHash}`.substring(0, 20)}...{`${tx.transactionHash}`.substring(`${tx.transactionHash}`.length - 4)}`{ }</a></td>
                                     <td className='class="px-6 py-4"'>{new Date(tx.timestamp * 1000).toLocaleDateString("en-US")}</td>
                                 </tr>

@@ -1,9 +1,33 @@
 import { javascript } from "@codemirror/lang-javascript";
+import { createTheme } from '@uiw/codemirror-themes';
 import { useCodeMirror } from "@uiw/react-codemirror";
 import { ethers } from "ethers";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateAddressesToSend, addressesToSend } from "../../store/multiDeposit/multiDepositSlice";
+import { tags as t } from '@lezer/highlight';
+const myTheme = createTheme({
+    theme: 'light',
+    settings: {
+      background: '#ffffff',
+      foreground: '#4D4D4C',
+      caret: '#AEAFAD',
+      selection: '#D6D6D6',
+      selectionMatch: '#D6D6D6',
+      gutterBackground: '#FFFFFF',
+      gutterForeground: '#4D4D4C',
+      gutterBorder: '#ddd',
+      gutterActiveForeground: '',
+      lineHighlight: '#EFEFEF',
+    },
+    styles: [
+      { tag: t.comment, color: '#787b80' },
+      { tag: t.definition(t.typeName), color: '#194a7b' },
+      { tag: t.typeName, color: '#194a7b' },
+      { tag: t.tagName, color: '#008a02' },
+      { tag: t.variableName, color: '#1a00db' },
+    ],
+  });
 const EditorManual = () => {
     const addressesFromStore = useAppSelector(addressesToSend);
     const dispatch = useAppDispatch();
@@ -15,6 +39,7 @@ const EditorManual = () => {
     const onChangeMirror = useCallback((value: any, viewUpdate: any) => {
         setCodeMirrorElement(value);
     }, []);
+   
     const { setContainer } = useCodeMirror({
         container: editor.current,
         extensions: [javascript({ jsx: true })],
@@ -23,6 +48,7 @@ const EditorManual = () => {
         width: "100%",
         placeholder: "Enter your deposit address and amount",
         onChange: onChangeMirror,
+        theme: myTheme
     });
     const showExample = () => {
         let exampleAddress = "0x5E8aC7D1BC6214e4CF2bE9dA175b9b9Ec1B94102, 0.1 \n0x4A7Df03838d2A4c9A9B81a3a0099dF500c0Bb102, 0.01 \n0x6538E7d6e90c14FC19045765BB474A6D781c5075, 0.03";

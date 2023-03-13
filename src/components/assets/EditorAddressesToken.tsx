@@ -25,7 +25,10 @@ const EditorAddressesToken = (props: any) => {
         setIsPreview(!isPreview);
     }
     useEffect(() => {
-        ethers.utils.isAddress(tokenAddress) ? setIsValidate(true) : setIsValidate(false);
+        if(tokenAddress !== ""){
+            console.log(tokenAddress);
+            ethers.utils.isAddress(tokenAddress) ? setIsValidate(true) : setIsValidate(false);
+        }
     }, [tokenAddress])
     return (
         <>
@@ -35,7 +38,7 @@ const EditorAddressesToken = (props: any) => {
                         <div className="md:flex mr-5 md:mr-0 md:flex-col w-[100%]">
                             <div className="flex flex-col mb-1 ">
                                 <div className="mb-2 flex flex-row">
-                                    <span className="mr-2 text-sm">Chose contract address</span>
+                                    <span className="mr-2 text-sm">Enter contract address</span>
                                     <input className={
                                         isValidate === true ?
                                             "block w-full p-2 text-gray-900 border border-gray-300 rounded-lg bg-gray-50 sm:text-xs focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

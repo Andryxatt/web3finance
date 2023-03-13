@@ -17,7 +17,6 @@ export interface TokenState {
   sortType: string;
   filterBy: string;
   searchField: string;
-  isDepositsOnly: boolean;
 }
 export interface Token {
   name: string;
@@ -31,6 +30,7 @@ export interface Token {
   isNative: boolean;
   isStablecoin: boolean;
   inactive: boolean;
+  isDeposit: boolean;
 }
 
 const initialState: TokenState = {
@@ -43,7 +43,6 @@ const initialState: TokenState = {
   sortType: 'asc',
   filterBy: 'All',
   searchField: '',
-  isDepositsOnly: false
 };
 
 export const tokenSlice = createSlice({
@@ -426,9 +425,7 @@ export const tokenSlice = createSlice({
     filterByName: (state, action: PayloadAction<any>) => {
       state.searchField = action.payload.searchField;
     },
-    filterDepositedOnly: (state, action: PayloadAction<any>) => {
-      state.isDepositsOnly = action.payload.isDepositsOnly;
-    },
+  
     openElement: (state, action: PayloadAction<any>) => {
       const { chainId, name } = action.payload;
       switch (chainId) {
@@ -496,7 +493,6 @@ export const {
   openElement,
   filterByName,
   filterTokens,
-  filterDepositedOnly,
 
   changeTokenByNetwork,
 
@@ -522,99 +518,66 @@ export const currentTokensList = (state: RootState) => {
     case 97: {
       if (state.token.filterBy === "Stablecoins") {
         return state.token.bscTokens.filter((token: Token) => {
-          if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-          }
-          
         });
       }
       else if (state.token.filterBy === "Inactive") {
         return state.token.bscTokens.filter((token: Token) => {
-          if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-          }
+        });
+      }
+      else if(state.token.filterBy === "Deposited"){
+        return state.token.bscTokens.filter((token: Token) => {
+            return token.isDeposit && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
         });
       }
       else {
         return state.token.bscTokens.filter((token: Token) => { 
-          if(state.token.isDepositsOnly){
-            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
-          }
         });
       }
     }
     case 80001: {
       if (state.token.filterBy === "Stablecoins") {
         return state.token.polygonTokens.filter((token: Token) => {
-          if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-          }
-          
         });
       }
       else if (state.token.filterBy === "Inactive") {
         return state.token.polygonTokens.filter((token: Token) => {
-          if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-          }
+        });
+      }
+      else if(state.token.filterBy === "Deposited"){
+        return state.token.polygonTokens.filter((token: Token) => {
+            return token.isDeposit && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
         });
       }
       else {
         return state.token.polygonTokens.filter((token: Token) => { 
-          if(state.token.isDepositsOnly){
-            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
-          }
         });
       }
     }
     case 5: {
       if (state.token.filterBy === "Stablecoins") {
         return state.token.goerliTokens.filter((token: Token) => {
-          if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-          }
-          
         });
       }
       else if (state.token.filterBy === "Inactive") {
         return state.token.goerliTokens.filter((token: Token) => {
-          if(state.token.isDepositsOnly){
-            return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-          }
+        });
+      }
+      else if(state.token.filterBy === "Deposited"){
+        return state.token.goerliTokens.filter((token: Token) => {
+            return token.isDeposit && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
         });
       }
       else {
         return state.token.goerliTokens.filter((token: Token) => { 
-          if(state.token.isDepositsOnly){
-            return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) && token.userBalanceDeposit !== "0" && token.userBalanceDeposit !== "0.0";
-          }
-          else {
             return token.name.toLowerCase().includes(state.token.searchField.toLowerCase()) 
-          }
         });
       }
     }
@@ -732,7 +695,7 @@ export const fetchUserBalanceGoerli = createAsyncThunk(
         const contractToken = new Contract(token.address, RTokenAbi, provider);
         const userBalanceToken = await contractToken.balanceOf(address);
         const userBalanceDeposit = await contractRToken.balanceOf(address);
-        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
+        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals), isDeposit: userBalanceDeposit.gt(0) }
       }
 
     })

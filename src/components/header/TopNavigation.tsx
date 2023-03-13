@@ -26,7 +26,7 @@ const TopNavigation = () => {
 
     return (
         <nav className="bg-white flex text-black align-center sm:flex-row p-4">
-            <div className=" container flex flex-wrap justify-between lg:justify-start mx-auto lg:flex-col">
+            <div className=" container flex flex-wrap justify-between lg:justify-start mx-auto lg:flex-col ">
                 <div className="flex lg:flex-row lg:justify-start">
                     <button onClick={showModal} type="button" className="inline-flex items-center text-sm text-gray-500 lg:block rounded-lg 2xl:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
                         <span className="sr-only">Open main menu</span>
@@ -34,7 +34,7 @@ const TopNavigation = () => {
                     </button>
                     <Logo logoName={logoParams.logoName} logoImg={logoParams.logoImg} />
                 </div>
-                <div className="flex lg:justify-between lg:mt-4 lg:self-center">
+                <div className="flex lg:justify-between lg:mt-4 md:self-start">
                     <div className="self-center xl:flex-row text-lg navigation lg:bg-slate-700 lg:hidden xl:block lg:w-[350px] lg:absolute lg:left-0 lg:top-0 lg:z-1 lg:h-full" id="navbar-default">
                         <button onClick={showModal} id="button-close-nav" className="hidden lg:block">x</button>
                         <ul className="flex-row">
@@ -42,7 +42,7 @@ const TopNavigation = () => {
                         </ul>
                         <SocialNetworks class={"hidden lg:flex"} />
                     </div>
-                    <TotalInformation />
+                    {/* <TotalInformation /> */}
                 </div>
 
                 <WalletModal />

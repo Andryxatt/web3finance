@@ -54,7 +54,7 @@ const WalletModal = () => {
           e.preventDefault();
           toggleModal(!modalShown);
         }}
-        className="black bg-orange-400 font-bold rounded-lg text-md py-3 px-5 h-12 mt-3 hover:bg-orange-500 lg:w-[200px] lg:absolute lg:right-5 lg:mt-0 ">
+        className="black bg-orange-400 font-bold rounded-lg text-md py-3 px-5 h-12 hover:bg-orange-500 lg:w-[200px] lg:absolute lg:right-5 lg:mt-0 ">
         <AccountBalanceWalletTwoToneIcon />
         {address === null ? 'Connect Wallet' : address ? `${address.substring(0, 6)}...${address.substring(address.length - 4)}` : 'Connect Wallet'}
       </button>

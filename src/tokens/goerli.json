@@ -11,7 +11,8 @@
             "isOpen": false,
             "isNative":false,
             "isStablecoin":false,
-            "inactive":false
+            "inactive":false,
+            "isDeposit":false
         },
         {
             "name":"WETH",
@@ -24,7 +25,8 @@
             "isOpen": false,
             "isNative":false,
             "isStablecoin":false,
-            "inactive":false
+            "inactive":false,
+            "isDeposit":false
         },
         {
             "name":"ETH",
@@ -37,7 +39,8 @@
             "isOpen": false,
             "isNative":true,
             "isStablecoin":false,
-            "inactive":false
+            "inactive":false,
+            "isDeposit":false
         }
     ]
 }

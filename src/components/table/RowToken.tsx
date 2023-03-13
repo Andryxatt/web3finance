@@ -27,7 +27,7 @@ const RowToken = (props: any) => {
                     <button className={`${ isOpen === true ? "bg-arrowUp" : "bg-arrowDown"} w-[15px] h-[15px] mr-2 bg-[length:15px_15px] rounded `}>
                     </button>
                     {/* <img className='w-[35px] h-[35px]' src={require(`../../images/icons/${props.token.name}.png`)} alt={props.token.name} /> */}
-                   <span className='pl-2'>Custom token sender</span> 
+                   <span className='pl-2'>Your token</span> 
                 </div>
            
             </div>
