@@ -717,7 +717,7 @@ export const fetchUserBalanceBsc = createAsyncThunk(
         const contractToken = new Contract(token.address, RTokenAbi, provider);
         const userBalanceToken = await contractToken.balanceOf(address);
         const userBalanceDeposit = await contractRToken.balanceOf(address);
-        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
+        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals),isDeposit: userBalanceDeposit.gt(0) }
       }
     })
     return Promise.all(newTokens);
@@ -738,7 +738,7 @@ export const fetchUserBalancePolygon = createAsyncThunk(
         const contractToken = new Contract(token.address, RTokenAbi, provider);
         const userBalanceToken = await contractToken.balanceOf(address);
         const userBalanceDeposit = await contractRToken.balanceOf(address);
-        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals) }
+        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals),isDeposit: userBalanceDeposit.gt(0) }
       }
     })
     return Promise.all(newTokens);
