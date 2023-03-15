@@ -3,12 +3,12 @@ import { ethers } from "ethers";
 import Web3 from "web3";
 import { useNetwork } from "wagmi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
-import {nativeBalance} from "../../../store/token/tokenSlice";
+// import {nativeBalance} from "../../../store/token/tokenSlice";
 import { getNetworkPriority, networkSpeedsArray, setSelectedPriority, updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
 const GasFeeEstimator = (props: any) => {
   const speeds = useAppSelector(networkSpeedsArray);
   const dispatch = useAppDispatch();
-  const nativeTokenPrice = useAppSelector(nativeBalance);
+  // const nativeTokenPrice = useAppSelector(nativeBalance);
   const { chain } = useNetwork();
   const [selectedSpeed, setSelectedSpeed] = useState("Average");
   const [subscribed, setSubscribed] = useState(false);
@@ -122,10 +122,10 @@ const GasFeeEstimator = (props: any) => {
     }
     return blocks;
   }
-  const claculatePriceSpeed = (maxFeePerGasFloat) => {
-    const price = parseFloat(ethers.utils.formatUnits(maxFeePerGasFloat.toString(),'gwei')) * parseFloat(nativeTokenPrice[0].tokenPrice)
-   return price
-  }
+  // const claculatePriceSpeed = (maxFeePerGasFloat) => {
+  //   const price = parseFloat(ethers.utils.formatUnits(maxFeePerGasFloat.toString(),'gwei')) * parseFloat(nativeTokenPrice[0].tokenPrice)
+  //  return price
+  // }
   useEffect(() => {
     const speeds = [
       {
