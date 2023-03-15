@@ -2,6 +2,7 @@ import {  createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
 
 export interface TransactionInfo {
+  id: number;
   transactionHash: string;
   event: string;
     blockNumber: number;

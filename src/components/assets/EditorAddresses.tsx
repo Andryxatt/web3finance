@@ -34,20 +34,19 @@ const EditorAddresses = (props: any) => {
                 isPreview ?
                     <div className="flex flex-row md:flex-col md:w-full w-[100%]">
                         <div className="md:flex mr-5 md:mr-0 md:flex-col w-[100%]">
-                            <div className="flex flex-row md:flex-col justify-between mb-1 ">
-                                <span className="mr-2 text-sm">Addresses with Amounts</span>
-
-                                <div className="underline cursor-pointer pl-1 text-gray-400 hover:text-gray-900 text-md" onClick={() => (setIsManual(!isManual))}> {isManual ? "Upload file" : "Insert manually"}</div>
+                            <div className="flex flex-row md:flex-col sm:flex-row justify-between mb-1 sm:mb-0">
+                                <span className="mr-2 text-sm line leading-0 sm:text-xs">Addresses with Amounts</span>
+                                <div className="underline cursor-pointer pl-1 text-gray-400 hover:text-gray-900 text-sm" onClick={() => (setIsManual(!isManual))}> {isManual ? "Upload file" : "Insert manually"}</div>
                             </div>
                             <div>
                                 {
                                     isManual ? <EditorManual /> : <EditorFile showManual={showManual} />
                                 }
-                                <button className="bg-blue-500 text-white font-bold px-5 py-1 rounded-md" onClick={(e) => { e.preventDefault(); showNext() }}>Next</button>
+                                <button className="bg-blue-500 sm:w-full text-white font-bold px-3 py-1 sm:mt-2 sm:mb-2 rounded-md" onClick={(e) => { e.preventDefault(); showNext() }}>Next</button>
                             </div>
                         </div>
                         {props.token.isNative ? <></> :
-                            <div className="w-[380px]">
+                            <div className="w-[380px] sm:w-auto">
                                 <div className="flex-row">
                                     <div className="flex-col">
                                       

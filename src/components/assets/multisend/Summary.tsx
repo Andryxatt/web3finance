@@ -57,7 +57,7 @@ export function Summary(props: any) {
 
     const [isCalculated, setIsCalculated] = useState(false);
 
-
+    const [maxFeePerGas, setMaxFeePerGas] = useState<any>();
     const calculateNative = async () => {
         
         setIsCalculated(false)
@@ -110,9 +110,12 @@ export function Summary(props: any) {
         finalAmount.unshift(ethers.utils.parseEther((total / 10 ** 18).toString()));
         addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
         const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseEther((total / 10 ** 18).toString()));
+        const gasPrice = await provider.getFeeData()
+        setMaxFeePerGas(gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas))
+        const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas);
         const txInfo = {
             value: msgValue,
-            "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei'),
+            "maxFeePerGas": feePerGas,
             "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')
         }
 
@@ -137,9 +140,9 @@ export function Summary(props: any) {
             else {
                 const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, txInfo);
 
-                setGasPrice(unitsUsed.mul(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei')).toString());
+                setGasPrice(unitsUsed.mul(feePerGas).toString());
                 setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
-                setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed))));
+                setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(feePerGas.mul(unitsUsed))));
                 setTxToSend(txInform);
                 setAmmount((total / 10 ** 18).toString());
                 setLoading(false);
@@ -310,11 +313,11 @@ export function Summary(props: any) {
             setAmmount(ammountT.toString())
             const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
             const gasPrice = await provider.getFeeData();
-            console.log(ethers.utils.formatUnits(gasPrice.lastBaseFeePerGas))
-            console.log(networkSpeed.baseFeeFloat)
+            setMaxFeePerGas(gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas))
+            const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas)
             const txInfo = {
                 value: msgValue,
-                "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei'),
+                "maxFeePerGas": feePerGas,
                 "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')
             }
             const finalAmount = amountsArray.map((item: any) => {
@@ -349,9 +352,9 @@ export function Summary(props: any) {
                 else {
                     const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addressesArray, finalAmount, txInfo);
                     setTxToSend(txInform);
-                    setGasPrice(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed).toString());
+                    setGasPrice(feePerGas.mul(unitsUsed).toString());
                     setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(addressesArray.length)))
-                    setTotalFee(ethers.utils.formatEther(feePerAddressNative.mul(addressesArray.length).add(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed))));
+                    setTotalFee(ethers.utils.formatEther(feePerAddressNative.mul(addressesArray.length).add(feePerGas.mul(unitsUsed))));
                     setIsCalculated(true);
                     setLoading(false);
                 }
@@ -376,8 +379,8 @@ export function Summary(props: any) {
                 const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
 
                 setAmmount(ammountT.toString());
-                setGasPrice(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed).toString());
-                setTotalFee(ethers.utils.formatUnits(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed)));
+                setGasPrice(feePerGas.mul(unitsUsed).toString());
+                setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
                 setTxToSend(txInform);
                 setLoading(false);
                 setIsCalculated(true);
@@ -554,7 +557,7 @@ export function Summary(props: any) {
                 })
             }
             else {
-                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimal), { "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei'), "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei') }).then((res: any) => {
+                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimal), { "maxFeePerGas": maxFeePerGas, "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei') }).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
@@ -705,35 +708,40 @@ export function Summary(props: any) {
         );
         contractForwarder.execute(dataBuffer.values, dataBuffer.signature).then((result: any) => {
             result.wait().then((receipt: any) => {
+                console.log(receipt, "receipt")
                 toast.update(toastSendSigned, { render: "Transaction sended successfully", type: "success", isLoading: false, autoClose:2000, position: toast.POSITION.TOP_CENTER })
             })
         }).catch((error: any) => {
+            console.log(error, "error")
             toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose:2000, position: toast.POSITION.TOP_CENTER })
         });
     }
     useEffect(() => {
-        if (props.token.isOpen && networkSpeed) {
+        console.log("networkSpeed", networkSpeed)
+            if (props.token.isOpen && networkSpeed) {
 
-            if (props.isNative) {
-                if (network.id === 97) {
-                    calculateNativeBSC();
+                if (props.isNative) {
+                    if (network.id === 97) {
+                        calculateNativeBSC();
+                    }
+                    else {
+                        calculateNative()
+                    }
+                }
+                else if (!props.isNativeFee) {
+                    if (network.id === 97) {
+                        calculateTokenAndPayNativeBSC()
+                    }
+                    else {
+                        calculateTokenAndPayNative()
+                    }
                 }
                 else {
-                    calculateNative()
+                    calculateTokenAndPayToken()
                 }
             }
-            else if (!props.isNativeFee) {
-                if (network.id === 97) {
-                    calculateTokenAndPayNativeBSC()
-                }
-                else {
-                    calculateTokenAndPayNative()
-                }
-            }
-            else {
-                calculateTokenAndPayToken()
-            }
-        }
+ 
+       
     }, [addressesAndAmounts, networkSpeed]) // eslint-disable-line react-hooks/exhaustive-deps
     const sendTransaction = async () => {
         if (props.isNative) {
@@ -753,8 +761,8 @@ export function Summary(props: any) {
                     <div className="spinner"></div>
                 </div> :
                     <div>
-                        <h3>Summary</h3>
-                        <div className={` ${!isCalculated ? 'blur-sm' : ''} bg-white flex flex-row w-full rounded-md`}>
+                        <h3 className="mb-1">Summary</h3>
+                        <div className={` ${!isCalculated ? 'blur-sm' : ''} bg-white flex flex-row w-full sm:flex-col rounded-md`}>
                             <div className="flex flex-col w-full">
                                 <div className="px-3 py-3 flex flex-col border-b-2">
                                     <span className="text-xl text-blue-900 font-bold">
@@ -806,8 +814,8 @@ export function Summary(props: any) {
                             </div>
                         </div>
                         {errorMessage ? <MultiSendError error={errorMessage} /> : null}
-                        <div className="mt-2">
-                            <button className="bg-blue-500 text-white font-bold px-5 py-1 mr-2 rounded-md" onClick={props.showPrev}>Prev</button>
+                        <div className="mt-2 flex sm:flex-col w-full">
+                            <button className="bg-blue-500 text-white font-bold px-5 py-1 mr-2 sm:mr-0 sm:mb-2 rounded-md" onClick={props.showPrev}>Prev</button>
                             {!isCalculated || error ?
                                 <button className="bg-neutral-400 text-white font-bold px-5 py-1 rounded-md backdrop:blur-md" disabled>Send</button> :
                                 <button className="bg-neutral-800 text-white font-bold px-5 py-1 rounded-md" onClick={sendTransaction}>Send</button>}

@@ -3,10 +3,12 @@ import { ethers } from "ethers";
 import Web3 from "web3";
 import { useNetwork } from "wagmi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
+import {nativeBalance} from "../../../store/token/tokenSlice";
 import { getNetworkPriority, networkSpeedsArray, setSelectedPriority, updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
 const GasFeeEstimator = (props: any) => {
   const speeds = useAppSelector(networkSpeedsArray);
   const dispatch = useAppDispatch();
+  const nativeTokenPrice = useAppSelector(nativeBalance);
   const { chain } = useNetwork();
   const [selectedSpeed, setSelectedSpeed] = useState("Average");
   const [subscribed, setSubscribed] = useState(false);
@@ -120,7 +122,10 @@ const GasFeeEstimator = (props: any) => {
     }
     return blocks;
   }
-
+  const claculatePriceSpeed = (maxFeePerGasFloat) => {
+    const price = parseFloat(ethers.utils.formatUnits(maxFeePerGasFloat.toString(),'gwei')) * parseFloat(nativeTokenPrice[0].tokenPrice)
+   return price
+  }
   useEffect(() => {
     const speeds = [
       {
@@ -188,24 +193,39 @@ const GasFeeEstimator = (props: any) => {
     setSelectedSpeed(e.speedName);
     dispatch(updateSpeedSelected(e.speedName));
   }
+  const Emoji = props => (
+    <span
+      className="emoji"
+      role="img"
+      aria-label={props.label ? props.label : ""}
+      aria-hidden={props.label ? "false" : "true"}
+    >
+      {props.symbol}
+    </span>
+  )
   return (
-    <div className="w-full">
-      <div>Network Speed  Gwei </div>
+    <div className="w-full mb-2 mt-2">
+      <div className="mb-1">Network Speed  Gwei </div>
       <div>
-        <div className="flex justify-between">
+        <div className="flex justify-between sm:flex-col">
           {
             speeds && speeds.map((speed: any, index: number) => {
               return (
-                <div className={`${speed.speedName === selectedSpeed ? "bg-slate-400" : "bg-white"} flex items-center flex-col cursor-pointer border-2 p-2  shadow-md`} onClick={() => selectPriority(speed)} key={index}>
-                  <span>{speed.speedName}</span>
+                <div className={`${speed.speedName === selectedSpeed ? "bg-slate-400" : "bg-white"} flex items-center flex-col cursor-pointer border-2 p-2 w-auto px-10 shadow-md`} onClick={() => selectPriority(speed)} key={index}>
+                  <span>
+                     {speed.speedName === "Low" ? <Emoji symbol="🐢" label="slow" /> : speed.speedName === "Average" ? <Emoji symbol="🐇" label="average" /> : <Emoji symbol="🚀" label="fast" />}
+                    </span>
                   <div><span className={`
                   ${speed.speedName === "Low" ? " text-green-500" :
                       speed.speedName === "Average" ? "text-yellow-500" : "text-red-500"
-                    }`}>{
+                    } text-lg`}>{
                       (parseFloat(speed.baseFeeFloat) + parseFloat(speed.maxPriorityFeePerGasFloat)).toFixed(1)
                     } </span><span>gwei</span></div>
-                  <span>base: {parseFloat(speed.baseFeeFloat).toFixed(1)} | Priority: {parseFloat(speed.maxPriorityFeePerGasFloat).toFixed(1)}</span>
-                  <span>price</span>
+                 <div className="flex flex-col sm:flex-col items-center">
+                  <span>base: {parseFloat(speed.baseFeeFloat).toFixed(1)}</span>
+                  <span>Priority:{parseFloat(speed.maxPriorityFeePerGasFloat).toFixed(1)}</span>
+                  {/* <span>Price:{claculatePriceSpeed(speed.maxFeePerGasFloat).toFixed(6)} $</span> */}
+                  </div>  
                 </div>
               )
             })

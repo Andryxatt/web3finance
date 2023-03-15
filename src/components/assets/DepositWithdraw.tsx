@@ -128,15 +128,15 @@ const DepositWithdraw = (props: any) => {
     return (
         <div>
             <div className={!props.isNativeFee ? "hidden" : "block"}>
-            <div className='font-bold text-center'>To send token and pay fee in token make a deposit!</div>
+            <div className='font-bold text-center sm:text-sm'>To send token and pay fee in token make a deposit!</div>
                 <div className="flex flex-row md:flex-col mt-3 mb-4">
-                    <button className="p-2 bg-neutral-800 text-white w-full rounded-md mr-3 md:mr-0 md:mb-3" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button>
-                    <button className="p-2 bg-neutral-800 text-white w-full rounded-md" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button>
+                    <button className="p-2 bg-neutral-800 text-white w-full rounded-md mr-3 md:mr-0 md:mb-3 sm:text-sm" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button>
+                    <button className="p-2 bg-neutral-800 text-white w-full rounded-md sm:text-sm" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button>
                 </div>
-                <input onChange={(e) => { setAmmount(parseFloat(e.target.value)) }} type="number" className="w-full  rounded-md p-2" />
+                <input onChange={(e) => { setAmmount(parseFloat(e.target.value)) }} type="number" className="w-full rounded-md p-2 sm:p-1" />
             </div>
             <div>
-                <span>Token balance: </span> <span className="text-lg font-bold">{parseFloat(props.token.userBalance).toFixed(3)} {props.token.name}</span>
+                <span className="sm:text-sm">Token balance: </span> <span className="text-lg sm:text-md font-bold">{parseFloat(props.token.userBalance).toFixed(3)} {props.token.name}</span>
             </div>
 
         </div>

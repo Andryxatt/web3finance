@@ -6,6 +6,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { updateAddressesToSend, addressesToSend } from "../../store/multiDeposit/multiDepositSlice";
 import { tags as t } from '@lezer/highlight';
+import { useMediaQuery } from 'react-responsive'
 const myTheme = createTheme({
     theme: 'light',
     settings: {
@@ -35,7 +36,7 @@ const EditorManual = () => {
     const [codeMirrorElement, setCodeMirrorElement] = useState<string>("");
     const [arrayOfAddressesFromEditor, setArrayOfAddressesFromEditor] = useState<any[]>([]);
     const [isValid, setIsValid] = useState<boolean>(true);
-    
+    const isTabletOrMobile = useMediaQuery({ query: '(max-width: 650px)' })
     const onChangeMirror = useCallback((value: any, viewUpdate: any) => {
         setCodeMirrorElement(value);
     }, []);
@@ -131,25 +132,33 @@ const EditorManual = () => {
         setContainer(editor.current);
         validate();
     }, [codeMirrorElement, setContainer, validate]);
+    const displayAddress = (address:string) =>{
+        if(isTabletOrMobile){
+            return address.slice(0, 6) + "..." + address.slice(address.length - 4, address.length);
+        }
+        else {
+            return address;
+        }
+    }
     return (
         <div>
             <div className='w-full rounded' ref={editor}></div>
             <div className="flex mt-2 justify-between">
-                <span className="text-sm">The address and amount are separated by commas</span>
-                <span onClick={() => showExample()} className="underline cursor-pointer pl-1 text-right text-gray-400 hover:text-gray-900 text-sm">Example files</span>
+                <span className="text-sm sm:text-xs">The address and amount are separated by commas</span>
+                <span onClick={() => showExample()} className="underline cursor-pointer pl-1 text-right text-gray-400 hover:text-gray-900 text-md sm:text-sm">Example files</span>
             </div>
             <div>
                 <div>
-                    {!isValid && <div className="flex justify-between"> <span className="text-red-600">The below addresses cannot be processed</span> <button className="text-red-600 underline" onClick={() => { deleteInvalid() }}>Delete them</button></div>}
+                    {!isValid && <div className="flex justify-between mt-2 mb-2"> <span className="text-red-600 sm:text-xs self-end">The below addresses cannot be processed</span> <button className="bg-transparent hover:bg-red-500 text-red-400 font-semibold hover:text-white px-1 leading-0 border border-red-500 hover:border-transparent rounded sm:text-sm " onClick={() => { deleteInvalid() }}>Delete them</button></div>}
                 </div>
-                <div className={!isValid ? "flex flex-col rounded-xl bg-white border-2 border-red-400 p-3 mb-1" : "hidden"}>
+                <div className={!isValid ? "flex flex-col rounded-sm bg-white border-2 border-red-400 p-3 sm:p-1 mb-1" : "hidden"}>
                     {
                         !isValid && arrayOfAddressesFromEditor.length > 0 && arrayOfAddressesFromEditor.map((element: any, index: number) => {
 
                             if (element.errorAddress !== "" || element.errorAmount !== "") {
                                 return (
                                     <>
-                                        {<span key={index} className="text-red-600 text-xs mb-1">Line {element.row} : {element.address} is a invalid wallet address and wrong amount. E.g:address,number</span>}
+                                        {<span key={index} className="text-red-600 text-xs mb-1">Line {element.row} : {displayAddress(element.address)} - invalid wallet address or wrong amount. E.g:address,number</span>}
                                     </>
                                 )
                             }

@@ -5,14 +5,12 @@ import Stats from './components/Stats';
 import Help from './components/Help';
 import Assets from './components/Assets';
 import TopNavigation from './components/header/TopNavigation';
-// import SocialNetworks from './components/SocialNetworks';
 import Footer from './components/Footer';
 window.Buffer = window.Buffer || require("buffer").Buffer;
 function App() {
   return (
     <div className='mx-auto max-w-screen-xl max-w-[960px] md:p-2'>
         <TopNavigation />
-        {/* <SocialNetworks class={"flex flex-col right-5 fixed lg:hidden"} /> */}
         <div className=''>
           <Routes>
             <Route path='/' element={<Main />} />
