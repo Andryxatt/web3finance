@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import NavigationLink from "./NavigationLink";
 // import TotalInformation from "./TotalInformation";
 import WalletModal from "./WalletModal";
-
+import { useMediaQuery } from 'react-responsive'
 const TopNavigation = () => {
     const links = [
         {
@@ -21,6 +21,7 @@ const TopNavigation = () => {
             link: '/help'
         }]
     const logoParams = { logoName: "Finance", logoImg: "logo512.png" }
+    const isMobile =  useMediaQuery({ query: '(max-width: 650px)' })
     const [hidden, setHidden] = React.useState(true);
     const showModal = () => {
         console.log("Show modal")
@@ -37,9 +38,9 @@ const TopNavigation = () => {
                     </button>
                     <Logo logoName={logoParams.logoName} logoImg={logoParams.logoImg} />
                 </div>
-                <div className="flex justify-between h-auto lg:mt-4 md:self-start">
-                    <div className={`${hidden ? "hidden":"flex"} self-end xl:flex-row sm:flex-col text-lg navigation sm:w-[350px] sm:h-[100%] sm:self-end sm:mr-auto sm:bg-gray-800 sm:fixed z-10 sm:left-0 sm:top-0`} id="navbar-default">
-                        <button onClick={showModal} type="button" id="button-close-nav" className="hidden sm:block self-end mt-5 mr-5 sm:text-white xs:mr-auto xs:text:wh md:text-white z-11"><CloseIcon/></button>
+                <div className="flex justify-between  h-auto lg:mt-4 md:self-start">
+                    <div className={`${hidden && isMobile ? "hidden":"flex"} self-end sm:flex-col xl:flex-row text-lg navigation sm:w-[350px] sm:h-[100%] sm:self-end  sm:bg-gray-800 sm:fixed z-10 sm:left-0 sm:top-0`} id="navbar-default">
+                        <button onClick={showModal} type="button" id="button-close-nav" className="hidden sm:block self-end mt-5 mr-5 sm:text-white xs:text:wh md:text-white z-11"><CloseIcon/></button>
                         <ul className="flex flex-row md:flex-col p-2">
                             {links.map((link, index) => <NavigationLink key={index} link={link.link} name={link.name} />)}
                         </ul>
