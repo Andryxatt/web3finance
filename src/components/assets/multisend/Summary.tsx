@@ -152,7 +152,7 @@ export function Summary(props: any) {
         }
         catch {
             setError(true);
-            setErrorMessage("Gas price too low")
+            setErrorMessage(`You don't have enough balance to pay fee` )
             setLoading(false);
             setIsCalculated(true);
         }
@@ -240,7 +240,7 @@ export function Summary(props: any) {
         }
         catch {
             setError(true);
-            setErrorMessage("Gas price too low")
+            setErrorMessage("You don't have enough balance to pay the fee")
             setLoading(false);
             setIsCalculated(true);
         }
@@ -366,30 +366,35 @@ export function Summary(props: any) {
                 }
             }
             else {
-
-                const txInform = {
-                    method: "multiSend(address,address[],uint256[])",
-                    token: props.token.address,
-                    addressesToSend: addressesArray,
-                    finalAmount,
-                    txInfo,
-                    isApproved: false
+                try{
+                    const txInform = {
+                        method: "multiSend(address,address[],uint256[])",
+                        token: props.token.address,
+                        addressesToSend: addressesArray,
+                        finalAmount,
+                        txInfo,
+                        isApproved: false
+                    }
+                    const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimal);
+                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
+    
+                    setAmmount(ammountT.toString());
+                    setGasPrice(feePerGas.mul(unitsUsed).toString());
+                    setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                    setTxToSend(txInform);
+                    setLoading(false);
+                    setIsCalculated(true);
+                    if (addressesAndAmounts.length === 0) {
+                        setTotalTransactions(0)
+                    }
+                    else {
+                        setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
+                    }
                 }
-                const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimal);
-                const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
-
-                setAmmount(ammountT.toString());
-                setGasPrice(feePerGas.mul(unitsUsed).toString());
-                setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
-                setTxToSend(txInform);
-                setLoading(false);
-                setIsCalculated(true);
-                if (addressesAndAmounts.length === 0) {
-                    setTotalTransactions(0)
+                catch(err){
+                    console.log("Incufficient allowance")
                 }
-                else {
-                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
-                }
+               
             }
             setLoading(false);
         }

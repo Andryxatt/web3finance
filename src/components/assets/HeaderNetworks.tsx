@@ -2,6 +2,7 @@ import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectNetwork,  changeSelectedNetwork } from "../../store/network/networkSlice";
 
 const HeaderNetworks = () => {
+
     const networks = useAppSelector(selectNetwork);
     const dispatch = useAppDispatch();
     return (

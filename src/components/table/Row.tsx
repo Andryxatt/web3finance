@@ -17,7 +17,7 @@ const Row = (props: any) => {
             + " mx-2 my-1 py-1 mb-3"
         }>
             <div
-                className="cursor-pointer items-center  mx-2 my-1 py-3 rounded-xl flex flex-row hover:bg-blue-100"
+                className="cursor-pointer items-center  mx-2 my-1 py-3 rounded-xl justify-between flex flex-row hover:bg-blue-100"
                 onClick={(e) => {
                     if (isConnected)
                         dispatch(openElement({ chainId: network.id, name: props.token.name }))

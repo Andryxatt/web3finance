@@ -56,6 +56,9 @@ export const multiDepositSlice = createSlice({
       console.log(action.payload)
       state.addressesToSend = state.addressesToSend.filter((asset: Asset) => asset.address !== action.payload.address);
     },
+    cleareAddressesToSend: (state) => {
+      state.addressesToSend = [];
+    },
     calculateUserTokenBalance: (state, action) => {
       state.userTokenBalance = action.payload;
     },
@@ -87,7 +90,8 @@ export const {
   getNetworkPriority,
   setSelectedPriority,
   updateSpeedSelected,
-  removeSingleAddress
+  removeSingleAddress,
+  cleareAddressesToSend
 
 } = multiDepositSlice.actions;
 export const currentNetwork = (state: RootState) => state.network.value.filter((network: any) => network.isActive)[0];

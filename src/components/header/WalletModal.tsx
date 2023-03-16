@@ -9,12 +9,13 @@ import Modal from "../ui/Modal"
 import { useAppSelector } from "../../store/hooks"
 import { useAccount, useConnect } from 'wagmi'
 import { currentNetwork, selectNetwork } from "../../store/network/networkSlice"
+import { useMediaQuery } from 'react-responsive'
 window.Buffer = window.Buffer || require("buffer").Buffer
 
 const WalletModal = () => {
   const networks = useAppSelector(selectNetwork);
   const selectedNetwork = useAppSelector(currentNetwork);
- 
+  const isMobile = useMediaQuery({ query: '(max-width: 768px)' })
   const setConnectorIcon = (connector: any) => {
     switch(connector.name){
       case "MetaMask":
@@ -72,7 +73,7 @@ const WalletModal = () => {
           {connectors.map((connector) => (
             <div
               key={connector.id}
-              onClick={() => connect({ connector, chainId:getChainId() })} className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300"
+              onClick={() => connect({ connector, chainId:getChainId() })} className={` ${isMobile && (connector.name === "MetaMask" || connector.name === "Injected") ? "hidden" : ""} cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300`}
             >
               <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={setConnectorIcon(connector)} />
               <span> {connector.name}  {!connector.ready && ' (unsupported)'}

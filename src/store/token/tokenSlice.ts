@@ -487,6 +487,7 @@ export const tokenSlice = createSlice({
     builder.addCase(fetchUserBalancePolygon.fulfilled, (state, action) => {
       state.polygonTokens = action.payload;
     });
+   
   }
 });
 export const {
