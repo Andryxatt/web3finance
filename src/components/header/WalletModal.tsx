@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import AccountBalanceWalletTwoToneIcon from '@mui/icons-material/AccountBalanceWalletTwoTone'
 import WalletNetwork from "./WalletNetwork"
 import bnbIcon from "../../images/bnb-modal.png"
@@ -16,8 +16,12 @@ const WalletModal = () => {
   const networks = useAppSelector(selectNetwork);
   const selectedNetwork = useAppSelector(currentNetwork);
   const isMobile = useMediaQuery({ query: '(max-width: 768px)' })
+  const { address } = useAccount()
+  const { connect, connectors, isLoading, pendingConnector } =
+    useConnect()
+  const [modalShown, toggleModal] = React.useState(false);
   const setConnectorIcon = (connector: any) => {
-    switch(connector.name){
+    switch (connector.name) {
       case "MetaMask":
         return metamaskIcon;
       case "WalletConnect":
@@ -31,7 +35,7 @@ const WalletModal = () => {
     }
   }
   const getChainId = () => {
-    switch(selectedNetwork.name){
+    switch (selectedNetwork.name) {
       case "Binance Smart Chain Testnet":
         return 97;
       case "Ethereum":
@@ -44,10 +48,45 @@ const WalletModal = () => {
         return 5;
     }
   }
-  const { address } = useAccount()
-  const { connect, connectors, isLoading, pendingConnector } =
-    useConnect()
-  const [modalShown, toggleModal] = React.useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [connectorElements, setConnectorElements] = React.useState([])
+  useEffect(() => {
+    for (let i = 0; i < connectors.length; i++) {
+      const connector = connectors[i]
+      if(connectors[i].name === "MetaMask"){
+        console.log("metamask")
+        const connector = connectors[2]
+        connectorElements.push(
+          <div
+            onClick={() => connect({ connector, chainId: getChainId() })} className={`cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300`}
+          >
+            <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={metamaskIcon} />
+            <span> MetaMask  {!connector.ready && ' (unsupported)'}
+              {isLoading &&
+                connector.id === pendingConnector?.id &&
+                ' (connecting)'}</span>
+            <p>Connect to your MetaMask</p>
+          </div>
+        )
+      }
+      else {
+        connectorElements.push(
+          <div
+            onClick={() => connect({ connector, chainId: getChainId() })} className={` ${isMobile && (connector.name === "MetaMask" || connector.name === "Injected" || connector.name === "Coinbase Wallet") ? "hidden" : ""} cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300`}
+          >
+            <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={setConnectorIcon(connector)} />
+            <span> {connector.name}  {!connector.ready && ' (unsupported)'}
+              {isLoading &&
+                connector.id === pendingConnector?.id &&
+                '(connecting)'}</span>
+            <p>Connect to your {connector.name}</p>
+          </div>
+        )
+      }
+     
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[])
   return (
     <>
       <button
@@ -69,34 +108,29 @@ const WalletModal = () => {
           }
         </div>
         <h1 className="px-3 text-center modal-title">2. Choose Wallet</h1>
-        <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
-          {connectors.map((connector) => (
-            <div
-              key={connector.id}
-              onClick={() => connect({ connector, chainId:getChainId() })} className={` ${isMobile && (connector.name === "MetaMask" || connector.name === "Injected") ? "hidden" : ""} cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300`}
-            >
-              <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={setConnectorIcon(connector)} />
-              <span> {connector.name}  {!connector.ready && ' (unsupported)'}
-                {isLoading &&
-                  connector.id === pendingConnector?.id &&
-                  ' (connecting)'}</span>
-              <p>Connect to your {connector.name}</p>
+        {
+          isMobile ? <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
+            {connectorElements}
+          </div>
+            :
+            <div className="flex flex-row flex-wrap md:flex-col sm:flex-col">
+              {connectors.map((connector) => (
+                <div
+                  key={connector.id}
+                  onClick={() => connect({ connector, chainId: getChainId() })} className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300"
+                >
+                  <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={ setConnectorIcon(connector)} />
+                  <span> {connector.name}  {!connector.ready && ' (unsupported)'}
+                    {isLoading &&
+                      connector.id === pendingConnector?.id &&
+                      ' (connecting)'}</span>
+                  <p>Connect to your {connector.name}</p>
+                </div>
+              ))}
             </div>
-          ))}
+        }
 
-          {/* <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300">
-            <img className="sm:max-w-[50px] max-w-[100px]" alt="Coinbase" src={coinbaseIcon} />
-            <span>Coinbase Wallet</span>
-          </div>
-          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300">
-            <img className="sm:max-w-[50px] max-w-[100px]" alt="Binance" src={bnbIcon} />
-            <span>Binance Chain Wallet</span>
-          </div>
-          <div className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300" >
-            <img className="sm:max-w-[50px] max-w-[100px]" alt="Wallet Connect" src={walletConnectIcon} />
-            <span>Wallet Connect</span>
-          </div> */}
-        </div>
+
       </Modal>
     </>
   );

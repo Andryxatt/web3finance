@@ -9,7 +9,7 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { fetchUserBalanceGoerli } from "../../../store/token/tokenSlice";
+import { fetchUserBalanceGoerli, nativeBalance } from "../../../store/token/tokenSlice";
 import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
@@ -28,6 +28,8 @@ interface TxInformation {
     isApproved: boolean;
 }
 export function SummaryToken(props: any) {
+    const native = useAppSelector(nativeBalance);
+
     const networkSpeed = useAppSelector(selectedSpeed)
     const dispatch = useAppDispatch();
     const network = useAppSelector(currentNetwork);
@@ -56,7 +58,7 @@ export function SummaryToken(props: any) {
     const [userTokenBalance, setUserTokenBalance] = useState("0");
     const [tokenDecimals, setTokenDecimals] = useState(0);
     const [tokenSymbol, setTokenSymbol] = useState("");
-
+    const [maxFeePerGas, setMaxFeePerGas] = useState<any>();
     const calculateTokenAndPayNative = async () => {
         setIsCalculated(false);
         setLoading(false);
@@ -72,6 +74,8 @@ export function SummaryToken(props: any) {
         setUserTokenBalance(userBalanceToken.toString())
         let addressesArray = [];
         let amountsArray = [];
+        const checkAddress = await feeShare.getRTokenAddress(props.tokenAddress);
+       if(checkAddress === "0x0000000000000000000000000000000000000000"){
         if (addressesAndAmounts.length === 0) {
             addressesArray = [];
             amountsArray = [];
@@ -104,9 +108,12 @@ export function SummaryToken(props: any) {
             setAmmount(ammountT.toString())
             const feePerAddressNative = ethers.utils.parseUnits("200000000000000000", 'wei');
             const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
+            const gasPrice = await provider.getFeeData();
+            setMaxFeePerGas(gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas))
+            const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas)
             const txInfo = {
                 value: msgValue,
-                "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei'),
+                "maxFeePerGas": feePerGas,
                 "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')
             }
             const finalAmount = amountsArray.map((item: any) => {
@@ -115,7 +122,7 @@ export function SummaryToken(props: any) {
             const isApproved = await tokenErc20.allowance(address, contractsAddresses[network.name][0].FeeShare);
             if (ammountT > userBalanceToken) {
                 setError(true);
-                setErrorMessage("You don't have enough balance to pay the fee")
+                setErrorMessage(`You don't have enough tokens to send transaction. Need ${ammountT} ${symbol} but you have ${userBalanceToken} ${symbol}`)
                 setLoading(false);
                 setIsCalculated(true);
             }
@@ -139,10 +146,17 @@ export function SummaryToken(props: any) {
                 }
                 else {
                     const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.tokenAddress, addressesArray, finalAmount, txInfo);
+                    console.log(unitsUsed)
                     setTxToSend(txInform);
-                    setGasPrice(ethers.utils.formatUnits(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed), 'gwei'));
+                    setGasPrice(ethers.utils.formatUnits(feePerGas.mul(unitsUsed), 'gwei'));
                     setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(addressesArray.length)))
-                    setTotalFee(ethers.utils.formatEther(feePerAddressNative.mul(addressesArray.length).add(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed))));
+                    const totalFee = ethers.utils.formatEther(feePerAddressNative.mul(addressesArray.length).add(feePerGas.mul(unitsUsed)))
+                    console.log(totalFee, native[0].userBalance)
+                    if(totalFee > native[0].userBalance){
+                        console.log(totalFee, native[0].userBalance)
+                    }
+                    setTotalFee(totalFee);
+
                     setIsCalculated(true);
                     setLoading(false);
                 }
@@ -154,30 +168,57 @@ export function SummaryToken(props: any) {
                 }
             }
             else {
-                const txInform = {
-                    method: "multiSend(address,address[],uint256[])",
-                    token: props.tokenAddress,
-                    addressesToSend: addressesArray,
-                    finalAmount,
-                    txInfo,
-                    isApproved: false
+                try{
+                    const txInform = {
+                        method: "multiSend(address,address[],uint256[])",
+                        token: props.tokenAddress,
+                        addressesToSend: addressesArray,
+                        finalAmount,
+                        txInfo,
+                        isApproved: false
+                    }
+                    const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), decimals);
+                    const unitsUsed = await tokenErc20.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
+                    if(totalFee > native[0].userBalance){
+                        setAmmount(ammountT.toString());
+                        setGasPrice(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setTxToSend(txInform);
+                        setErrorMessage("You don't have enough balance to pay the fee")
+                        setError(true);
+                        setLoading(false);
+                        setIsCalculated(true);
+                    }
+                    else {
+                        setAmmount(ammountT.toString());
+                        setGasPrice(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setTxToSend(txInform);
+                        setLoading(false);
+                        setIsCalculated(true);
+                    }
+                   
+                    if (addressesAndAmounts.length === 0) {
+                        setTotalTransactions(0)
+                    }
+                    else {
+                        setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
+                    }
                 }
-                const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), decimals);
-                const unitsUsed = await tokenErc20.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
-                setAmmount(ammountT.toString());
-                setGasPrice(ethers.utils.formatUnits(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed)));
-                setTotalFee(ethers.utils.formatUnits(ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed)));
-                setTxToSend(txInform);
-                setLoading(false);
-                setIsCalculated(true);
-                if (addressesAndAmounts.length === 0) {
-                    setTotalTransactions(0)
+                catch(err){
+                    console.log(err)
                 }
-                else {
-                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
-                }
+               
             }
         }
+       }
+       else {
+              setError(true);
+              setErrorMessage("This address is not available.")
+              setLoading(false);
+              setIsCalculated(true);
+       }
+     
     }
     const sendTokenAndPayNative = async () => {
         const signer = await fetchSigner()
@@ -222,7 +263,7 @@ export function SummaryToken(props: any) {
                 })
             }
             else {
-                tokenErc20.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, decimals), { "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei'), "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei') }).then((res: any) => {
+                tokenErc20.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, decimals), { "maxFeePerGas": maxFeePerGas, "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei') }).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
@@ -253,7 +294,7 @@ export function SummaryToken(props: any) {
                 </div> :
                     <div>
                         <h3>Summary</h3>
-                        <div className={` ${!isCalculated ? 'blur-sm' : ''} bg-white flex flex-row w-full rounded-md`}>
+                        <div className={` ${!isCalculated ? 'blur-sm' : ''} bg-white flex flex-row sm:flex-col w-full rounded-md`}>
                             <div className="flex flex-col w-full">
                                 <div className="px-3 py-3 flex flex-col border-b-2">
                                     <span className="text-xl text-blue-900 font-bold">

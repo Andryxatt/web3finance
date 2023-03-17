@@ -59,7 +59,6 @@ export function Summary(props: any) {
 
     const [maxFeePerGas, setMaxFeePerGas] = useState<any>();
     const calculateNative = async () => {
-        
         setIsCalculated(false)
         setError(false);
         setErrorMessage('');

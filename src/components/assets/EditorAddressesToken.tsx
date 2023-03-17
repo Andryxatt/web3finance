@@ -9,7 +9,7 @@ const EditorAddressesToken = (props: any) => {
     const [isManual, setIsManual] = useState(true);
     const [isPreview, setIsPreview] = useState(true);
     const showNext = () => {
-        if (addressesToSend.length > 0) {
+        if (addressesToSend.length > 0 && tokenAddress !== "") {
             setIsPreview(!isPreview);
         }
         else {
@@ -55,7 +55,7 @@ const EditorAddressesToken = (props: any) => {
                                 {
                                     isManual ? <EditorManual /> : <EditorFile showManual={showManual} />
                                 }
-                                <button className="bg-blue-500 text-white font-bold px-5 py-1 rounded-md" onClick={(e) => { e.preventDefault(); showNext() }}>Next</button>
+                                <button className={`${!isValidate ? "bg-blue-300" : "bg-blue-500"} text-white font-bold px-5 py-1 rounded-md`} disabled={!isValidate} onClick={(e) => { e.preventDefault(); showNext() }}>Next</button>
                             </div>
                         </div>
                     </div> :
