@@ -2,15 +2,14 @@ import { useEffect, useState } from "react";
 import EditorFile from "./EditorFile";
 import 'react-toastify/dist/ReactToastify.css';
 import EditorManual from "./EditorManual";
-import { addressesToSend } from "../../store/multiDeposit/multiDepositSlice";
+import { addressesToSend, currentNetwork } from "../../store/multiDeposit/multiDepositSlice";
 import PreviewResultToken from "./PreviewResultToken";
-// import { Contract, ethers } from "ethers";
+import { Contract } from "ethers";
 import { toast } from "react-toastify";
-import { ethers } from "ethers";
-// import { useProvider } from "wagmi";
-// import contractsAddresses from "./../../contracts/AddressesContracts.json";
-// import FeeShareAbi from "./../../contracts/FeeShare.json";
-// import { useAppSelector } from "../../store/hooks";
+import { useProvider } from "wagmi";
+import contractsAddresses from "./../../contracts/AddressesContracts.json";
+import FeeShareAbi from "./../../contracts/FeeShare.json";
+import { useAppSelector } from "../../store/hooks";
 const EditorAddressesToken = (props: any) => {
     const [isManual, setIsManual] = useState(true);
     const [isPreview, setIsPreview] = useState(true);
@@ -19,7 +18,7 @@ const EditorAddressesToken = (props: any) => {
             setIsPreview(!isPreview);
         }
         else {
-           toast("No token address or amounts added", { type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER })
+            toast("No token address or amounts added", { type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER })
         }
     }
     const [tokenAddress, setTokenAddress] = useState("");
@@ -31,8 +30,8 @@ const EditorAddressesToken = (props: any) => {
     const showPrev = () => {
         setIsPreview(!isPreview);
     }
-    // const network = useAppSelector(currentNetwork);
-    // const provider = useProvider();
+    const network = useAppSelector(currentNetwork);
+    const provider = useProvider();
     // const isFeeShareToken = async () => {
     //     const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, provider);
     //     const checkAddress = await feeShare.getRTokenAddress(tokenAddress);
@@ -44,16 +43,50 @@ const EditorAddressesToken = (props: any) => {
     //         return true;
     //     }
     // }
+
+
     useEffect(() => {
-        if (tokenAddress !== "") {
-            console.log(ethers.utils.isAddress(tokenAddress));
-            ethers.utils.isAddress(tokenAddress) ? setIsValidate(true) : setIsValidate(false);
-            ethers.utils.isAddress(tokenAddress) ? setMessageErrorAddress("") : setMessageErrorAddress("Invalid address");
+        const validateAddressContract = async () => {
+            try {
+                const code = await provider.getCode(tokenAddress);
+                if (code !== '0x') return true;
+                else return false;
+            } catch (error) { }
         }
-        else {
-            setIsValidate(false);
-            setMessageErrorAddress("Invalid address");
+        const validateIsTokenFeeShare = async () => {
+            const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, provider);
+            const checkAddress = await feeShare.getRTokenAddress(tokenAddress);
+            if (checkAddress === "0x0000000000000000000000000000000000000000") {
+                return true;
+            }
+            else {
+                return false;
+            }
+
         }
+        validateIsTokenFeeShare().then((res) => {
+            console.log(res, "validateIsTokenFeeShare")
+            if (res) {
+                setIsValidate(true);
+                setMessageErrorAddress("");
+            }
+            else {
+                setIsValidate(false);
+                setMessageErrorAddress("Invalid address");
+            }
+        })
+        validateAddressContract().then((res) => {
+            console.log(res, "validateAddressContract")
+            if (res) {
+                setIsValidate(true);
+                setMessageErrorAddress("");
+            }
+            else {
+                setIsValidate(false);
+                setMessageErrorAddress("Invalid address");
+            }
+        })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [tokenAddress])
     return (
         <>
