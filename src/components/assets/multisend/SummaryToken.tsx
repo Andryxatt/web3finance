@@ -107,7 +107,7 @@ export function SummaryToken(props: any) {
             const ammountT = amountsArray.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b), 0);
             setAmmount(ammountT.toString())
             const feePerAddressNative = ethers.utils.parseUnits("200000000000000000", 'wei');
-            const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
+            const msgValue = feePerAddressNative;
             const gasPrice = await provider.getFeeData();
             setMaxFeePerGas(gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas))
             const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas)
@@ -148,9 +148,9 @@ export function SummaryToken(props: any) {
                     const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.tokenAddress, addressesArray, finalAmount, txInfo);
                     console.log(unitsUsed)
                     setTxToSend(txInform);
-                    setGasPrice(ethers.utils.formatUnits(feePerGas.mul(unitsUsed), 'gwei'));
-                    setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(addressesArray.length)))
-                    const totalFee = ethers.utils.formatEther(feePerAddressNative.mul(addressesArray.length).add(feePerGas.mul(unitsUsed)))
+                    setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
+                    setTxFee(ethers.utils.formatUnits(feePerAddressNative))
+                    const totalFee = ethers.utils.formatEther(feePerAddressNative.add(feePerGas.mul(unitsUsed)))
                     console.log(totalFee, native[0].userBalance)
                     if(totalFee > native[0].userBalance){
                         console.log(totalFee, native[0].userBalance)
@@ -181,7 +181,7 @@ export function SummaryToken(props: any) {
                     const unitsUsed = await tokenErc20.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
                     if(totalFee > native[0].userBalance){
                         setAmmount(ammountT.toString());
-                        setGasPrice(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
                         setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
                         setTxToSend(txInform);
                         setErrorMessage("You don't have enough balance to pay the fee")
@@ -191,7 +191,7 @@ export function SummaryToken(props: any) {
                     }
                     else {
                         setAmmount(ammountT.toString());
-                        setGasPrice(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
                         setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
                         setTxToSend(txInform);
                         setLoading(false);
