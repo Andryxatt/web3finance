@@ -3,12 +3,13 @@ import AnimatedDots from '../AnimatedDots';
 import { openElement } from '../../store/token/tokenSlice';
 import { currentNetwork } from "../../store/network/networkSlice";
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { useAccount } from 'wagmi';
+import { useAccount,  useNetwork } from 'wagmi';
 
 const Row = (props: any) => {
     const dispatch = useAppDispatch();
     const network = useAppSelector(currentNetwork)
     const { isConnected } = useAccount()
+    const {chain} = useNetwork()
     return (
         <div className={
             (props.token.isOpen ?
@@ -19,7 +20,7 @@ const Row = (props: any) => {
             <div
                 className="cursor-pointer items-center  mx-2 my-1 py-3 rounded-xl justify-between flex flex-row hover:bg-blue-100"
                 onClick={(e) => {
-                    if (isConnected)
+                    if (isConnected && chain.id === network.id)
                         dispatch(openElement({ chainId: network.id, name: props.token.name }))
                 }}
             >

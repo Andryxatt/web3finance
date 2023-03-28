@@ -32,7 +32,7 @@ const RowToken = (props: any) => {
            
             </div>
             <div className={isOpen ? "isopen mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5 flex" : "hidden isopen"}>
-                <EditorAddressesToken />
+                <EditorAddressesToken isOpen={isOpen} />
             </div>
         </div>
     )

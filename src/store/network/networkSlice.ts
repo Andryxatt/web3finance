@@ -26,6 +26,14 @@ const initialState: NetworkState = {
         rpcUrl: 'https://rpc-mumbai.matic.today'
     },
     {
+      name: "Polygon",
+      icon: require("../../images/polygon.png"),
+      id: 137,
+      isActive: false,
+      Currency: 'MATIC',
+      rpcUrl: 'https://rpc-mainnet.maticvigil.com/'
+  },
+    {
         name: "Goerli",
         icon: require("../../images/ethereum.png"),
         id: 5,
@@ -40,7 +48,15 @@ const initialState: NetworkState = {
         isActive: false,
         Currency: 'tBNB',
         rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
-    }
+    },
+    {
+      icon: require("../../images/binance.png"),
+      name: "Binance Smart Chain",
+      id: 56,
+      isActive: false,
+      Currency: 'BNB',
+      rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
+  }
 ],
   status: 'idle',
   selectedNetwork: {

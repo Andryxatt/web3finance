@@ -8,7 +8,7 @@ import { currentNetwork } from "../../store/network/networkSlice";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { fetchSigner } from '@wagmi/core'
 import { useAccount, useProvider, useContractEvent } from "wagmi";
-import { fetchTokensPricesBsc, fetchTokensPricesGoerli, fetchTokensPricesPolygon, fetchUserBalanceBsc, fetchUserBalanceGoerli, fetchUserBalancePolygon } from "../../store/token/tokenSlice";
+import { fetchTokensPricesBsc, fetchTokensPricesBscT, fetchTokensPricesEth, fetchTokensPricesGoerli, fetchTokensPricesMumbai, fetchTokensPricesPolygon, fetchUserBalanceBsc, fetchUserBalanceBscT, fetchUserBalanceEth, fetchUserBalanceGoerli, fetchUserBalanceMumbai, fetchUserBalancePolygon } from "../../store/token/tokenSlice";
 const DepositWithdraw = (props: any) => {
     const dispatch = useAppDispatch();
     const provider = useProvider()
@@ -32,12 +32,27 @@ const DepositWithdraw = (props: any) => {
                     dispatch(fetchUserBalanceGoerli({ provider, address }))
                 })
             }
+            if (isConnected && network.id === 1) {
+                dispatch(fetchTokensPricesEth({})).then(() => {
+                    dispatch(fetchUserBalanceEth({ provider, address }))
+                })
+            }
             if (isConnected && network.id === 97) {
+                dispatch(fetchTokensPricesBscT({})).then(() => {
+                    dispatch(fetchUserBalanceBscT({ provider, address }))
+                })
+            }
+            if (isConnected && network.id === 56) {
                 dispatch(fetchTokensPricesBsc({})).then(() => {
                     dispatch(fetchUserBalanceBsc({ provider, address }))
                 })
             }
             if (isConnected && network.id === 80001) {
+                dispatch(fetchTokensPricesMumbai({})).then(() => {
+                    dispatch(fetchUserBalanceMumbai({ provider, address }))
+                })
+            }
+            if (isConnected && network.id === 137) {
                 dispatch(fetchTokensPricesPolygon({})).then(() => {
                     dispatch(fetchUserBalancePolygon({ provider, address }))
                 })
@@ -55,12 +70,27 @@ const DepositWithdraw = (props: any) => {
                     dispatch(fetchUserBalanceGoerli({ provider, address }))
                 })
             }
+            if (isConnected && network.id === 1) {
+                dispatch(fetchTokensPricesEth({})).then(() => {
+                    dispatch(fetchUserBalanceEth({ provider, address }))
+                })
+            }
             if (isConnected && network.id === 97) {
+                dispatch(fetchTokensPricesBscT({})).then(() => {
+                    dispatch(fetchUserBalanceBscT({ provider, address }))
+                })
+            }
+            if (isConnected && network.id === 56) {
                 dispatch(fetchTokensPricesBsc({})).then(() => {
                     dispatch(fetchUserBalanceBsc({ provider, address }))
                 })
             }
             if (isConnected && network.id === 80001) {
+                dispatch(fetchTokensPricesMumbai({})).then(() => {
+                    dispatch(fetchUserBalanceMumbai({ provider, address }))
+                })
+            }
+            if (isConnected && network.id === 137) {
                 dispatch(fetchTokensPricesPolygon({})).then(() => {
                     dispatch(fetchUserBalancePolygon({ provider, address }))
                 })
@@ -69,8 +99,11 @@ const DepositWithdraw = (props: any) => {
         once: true,
     })
     const depositAmount = async (token: any, amount: any) => {
+        console.log(token, "token")
         const signer = await fetchSigner()
-        let contract = new Contract(contractsAddresses[network.name][0][token.name], RTokenAbi, signer);
+        console.log(contractsAddresses[network.name][0], "network name")
+        let contract = new Contract(token.address, RTokenAbi, signer);
+        console.log(contract, "contract")
         let checkAllowance = await contract.allowance(address, contractsAddresses[network.name][0].FeeShare);
         let feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)) < amount!) {
@@ -80,7 +113,7 @@ const DepositWithdraw = (props: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(idToastApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         const idToastDepositApprove = toast.loading("Depositing please wait...")
-                        await feeShare.deposit(contractsAddresses[network.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                        await feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
                             result.wait().then(async (recept: any) => {
                                 toast.update(idToastDepositApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                             })
@@ -94,7 +127,7 @@ const DepositWithdraw = (props: any) => {
         }
         else {
             const idToast2 = toast.loading("Depositing please wait...")
-            feeShare.deposit(contractsAddresses[network.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
+            feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
 
@@ -114,7 +147,7 @@ const DepositWithdraw = (props: any) => {
             toast.update(idToastWithdraw, { render: "Input correct amount", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
         }
         else {
-            feeShare.withdraw(contractsAddresses[network.name][0][token.name], ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: "210000" }).then((result: any) => {
+            feeShare.withdraw(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: "210000" }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToastWithdraw, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 }).catch((err: any) => {

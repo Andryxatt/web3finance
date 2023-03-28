@@ -5,17 +5,21 @@ import EditorManual from "./EditorManual";
 import PreviewResult from "./PreviewResult";
 import DepositWithdraw from "./DepositWithdraw";
 import ToogleFee from "./multisend/ToogleFee";
-import { addressesToSend } from "../../store/multiDeposit/multiDepositSlice";
+import { addressesToSend, updateAddressesToSend } from "../../store/multiDeposit/multiDepositSlice";
+import { useAppDispatch, useAppSelector } from "../../store/hooks";
+import { toast } from "react-toastify";
 const EditorAddresses = (props: any) => {
+    const dispatch = useAppDispatch();
     const [isManual, setIsManual] = useState(true);
     const [isPreview, setIsPreview] = useState(true);
     const [isNativeFee, setIsNativeFee] = useState(false);
+    const addresses = useAppSelector(addressesToSend);
     const showNext = () => {
-        if (addressesToSend.length > 0) {
+        if (addresses.length > 0) {
             setIsPreview(!isPreview);
         }
         else {
-            // const idToast = toast( "No addresses and amounts added", {type: "error", autoClose: 2000, isLoading: false, position: toast.POSITION.TOP_CENTER })
+            const idToast = toast( "You need to input at least one address and amount!", {type: "error", autoClose: 2000,icon:"🚨", isLoading: false, position: toast.POSITION.TOP_CENTER })
         }
     }
     const toogleNativeFee = () => {
@@ -27,6 +31,7 @@ const EditorAddresses = (props: any) => {
     const showPrev = () => {
         setIsNativeFee(false);
         setIsPreview(!isPreview);
+        dispatch(updateAddressesToSend([]));
     }
     return (
         <>

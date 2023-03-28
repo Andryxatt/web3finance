@@ -38,6 +38,10 @@ const WalletModal = () => {
     switch (selectedNetwork.name) {
       case "Binance Smart Chain Testnet":
         return 97;
+        case "Binance Smart Chain":
+        return 56;
+      case "Polygon":
+        return 137;
       case "Ethereum":
         return 1;
       case "Polygon Mumbai":
@@ -53,8 +57,7 @@ const WalletModal = () => {
   useEffect(() => {
     for (let i = 0; i < connectors.length; i++) {
       const connector = connectors[i]
-      if(connectors[i].name === "MetaMask"){
-        console.log("metamask")
+      if (connectors[i].name === "MetaMask") {
         const connector = connectors[2]
         connectorElements.push(
           <div
@@ -83,10 +86,10 @@ const WalletModal = () => {
           </div>
         )
       }
-     
+
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[])
+  }, [])
   return (
     <>
       <button
@@ -119,7 +122,7 @@ const WalletModal = () => {
                   key={connector.id}
                   onClick={() => connect({ connector, chainId: getChainId() })} className="cursor-pointer flex items-center w-[50%] md:w-[100%] flex-col relative mb-3 hover:bg-blue-300"
                 >
-                  <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={ setConnectorIcon(connector)} />
+                  <img alt="Metamask" className="sm:max-w-[50px] max-w-[100px]" src={setConnectorIcon(connector)} />
                   <span> {connector.name}  {!connector.ready && ' (unsupported)'}
                     {isLoading &&
                       connector.id === pendingConnector?.id &&

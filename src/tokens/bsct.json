@@ -1,0 +1,46 @@
+{
+    "Tokenization": [
+        {
+            "name": "WBNB",
+            "decimals": 18,
+            "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+             "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
+            "isOpen": false,
+            "isNative":false,
+            "isStablecoin":false,
+            "inactive":false,
+            "isDeposit":false
+        },
+        {
+            "name": "LINK",
+            "decimals": 18,
+            "address": "0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06",
+             "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
+            "isOpen": false,
+            "isNative":false,
+            "isStablecoin":false,
+            "inactive":false,
+            "isDeposit":false
+        },
+        {
+            "name": "BNB",
+            "decimals": 18,
+            "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
+             "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
+            "isOpen": false,
+            "isNative":true,
+            "isStablecoin":false,
+            "inactive":false,
+            "isDeposit":false
+        }
+    ]
+}

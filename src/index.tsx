@@ -3,7 +3,7 @@ import { ThemeProvider } from "@material-tailwind/react";
 import { BrowserRouter } from "react-router-dom";
 import { store } from './store/store'
 import { Provider } from 'react-redux'
-import { bscTestnet, polygonMumbai, mainnet, goerli } from 'wagmi/chains'
+import { bscTestnet, polygonMumbai, mainnet, goerli, polygon, bsc } from 'wagmi/chains'
 import { WagmiConfig, createClient, configureChains } from 'wagmi'
 import { publicProvider } from 'wagmi/providers/public'
 import { CoinbaseWalletConnector } from 'wagmi/connectors/coinbaseWallet'
@@ -14,7 +14,7 @@ import './index.css';
 import App from './App';
 
 const { chains, provider, webSocketProvider } = configureChains(
-  [mainnet, goerli, bscTestnet, polygonMumbai],
+  [mainnet, goerli, bscTestnet, polygonMumbai, polygon, bsc],
   [
     publicProvider()
   ],

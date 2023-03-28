@@ -15,12 +15,14 @@ const GasFeeEstimator = (props: any) => {
   const historicalBlocks = 20;
   const infuraApiKey = process.env.REACT_APP_INFURA_KEY;
   async function feeCalculate() {
-    
+
     let provider;
     switch (chain.id) {
       case 5:
-       
         provider = new Web3.providers.HttpProvider(`https://goerli.infura.io/v3/${infuraApiKey}`);
+        break;
+      case 1:
+        provider = new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
         break;
       case 80001: {
         provider = new Web3.providers.HttpProvider(`https://polygon-mumbai.infura.io/v3/${infuraApiKey}`);
@@ -28,6 +30,14 @@ const GasFeeEstimator = (props: any) => {
       }
       case 97: {
         provider = new Web3.providers.HttpProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
+        break;
+      }
+      case 56: {
+        provider = new Web3.providers.HttpProvider("https://bsc-dataseed.binance.org/");
+        break;
+      }
+      case 137: {
+        provider = new Web3.providers.HttpProvider("https://rpc-mainnet.maticvigil.com/");
         break;
       }
     }
@@ -129,7 +139,7 @@ const GasFeeEstimator = (props: any) => {
   useEffect(() => {
     const speeds = [
       {
-        "speedName": "Slow",
+        "speedName": "Low",
         "maxPriorityFeePerGas": 5,
         "baseFeePerGas": 0,
         "baseFeeFloat": "0",
@@ -161,6 +171,10 @@ const GasFeeEstimator = (props: any) => {
 
     ]
     if (chain.id === 97) {
+      dispatch(getNetworkPriority(speeds))
+      dispatch(setSelectedPriority(speeds[1]));
+    }
+    else if (chain.id === 56) {
       dispatch(getNetworkPriority(speeds))
       dispatch(setSelectedPriority(speeds[1]));
     }
@@ -213,19 +227,19 @@ const GasFeeEstimator = (props: any) => {
               return (
                 <div className={`${speed.speedName === selectedSpeed ? "bg-slate-400" : "bg-white"} flex items-center flex-col cursor-pointer border-2 p-2 w-auto px-10 shadow-md`} onClick={() => selectPriority(speed)} key={index}>
                   <span>
-                     {speed.speedName === "Low" ? <Emoji symbol="🐢" label="slow" /> : speed.speedName === "Average" ? <Emoji symbol="🐇" label="average" /> : <Emoji symbol="🚀" label="fast" />}
-                    </span>
+                    {speed.speedName === "Low" ? <Emoji symbol="🐢" label="slow" /> : speed.speedName === "Average" ? <Emoji symbol="🐇" label="average" /> : <Emoji symbol="🚀" label="fast" />}
+                  </span>
                   <div><span className={`
                   ${speed.speedName === "Low" ? " text-green-500" :
                       speed.speedName === "Average" ? "text-yellow-500" : "text-red-500"
                     } text-lg`}>{
                       (parseFloat(speed.baseFeeFloat) + parseFloat(speed.maxPriorityFeePerGasFloat)).toFixed(1)
                     } </span><span>gwei</span></div>
-                 <div className="flex flex-col sm:flex-col items-center">
-                  <span>base: {parseFloat(speed.baseFeeFloat).toFixed(1)}</span>
-                  <span>Priority:{parseFloat(speed.maxPriorityFeePerGasFloat).toFixed(1)}</span>
-                  {/* <span>Price:{claculatePriceSpeed(speed.maxFeePerGasFloat).toFixed(6)} $</span> */}
-                  </div>  
+                  <div className="flex flex-col sm:flex-col items-center">
+                    <span>base: {parseFloat(speed.baseFeeFloat).toFixed(1)}</span>
+                    <span>Priority:{parseFloat(speed.maxPriorityFeePerGasFloat).toFixed(1)}</span>
+                    {/* <span>Price:{claculatePriceSpeed(speed.maxFeePerGasFloat).toFixed(6)} $</span> */}
+                  </div>
                 </div>
               )
             })

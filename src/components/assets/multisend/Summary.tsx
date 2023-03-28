@@ -1,4 +1,4 @@
-import { Contract, ethers, Wallet } from "ethers";
+import { BigNumber, Contract, ethers, Wallet } from "ethers";
 import { useEffect, useState } from "react";
 import MultiSendError from "./MultiSendError";
 import {
@@ -9,7 +9,7 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { fetchUserBalanceGoerli, fetchUserBalancePolygon, fetchUserBalanceBsc } from "../../../store/token/tokenSlice";
+import { fetchUserBalanceGoerli, fetchUserBalancePolygon, fetchUserBalanceBsc, fetchUserBalanceMumbai, fetchUserBalanceBscT, fetchUserBalanceEth } from "../../../store/token/tokenSlice";
 import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner, signTypedData } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
@@ -151,7 +151,7 @@ export function Summary(props: any) {
         }
         catch {
             setError(true);
-            setErrorMessage(`You don't have enough balance to pay fee` )
+            setErrorMessage(`You don't have enough balance to pay fee. Your token balance is ${!props.isNativeFee ? parseFloat(props.token.userBalance).toFixed(4) + props.token.name : parseFloat(props.token.userBalanceDeposit).toFixed(4) + props.token.name}` )
             setLoading(false);
             setIsCalculated(true);
         }
@@ -239,35 +239,68 @@ export function Summary(props: any) {
         }
         catch {
             setError(true);
-            setErrorMessage("You don't have enough balance to pay the fee")
+            setErrorMessage(`You don't have enough balance to pay fee.Your token balance is ${!props.isNativeFee ? parseFloat(props.token.userBalance).toFixed(4) + props.token.name : parseFloat(props.token.userBalanceDeposit).toFixed(4) + props.token.name}`)
             setLoading(false);
             setIsCalculated(true);
         }
     }
     const sendNativeTx = async () => {
-        const signer = await fetchSigner()
-        const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
+        //My fersion
+        // const signer = await fetchSigner()
+        // const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
+        // const idToastNative = toast.loading("Sending transaction please wait...")
+        // feeShare[txToSend.method](txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
+        //     tx.wait().then(async (receipt: any) => {
+        //         dispatch(removeSendedAddress(txToSend.addressesToSend.length));
+        //         setIsCalculated(true);
+        //         toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+        //         if (isConnected && network.id === 5) {
+        //             dispatch(fetchUserBalanceGoerli({ provider, address }))
+        //         }
+        //         else if (isConnected && network.id === 80001) {
+        //             dispatch(fetchUserBalancePolygon({ provider, address }))
+        //         }
+        //         else if (isConnected && network.id === 97) {
+        //             dispatch(fetchUserBalanceBsc({ provider, address }))
+        //         }
+        //     }).catch((err: any) => {
+        //         toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+        //     })
+        // }).catch((err: any) => {
+        //     toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+        // });
+        //openAi version
         const idToastNative = toast.loading("Sending transaction please wait...")
-        feeShare[txToSend.method](txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
-            tx.wait().then(async (receipt: any) => {
-                dispatch(removeSendedAddress(txToSend.addressesToSend.length));
-                setIsCalculated(true);
-                toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                if (isConnected && network.id === 5) {
-                    dispatch(fetchUserBalanceGoerli({ provider, address }))
-                }
-                else if (isConnected && network.id === 80001) {
-                    dispatch(fetchUserBalancePolygon({ provider, address }))
-                }
-                else if (isConnected && network.id === 97) {
-                    dispatch(fetchUserBalanceBsc({ provider, address }))
-                }
-            }).catch((err: any) => {
-                toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-            })
-        }).catch((err: any) => {
+        try {
+            const signer = await fetchSigner()
+            const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
+            const tx = await feeShare[txToSend.method](txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo);
+            const receipt = await tx.wait();
+            console.log(receipt);
+            dispatch(removeSendedAddress(txToSend.addressesToSend.length));
+            setIsCalculated(true);
+            toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            if (isConnected && network.id === 5) {
+                dispatch(fetchUserBalanceGoerli({ provider, address }))
+            }
+            if (isConnected && network.id === 1) {
+                dispatch(fetchUserBalanceEth({ provider, address }))
+            }
+            else if (isConnected && network.id === 80001) {
+                dispatch(fetchUserBalanceMumbai({ provider, address }))
+            }
+            else if (isConnected && network.id === 97) {
+                dispatch(fetchUserBalanceBscT({ provider, address }))
+            }
+            else if (isConnected && network.id === 56) {
+                dispatch(fetchUserBalanceBsc({ provider, address }))
+            }
+            else if (isConnected && network.id === 137) {
+                dispatch(fetchUserBalancePolygon({ provider, address }))
+            }
+        } catch (err) {
             toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-        });
+        }
 
     }
 
@@ -326,7 +359,7 @@ export function Summary(props: any) {
             const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
             if (ammountT > props.token.userBalance) {
                 setError(true);
-                setErrorMessage("You don't have enough balance to pay the fee")
+                setErrorMessage(`You don't have enough balance to pay fee. Your token balance is  ${!props.isNativeFee ? parseFloat(props.token.userBalance).toFixed(4) + props.token.name : parseFloat(props.token.userBalanceDeposit).toFixed(4) + props.token.name}`)
                 setLoading(false);
                 setIsCalculated(true);
             }
@@ -400,6 +433,7 @@ export function Summary(props: any) {
 
     }
     const calculateTokenAndPayNativeBSC = async () => {
+        console.log("calculateTokenAndPayNativeBSC")
         setIsCalculated(false);
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
@@ -439,6 +473,7 @@ export function Summary(props: any) {
             setAmmount(ammountT.toString())
             const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
             const gasPrice = await signer.provider.getGasPrice();
+            console.log("gasPrice", gasPrice)
             const txInfo = {
                 value: msgValue,
                 gasPrice
@@ -499,7 +534,7 @@ export function Summary(props: any) {
                     isApproved: false
                 }
                 const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimal);
-                const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove, gasPrice);
+                const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
 
                 setAmmount(ammountT.toString());
                 setGasPrice(gasPrice.mul(unitsUsed).toString());
@@ -547,7 +582,7 @@ export function Summary(props: any) {
             const approveToast = toast.loading("Approving please wait...")
             if (network.id === 97) {
                 const gasPrice = await provider.getGasPrice();
-                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimal), gasPrice).then((res: any) => {
+                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimal)).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
@@ -618,6 +653,7 @@ export function Summary(props: any) {
             return ethers.utils.parseUnits(item);
         });
        const calculateFeeAsset = await feeShare["calculateFee(address)"](props.token.address);
+       console.log(ethers.utils.formatEther(calculateFeeAsset), "calculateFeeAsset")
         setTotalAddressesPerTx(addressesArray.length)
         try{
             const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei'));
@@ -625,6 +661,90 @@ export function Summary(props: any) {
             setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimal))
             const minimalForwarderContract = new Contract(contractsAddresses[network.name][0].MinimalForwarder, MinimalForwarderAbi, signer);
             const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')]) as any;
+            if (totalAmmountTokensToSend > props.token.userBalanceDeposit) {
+                setError(true);
+                setErrorMessage("You don't have enough balance token to pay the fee")
+                setIsCalculated(true);
+            }
+            const nonce = await minimalForwarderContract.getNonce(address);
+            const values = {
+                from: address,
+                to: contractsAddresses[network.name][0].FeeShare,
+                value: 0,
+                gas: 210000,
+                nonce: nonce.toString(),
+                data: dataMessage,
+            }
+    
+            const txInform = {
+                method: "multiSendFee(address,address[],uint256[],uint256)",
+                token: props.token.address,
+                addressesToSend: addressesArray,
+                finalAmount,
+                txInfo: values,
+                isApproved: true
+            }
+            setTxToSend(txInform);
+            setSignedTxToSend(values);
+            setLoading(false);
+            setIsCalculated(true);
+        }
+        catch(err){
+            console.log(err, "err")
+            setError(true);
+            setLoading(false);
+            setErrorMessage("User deposit is less than amount needed to pay the fee")
+            setIsCalculated(true);
+        }
+    }
+    const calculateTokenAndPayTokenBsc = async () => {
+        setIsCalculated(false);
+        setError(false);
+        const signer = await fetchSigner()
+        const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
+        //first 
+        if (addressesAndAmounts.length === 0) {
+            setTotalTransactions(0)
+        }
+        else {
+            setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+        }
+        let addressesArray = [];
+        let amountsArray = [];
+        if (addressesAndAmounts.length === 0) {
+            addressesArray = [];
+            amountsArray = [];
+        }
+        else if (addressesAndAmounts.length > 253) {
+            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                return item.address;
+            });
+            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                return item.amount.toString().trim();
+            });
+        }
+        else {
+            addressesArray = addressesAndAmounts.map((item: any) => {
+                return item.address;
+            });
+            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                return item.amount.toString().trim();
+            });
+        }
+        const ammountT = amountsArray.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b), 0);
+        setAmmount(ammountT.toString())
+        const finalAmount = amountsArray.map((item: any) => {
+            return ethers.utils.parseUnits(item);
+        });
+       const calculateFeeAsset = await feeShare["calculateFee(address)"](props.token.address);
+        setTotalAddressesPerTx(addressesArray.length)
+        try{
+            const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, addressesArray, finalAmount, BigNumber.from(0));
+            console.log(unitsUsed, "unitsUsed")
+            const txFeeInToken = await feeShare["calculateTxfeeToken(address,uint256)"](props.token.address, ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed));
+            setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimal))
+            const minimalForwarderContract = new Contract(contractsAddresses[network.name][0].MinimalForwarder, MinimalForwarderAbi, signer);
+            const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesArray, finalAmount, 0]) as any;
             if (totalAmmountTokensToSend > props.token.userBalanceDeposit) {
                 setError(true);
                 setErrorMessage("You don't have enough balance token to pay the fee")
@@ -712,7 +832,6 @@ export function Summary(props: any) {
         );
         contractForwarder.execute(dataBuffer.values, dataBuffer.signature).then((result: any) => {
             result.wait().then((receipt: any) => {
-                console.log(receipt, "receipt")
                 toast.update(toastSendSigned, { render: "Transaction sended successfully", type: "success", isLoading: false, autoClose:2000, position: toast.POSITION.TOP_CENTER })
             })
         }).catch((error: any) => {
@@ -725,7 +844,7 @@ export function Summary(props: any) {
             if (props.token.isOpen && networkSpeed) {
 
                 if (props.isNative) {
-                    if (network.id === 97) {
+                    if (network.id === 97 || network.id === 56) {
                         calculateNativeBSC();
                     }
                     else {
@@ -733,7 +852,7 @@ export function Summary(props: any) {
                     }
                 }
                 else if (!props.isNativeFee) {
-                    if (network.id === 97) {
+                    if (network.id === 97 || network.id === 56) {
                         calculateTokenAndPayNativeBSC()
                     }
                     else {
@@ -741,7 +860,13 @@ export function Summary(props: any) {
                     }
                 }
                 else {
-                    calculateTokenAndPayToken()
+                    if (network.id === 97 || network.id === 56) {
+                        calculateTokenAndPayTokenBsc()
+                    }
+                    else {
+                        calculateTokenAndPayToken()
+                    }
+                    
                 }
             }
  

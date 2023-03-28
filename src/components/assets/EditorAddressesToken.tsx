@@ -6,11 +6,12 @@ import { addressesToSend, currentNetwork } from "../../store/multiDeposit/multiD
 import PreviewResultToken from "./PreviewResultToken";
 import { Contract } from "ethers";
 import { toast } from "react-toastify";
-import { useProvider } from "wagmi";
+import { useAccount, useProvider } from "wagmi";
 import contractsAddresses from "./../../contracts/AddressesContracts.json";
 import FeeShareAbi from "./../../contracts/FeeShare.json";
 import { useAppSelector } from "../../store/hooks";
 const EditorAddressesToken = (props: any) => {
+    const {isConnected} = useAccount();
     const [isManual, setIsManual] = useState(true);
     const [isPreview, setIsPreview] = useState(true);
     const showNext = () => {
@@ -56,16 +57,10 @@ const EditorAddressesToken = (props: any) => {
         const validateIsTokenFeeShare = async () => {
             const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, provider);
             const checkAddress = await feeShare.getRTokenAddress(tokenAddress);
-            if (checkAddress === "0x0000000000000000000000000000000000000000") {
-                return true;
-            }
-            else {
-                return false;
-            }
-
+           return checkAddress === "0x0000000000000000000000000000000000000000" ? true : false;
         }
+       if(props.isOpen){
         validateIsTokenFeeShare().then((res) => {
-            console.log(res, "validateIsTokenFeeShare")
             if (res) {
                 setIsValidate(true);
                 setMessageErrorAddress("");
@@ -86,8 +81,10 @@ const EditorAddressesToken = (props: any) => {
                 setMessageErrorAddress("Invalid address");
             }
         })
+       }
+      
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tokenAddress])
+    }, [tokenAddress, props.isOpen])
     return (
         <>
             {

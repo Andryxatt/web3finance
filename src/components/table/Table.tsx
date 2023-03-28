@@ -7,10 +7,16 @@ import {
     currentTokensList,
     fetchTokensPricesBsc,
     fetchTokensPricesGoerli,
+    fetchTokensPricesMumbai,
     fetchTokensPricesPolygon,
     fetchUserBalanceBsc,
     fetchUserBalanceGoerli,
-    fetchUserBalancePolygon
+    fetchUserBalanceMumbai,
+    fetchUserBalancePolygon,
+    fetchTokensPricesBscT,
+    fetchUserBalanceBscT,
+    fetchTokensPricesEth,
+    fetchUserBalanceEth,
 } from "../../store/token/tokenSlice";
 import {  currentNetwork, changeSelectedNetwork } from "../../store/network/networkSlice";
 import { ToastContainer } from "react-toastify";
@@ -29,14 +35,29 @@ const Table = () => {
                     dispatch(fetchUserBalanceGoerli({ provider, address }))
                 }
             })
-            dispatch(fetchTokensPricesBsc({})).then(() => {
+            dispatch(fetchTokensPricesEth({})).then(() => {
+                if (isConnected && network.id === 1) {
+                    dispatch(fetchUserBalanceEth({ provider, address }))
+                }
+            })
+            dispatch(fetchTokensPricesBscT({})).then(() => {
                 if (isConnected && network.id === 97) {
+                    dispatch(fetchUserBalanceBscT({ provider, address }))
+                }
+            })
+            dispatch(fetchTokensPricesBsc({})).then(() => {
+                if (isConnected && network.id === 56) {
                     dispatch(fetchUserBalanceBsc({ provider, address }))
                 }
             })
             dispatch(fetchTokensPricesPolygon({})).then(() => {
-                if (isConnected && network.id === 80001) {
+                if (isConnected && network.id === 137) {
                     dispatch(fetchUserBalancePolygon({ provider, address }))
+                }
+            })
+            dispatch(fetchTokensPricesMumbai({})).then(() => {
+                if (isConnected && network.id === 80001) {
+                    dispatch(fetchUserBalanceMumbai({ provider, address }))
                 }
             })
         }

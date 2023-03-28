@@ -53,7 +53,6 @@ export const multiDepositSlice = createSlice({
     },
     removeSingleAddress: (state, action) => {
       //remove single address from array
-      console.log(action.payload)
       state.addressesToSend = state.addressesToSend.filter((asset: Asset) => asset.address !== action.payload.address);
     },
     cleareAddressesToSend: (state) => {
@@ -103,22 +102,22 @@ export const addressesToSend = (state: RootState) => state.multiDeposit.addresse
 export const arrayOfAmounts = (state: RootState) => state.multiDeposit.addressesToSend.map((asset: Asset) => asset.amount.toString().trim());
 export const arrayOfAddresses = (state: RootState) => state.multiDeposit.addressesToSend.map((asset: Asset) => asset.address.trim());
 export default multiDepositSlice.reducer;
-export const getUserTokenBalamce = createAsyncThunk(
-  'multiDeposit/calculateUserTokenBalance',
-  async (args: any, { getState }) => {
-    const state = getState() as any;
-    const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
-    const contractBsc = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
-    const newBsc = state.token.bscTokens.map(async (token: any) => {
-      const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
-      const totalDeposits = await tokenContract.totalSupply();
-      const decimals = await tokenContract.decimals();
-      const bscPrice = await contractBsc.getAssetPrice(token.address);
-      return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
-    })
-    return Promise.all(newBsc);
-  }
-)
+// export const getUserTokenBalance = createAsyncThunk(
+//   'multiDeposit/calculateUserTokenBalance',
+//   async (args: any, { getState }) => {
+//     const state = getState() as any;
+//     const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
+//     const contractBsc = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
+//     const newBsc = state.token.bscTokens.map(async (token: any) => {
+//       const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
+//       const totalDeposits = await tokenContract.totalSupply();
+//       const decimals = await tokenContract.decimals();
+//       const bscPrice = await contractBsc.getAssetPrice(token.address);
+//       return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+//     })
+//     return Promise.all(newBsc);
+//   }
+// )
 export const getNetworkSpeeds = createAsyncThunk(
   'multiDeposit/calculateUserTokenBalance',
   async (args: any, { getState }) => {
