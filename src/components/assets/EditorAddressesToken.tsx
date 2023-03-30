@@ -6,12 +6,11 @@ import { addressesToSend, currentNetwork } from "../../store/multiDeposit/multiD
 import PreviewResultToken from "./PreviewResultToken";
 import { Contract } from "ethers";
 import { toast } from "react-toastify";
-import { useAccount, useProvider } from "wagmi";
+import { useProvider } from "wagmi";
 import contractsAddresses from "./../../contracts/AddressesContracts.json";
 import FeeShareAbi from "./../../contracts/FeeShare.json";
 import { useAppSelector } from "../../store/hooks";
 const EditorAddressesToken = (props: any) => {
-    const {isConnected} = useAccount();
     const [isManual, setIsManual] = useState(true);
     const [isPreview, setIsPreview] = useState(true);
     const showNext = () => {

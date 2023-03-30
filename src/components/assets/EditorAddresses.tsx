@@ -19,7 +19,7 @@ const EditorAddresses = (props: any) => {
             setIsPreview(!isPreview);
         }
         else {
-            const idToast = toast( "You need to input at least one address and amount!", {type: "error", autoClose: 2000,icon:"🚨", isLoading: false, position: toast.POSITION.TOP_CENTER })
+            toast( "You need to input at least one address and amount!", {type: "error", autoClose: 2000,icon:"🚨", isLoading: false, position: toast.POSITION.TOP_CENTER })
         }
     }
     const toogleNativeFee = () => {

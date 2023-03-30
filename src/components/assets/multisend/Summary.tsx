@@ -581,7 +581,7 @@ export function Summary(props: any) {
             const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
             const approveToast = toast.loading("Approving please wait...")
             if (network.id === 97) {
-                const gasPrice = await provider.getGasPrice();
+                // const gasPrice = await provider.getGasPrice();
                 tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimal)).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
