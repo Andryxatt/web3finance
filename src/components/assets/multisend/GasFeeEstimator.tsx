@@ -14,33 +14,22 @@ const GasFeeEstimator = (props: any) => {
   const [subscribed, setSubscribed] = useState(false);
   const historicalBlocks = 20;
   const infuraApiKey = process.env.REACT_APP_INFURA_KEY;
+  const providerUrls = {
+    1: `https://mainnet.infura.io/v3/${infuraApiKey}`,
+    // 5: `https://goerli.infura.io/v3/${infuraApiKey}`,
+    10: `https://optimism-mainnet.infura.io/${infuraApiKey}`,
+    56: "https://bsc-dataseed.binance.org/",
+    97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
+    137: "https://rpc-mainnet.maticvigil.com/",
+    // 80001: `https://polygon-mumbai.infura.io/v3/${infuraApiKey}`,
+    42161: `https://arbitrum-mainnet.infura.io/v3/${infuraApiKey}`,
+    43114: `https://avalanche-mainnet.infura.io/v3/${infuraApiKey}`
+  };
+  const getProviderUrl = chainId => {
+    return providerUrls[chainId] || providerUrls[5];
+  };
   async function feeCalculate() {
-
-    let provider;
-    switch (chain.id) {
-      case 5:
-        provider = new Web3.providers.HttpProvider(`https://goerli.infura.io/v3/${infuraApiKey}`);
-        break;
-      case 1:
-        provider = new Web3.providers.HttpProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
-        break;
-      case 80001: {
-        provider = new Web3.providers.HttpProvider(`https://polygon-mumbai.infura.io/v3/${infuraApiKey}`);
-        break;
-      }
-      case 97: {
-        provider = new Web3.providers.HttpProvider("https://data-seed-prebsc-1-s1.binance.org:8545/");
-        break;
-      }
-      case 56: {
-        provider = new Web3.providers.HttpProvider("https://bsc-dataseed.binance.org/");
-        break;
-      }
-      case 137: {
-        provider = new Web3.providers.HttpProvider("https://rpc-mainnet.maticvigil.com/");
-        break;
-      }
-    }
+    const provider = new Web3.providers.HttpProvider(getProviderUrl(chain.id));
     const web3 = new Web3(provider);
     web3.eth.getFeeHistory(historicalBlocks, "pending", [15, 55, 85]).then((feeHistory) => {
       const blocks = formatFeeHistory(feeHistory, false);
@@ -170,13 +159,46 @@ const GasFeeEstimator = (props: any) => {
       },
 
     ]
-    if (chain.id === 97) {
+    const speedsOptimism = [
+      {
+        "speedName": "Low",
+        "maxPriorityFeePerGas": 0.1,
+        "baseFeePerGas": 0,
+        "baseFeeFloat": "0",
+        "maxPriorityFeePerGasFloat": "0.1",
+        "maxFeePerGas": 0.1,
+        "maxFeePerGasFloat": "0.1",
+        "selected": false
+      },
+      {
+        "speedName": "Average",
+        "maxPriorityFeePerGas": 0.2,
+        "baseFeePerGas": 0,
+        "baseFeeFloat": "0",
+        "maxPriorityFeePerGasFloat": "0.2",
+        "maxFeePerGas": 0.2,
+        "maxFeePerGasFloat": "0.2",
+        "selected": true
+      },
+      {
+        "speedName": "Fast",
+        "maxPriorityFeePerGas": 0.3,
+        "baseFeePerGas": 0,
+        "baseFeeFloat": "0",
+        "maxPriorityFeePerGasFloat": "0.3",
+        "maxFeePerGas": 0.3,
+        "maxFeePerGasFloat": "0.3",
+        "selected": false
+      },
+
+    ]
+    if (chain.id === 97 || chain.id === 56) {
       dispatch(getNetworkPriority(speeds))
       dispatch(setSelectedPriority(speeds[1]));
     }
-    else if (chain.id === 56) {
-      dispatch(getNetworkPriority(speeds))
-      dispatch(setSelectedPriority(speeds[1]));
+    else if (chain.id === 10) {
+      dispatch(getNetworkPriority(speedsOptimism))
+      dispatch(setSelectedPriority(speedsOptimism[1]));
     }
     else {
       feeCalculate();

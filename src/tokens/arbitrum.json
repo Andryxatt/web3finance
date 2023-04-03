@@ -85,6 +85,20 @@
             "isDeposit":false
         },
         {
+            "name":"ETH",
+            "decimals": 18,
+            "address": "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+            "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
+            "isOpen": false,
+            "isNative":true,
+            "isStablecoin":false,
+            "inactive":false,
+            "isDeposit":false
+        },
+        {
             "name":"LINK",
             "decimals": 18,
             "address": "0xf97f4df75117a78c1A5a0DBb814Af92458539FB4",
@@ -107,7 +121,7 @@
             "userBalance": "0",
             "userBalanceDeposit": "0",
             "isOpen": false,
-            "isNative":true,
+            "isNative":false,
             "isStablecoin":false,
             "inactive":false,
             "isDeposit":false

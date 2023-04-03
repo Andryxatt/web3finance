@@ -8,7 +8,22 @@ import { currentNetwork } from "../../store/network/networkSlice";
 import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { fetchSigner } from '@wagmi/core'
 import { useAccount, useProvider, useContractEvent } from "wagmi";
-import { fetchTokensPricesBsc, fetchTokensPricesBscT, fetchTokensPricesEth, fetchTokensPricesGoerli, fetchTokensPricesMumbai, fetchTokensPricesPolygon, fetchUserBalanceBsc, fetchUserBalanceBscT, fetchUserBalanceEth, fetchUserBalanceGoerli, fetchUserBalanceMumbai, fetchUserBalancePolygon } from "../../store/token/tokenSlice";
+import {
+    fetchTokensPricesArbitrum,
+    fetchUserBalanceArbitrum,
+    fetchTokensPricesAvalanche,
+    fetchTokensPricesBsc,
+    fetchTokensPricesBscT,
+    fetchTokensPricesEth,
+    fetchTokensPricesOptimism,
+    fetchTokensPricesPolygon,
+    fetchUserBalanceAvalanche,
+    fetchUserBalanceBsc,
+    fetchUserBalanceBscT,
+    fetchUserBalanceEth,
+    fetchUserBalanceOptimism,
+    fetchUserBalancePolygon
+} from "../../store/token/tokenSlice";
 const DepositWithdraw = (props: any) => {
     const dispatch = useAppDispatch();
     const provider = useProvider()
@@ -27,19 +42,19 @@ const DepositWithdraw = (props: any) => {
         abi: FeeShareAbi,
         eventName: 'Deposit',
         listener(node, label, owner) {
-            if (isConnected && network.id === 5) {
-                dispatch(fetchTokensPricesGoerli({})).then(() => {
-                    dispatch(fetchUserBalanceGoerli({ provider, address }))
-                })
-            }
             if (isConnected && network.id === 1) {
                 dispatch(fetchTokensPricesEth({})).then(() => {
                     dispatch(fetchUserBalanceEth({ provider, address }))
                 })
             }
-            if (isConnected && network.id === 97) {
-                dispatch(fetchTokensPricesBscT({})).then(() => {
-                    dispatch(fetchUserBalanceBscT({ provider, address }))
+            // if (isConnected && network.id === 5) {
+            //     dispatch(fetchTokensPricesGoerli({})).then(() => {
+            //         dispatch(fetchUserBalanceGoerli({ provider, address }))
+            //     })
+            // }
+            if (isConnected && network.id === 10) {
+                dispatch(fetchTokensPricesOptimism({})).then(() => {
+                    dispatch(fetchUserBalanceOptimism({ provider, address }))
                 })
             }
             if (isConnected && network.id === 56) {
@@ -47,14 +62,29 @@ const DepositWithdraw = (props: any) => {
                     dispatch(fetchUserBalanceBsc({ provider, address }))
                 })
             }
-            if (isConnected && network.id === 80001) {
-                dispatch(fetchTokensPricesMumbai({})).then(() => {
-                    dispatch(fetchUserBalanceMumbai({ provider, address }))
+            if (isConnected && network.id === 97) {
+                dispatch(fetchTokensPricesBscT({})).then(() => {
+                    dispatch(fetchUserBalanceBscT({ provider, address }))
                 })
             }
             if (isConnected && network.id === 137) {
                 dispatch(fetchTokensPricesPolygon({})).then(() => {
                     dispatch(fetchUserBalancePolygon({ provider, address }))
+                })
+            }
+            // if (isConnected && network.id === 80001) {
+            //     dispatch(fetchTokensPricesMumbai({})).then(() => {
+            //         dispatch(fetchUserBalanceMumbai({ provider, address }))
+            //     })
+            // }
+            if (isConnected && network.id === 42161) {
+                dispatch(fetchTokensPricesArbitrum({})).then(() => {
+                    dispatch(fetchUserBalanceArbitrum({ provider, address }))
+                })
+            }
+            if (isConnected && network.id === 43114) {
+                dispatch(fetchTokensPricesAvalanche({})).then(() => {
+                    dispatch(fetchUserBalanceAvalanche({ provider, address }))
                 })
             }
         },
@@ -65,19 +95,19 @@ const DepositWithdraw = (props: any) => {
         abi: FeeShareAbi,
         eventName: 'Withdraw',
         listener(node, label, owner) {
-            if (isConnected && network.id === 5) {
-                dispatch(fetchTokensPricesGoerli({})).then(() => {
-                    dispatch(fetchUserBalanceGoerli({ provider, address }))
-                })
-            }
             if (isConnected && network.id === 1) {
                 dispatch(fetchTokensPricesEth({})).then(() => {
                     dispatch(fetchUserBalanceEth({ provider, address }))
                 })
             }
-            if (isConnected && network.id === 97) {
-                dispatch(fetchTokensPricesBscT({})).then(() => {
-                    dispatch(fetchUserBalanceBscT({ provider, address }))
+            // if (isConnected && network.id === 5) {
+            //     dispatch(fetchTokensPricesGoerli({})).then(() => {
+            //         dispatch(fetchUserBalanceGoerli({ provider, address }))
+            //     })
+            // }
+            if (isConnected && network.id === 10) {
+                dispatch(fetchTokensPricesOptimism({})).then(() => {
+                    dispatch(fetchUserBalanceOptimism({ provider, address }))
                 })
             }
             if (isConnected && network.id === 56) {
@@ -85,14 +115,29 @@ const DepositWithdraw = (props: any) => {
                     dispatch(fetchUserBalanceBsc({ provider, address }))
                 })
             }
-            if (isConnected && network.id === 80001) {
-                dispatch(fetchTokensPricesMumbai({})).then(() => {
-                    dispatch(fetchUserBalanceMumbai({ provider, address }))
+            if (isConnected && network.id === 97) {
+                dispatch(fetchTokensPricesBscT({})).then(() => {
+                    dispatch(fetchUserBalanceBscT({ provider, address }))
                 })
             }
             if (isConnected && network.id === 137) {
                 dispatch(fetchTokensPricesPolygon({})).then(() => {
                     dispatch(fetchUserBalancePolygon({ provider, address }))
+                })
+            }
+            // if (isConnected && network.id === 80001) {
+            //     dispatch(fetchTokensPricesMumbai({})).then(() => {
+            //         dispatch(fetchUserBalanceMumbai({ provider, address }))
+            //     })
+            // }
+            if (isConnected && network.id === 42161) {
+                dispatch(fetchTokensPricesArbitrum({})).then(() => {
+                    dispatch(fetchUserBalanceArbitrum({ provider, address }))
+                })
+            }
+            if (isConnected && network.id === 43114) {
+                dispatch(fetchTokensPricesAvalanche({})).then(() => {
+                    dispatch(fetchUserBalanceAvalanche({ provider, address }))
                 })
             }
         },
@@ -161,7 +206,7 @@ const DepositWithdraw = (props: any) => {
     return (
         <div>
             <div className={!props.isNativeFee ? "hidden" : "block"}>
-            <div className='font-bold text-center sm:text-sm'>To send token and pay fee in token make a deposit!</div>
+                <div className='font-bold text-center sm:text-sm'>To send token and pay fee in token make a deposit!</div>
                 <div className="flex flex-row md:flex-col mt-3 mb-4">
                     <button className="p-2 bg-neutral-800 text-white w-full rounded-md mr-3 md:mr-0 md:mb-3 sm:text-sm" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button>
                     <button className="p-2 bg-neutral-800 text-white w-full rounded-md sm:text-sm" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button>

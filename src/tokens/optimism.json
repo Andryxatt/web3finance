@@ -97,6 +97,20 @@
             "isStablecoin":false,
             "inactive":false,
             "isDeposit":false
+        },
+        {
+            "name":"ETH",
+            "decimals": 18,
+            "address": "0x4200000000000000000000000000000000000006",
+            "tokenPrice": "0",
+            "deposits": "0",
+            "userBalance": "0",
+            "userBalanceDeposit": "0",
+            "isOpen": false,
+            "isNative":true,
+            "isStablecoin":false,
+            "inactive":false,
+            "isDeposit":false
         }
     ]
 }

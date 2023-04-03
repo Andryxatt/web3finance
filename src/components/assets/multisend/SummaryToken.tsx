@@ -9,12 +9,13 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { fetchUserBalanceGoerli, nativeBalance } from "../../../store/token/tokenSlice";
+import { nativeBalance } from "../../../store/token/tokenSlice";
 import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
 import FeeShareAbi from "./../../../contracts/FeeShare.json";
 import ERC20Abi from "./../../../contracts/ERC20Abi.json";
+import RTokenAbi from "./../../../contracts/RTokenAbi.json";
 // import MinimalForwarderAbi from "./../../../contracts/MinimalForwarderAbi.json";
 import { toast } from "react-toastify";
 interface TxInformation {
@@ -53,7 +54,7 @@ export function SummaryToken(props: any) {
     //Errors
     const [error, setError] = useState(false);
     const [errorMessage, setErrorMessage] = useState("");
-
+    const [totalAddressesPerTx, setTotalAddressesPerTx] = useState(0);
     const [isCalculated, setIsCalculated] = useState(false);
     const [userTokenBalance, setUserTokenBalance] = useState("0");
     const [tokenDecimals, setTokenDecimals] = useState(0);
@@ -83,6 +84,7 @@ export function SummaryToken(props: any) {
             setTxFee("0");
             setTotalFee("0");
             setTotalTransactions(0);
+            setTotalAddressesPerTx(0);
             setAmmount("0");
             setLoading(false);
             setIsCalculated(true);
@@ -148,6 +150,7 @@ export function SummaryToken(props: any) {
                     const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.tokenAddress, addressesArray, finalAmount, txInfo);
                     console.log(unitsUsed)
                     setTxToSend(txInform);
+                    setTotalAddressesPerTx(addressesArray.length);
                     setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
                     setTxFee(ethers.utils.formatUnits(feePerAddressNative))
                     const totalFee = ethers.utils.formatEther(feePerAddressNative.add(feePerGas.mul(unitsUsed)))
@@ -220,6 +223,127 @@ export function SummaryToken(props: any) {
        }
      
     }
+    const calculateTokenAndPayNativeBSC = async () => {
+        console.log("calculateTokenAndPayNativeBSC")
+        setIsCalculated(false);
+        const signer = await fetchSigner()
+        const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
+        const feePerAddressNative = await feeShare["calculateFee()"]();
+        let addressesArray = [];
+        let amountsArray = [];
+        if (addressesAndAmounts.length === 0) {
+            addressesArray = [];
+            amountsArray = [];
+            setGasPrice("0");
+            setTxFee("0");
+            setTotalFee("0");
+            setTotalTransactions(0);
+            setTotalAddressesPerTx(0);
+            setAmmount("0");
+            setLoading(false);
+            setIsCalculated(true);
+        }
+        else {
+            if (addressesAndAmounts.length > 253) {
+                addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                    return item.address;
+                });
+                amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                    return item.amount.toString().trim();
+                });
+            }
+            else {
+                addressesArray = addressesAndAmounts.map((item: any) => {
+                    return item.address;
+                });
+                amountsArray = addressesAndAmounts.map((item: any) => {
+                    return item.amount.toString().trim();
+                });
+            }
+            setTotalAddressesPerTx(addressesArray.length);
+            const ammountT = amountsArray.reduce((a: any, b: any) => parseFloat(a) + parseFloat(b), 0);
+            setAmmount(ammountT.toString())
+            const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
+            const gasPrice = await signer.provider.getGasPrice();
+            console.log("gasPrice", gasPrice)
+            const txInfo = {
+                value: msgValue,
+                gasPrice
+            }
+            const finalAmount = amountsArray.map((item: any) => {
+                return ethers.utils.parseUnits(item);
+            });
+            const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
+            const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
+            if (ammountT > props.token.userBalance) {
+                setError(true);
+                setErrorMessage("You don't have enough balance to pay the fee")
+                setLoading(false);
+                setIsCalculated(true);
+            }
+            if (+ethers.utils.formatUnits(isApproved, props.token.decimal) >= ammountT) {
+                const txInform = {
+                    method: "multiSend(address,address[],uint256[])",
+                    token: props.token.address,
+                    addressesToSend: addressesArray,
+                    finalAmount,
+                    txInfo,
+                    isApproved: true
+                }
+                if (addressesAndAmounts.length === 0) {
+                    setGasPrice("0");
+                    setTxFee("0");
+                    setTotalFee("0");
+                    setTxToSend(txInform);
+                    setAmmount("0");
+                    setLoading(false);
+                    setIsCalculated(true);
+                }
+                else {
+                    const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addressesArray, finalAmount, txInfo);
+                    setTxToSend(txInform);
+                    setGasPrice(gasPrice.mul(unitsUsed).toString());
+                    setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(addressesArray.length)))
+                    setTotalFee(ethers.utils.formatEther(feePerAddressNative.mul(addressesArray.length).add(gasPrice.mul(unitsUsed))));
+                    setIsCalculated(true);
+                    setLoading(false);
+                }
+                if (addressesAndAmounts.length === 0) {
+                    setTotalTransactions(0)
+                }
+                else {
+                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+                }
+            }
+            else {
+
+                const txInform = {
+                    method: "multiSend(address,address[],uint256[])",
+                    token: props.token.address,
+                    addressesToSend: addressesArray,
+                    finalAmount,
+                    txInfo,
+                    isApproved: false
+                }
+                const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimal);
+                const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
+
+                setAmmount(ammountT.toString());
+                setGasPrice(gasPrice.mul(unitsUsed).toString());
+                setTotalFee(ethers.utils.formatUnits(gasPrice.mul(unitsUsed)));
+                setTxToSend(txInform);
+                setLoading(false);
+                setIsCalculated(true);
+                if (addressesAndAmounts.length === 0) {
+                    setTotalTransactions(0)
+                }
+                else {
+                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
+                }
+            }
+        }
+
+    }
     const sendTokenAndPayNative = async () => {
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
@@ -232,7 +356,7 @@ export function SummaryToken(props: any) {
                 tx.wait().then((receipt: any) => {
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     if (isConnected && network.id === 5) {
-                        dispatch(fetchUserBalanceGoerli({ provider, address }))
+                        // dispatch(fetchUserBalanceGoerli({ provider, address }))
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                         calculateTokenAndPayNative();
                     }
@@ -279,9 +403,17 @@ export function SummaryToken(props: any) {
         }
     }
     useEffect(() => {
-        if (networkSpeed !== undefined) {
-            calculateTokenAndPayNative()
-        }
+        console.log("networkSpeed", networkSpeed)
+            if (props.token.isOpen && networkSpeed) {
+                    if (network.id === 97 || network.id === 56 || network.id === 10) {
+                        calculateTokenAndPayNativeBSC()
+                    }
+                    else {
+                        calculateTokenAndPayNative()
+                    }
+                }
+ 
+       
     }, [addressesAndAmounts, networkSpeed]) // eslint-disable-line react-hooks/exhaustive-deps
     const sendTransaction = async () => {
         sendTokenAndPayNative()
@@ -298,7 +430,7 @@ export function SummaryToken(props: any) {
                             <div className="flex flex-col w-full">
                                 <div className="px-3 py-3 flex flex-col border-b-2">
                                     <span className="text-xl text-blue-900 font-bold">
-                                        {txToSend?.addressesToSend.length}
+                                    {props.isNative ? totalAddressesPerTx - 1 : totalAddressesPerTx}
                                     </span>
                                     <span className="text-xs text-gray-400">Total number of addresses </span>
                                 </div>

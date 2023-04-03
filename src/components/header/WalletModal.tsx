@@ -34,24 +34,23 @@ const WalletModal = () => {
         return metamaskIcon;
     }
   }
+  const chainIds = {
+    Ethereum: 1,
+    // Goerli: 5,
+    Optimism: 10,
+    "Binance Smart Chain": 56,
+    "Binance Smart Chain Testnet": 97,
+    Polygon: 137,
+    // "Polygon Mumbai": 80001,
+    "Arbitrum": 42161,
+    Avalanche: 43114
+  };
+  
   const getChainId = () => {
-    switch (selectedNetwork.name) {
-      case "Binance Smart Chain Testnet":
-        return 97;
-        case "Binance Smart Chain":
-        return 56;
-      case "Polygon":
-        return 137;
-      case "Ethereum":
-        return 1;
-      case "Polygon Mumbai":
-        return 80001;
-      case "Goerli":
-        return 5;
-      default:
-        return 5;
-    }
-  }
+    const selectedChainId = chainIds[selectedNetwork.name];
+    return selectedChainId ? selectedChainId : 5;
+  };
+  
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [connectorElements, setConnectorElements] = React.useState([])
   useEffect(() => {

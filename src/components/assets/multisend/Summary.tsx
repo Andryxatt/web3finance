@@ -9,7 +9,7 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { fetchUserBalanceGoerli, fetchUserBalancePolygon, fetchUserBalanceBsc, fetchUserBalanceMumbai, fetchUserBalanceBscT, fetchUserBalanceEth } from "../../../store/token/tokenSlice";
+import { fetchUserBalancePolygon, fetchUserBalanceBsc, fetchUserBalanceBscT, fetchUserBalanceEth, fetchUserBalanceAvalanche, fetchUserBalanceOptimism, fetchUserBalanceArbitrum } from "../../../store/token/tokenSlice";
 import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner, signTypedData } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
@@ -245,30 +245,6 @@ export function Summary(props: any) {
         }
     }
     const sendNativeTx = async () => {
-        //My fersion
-        // const signer = await fetchSigner()
-        // const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
-        // const idToastNative = toast.loading("Sending transaction please wait...")
-        // feeShare[txToSend.method](txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
-        //     tx.wait().then(async (receipt: any) => {
-        //         dispatch(removeSendedAddress(txToSend.addressesToSend.length));
-        //         setIsCalculated(true);
-        //         toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-        //         if (isConnected && network.id === 5) {
-        //             dispatch(fetchUserBalanceGoerli({ provider, address }))
-        //         }
-        //         else if (isConnected && network.id === 80001) {
-        //             dispatch(fetchUserBalancePolygon({ provider, address }))
-        //         }
-        //         else if (isConnected && network.id === 97) {
-        //             dispatch(fetchUserBalanceBsc({ provider, address }))
-        //         }
-        //     }).catch((err: any) => {
-        //         toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-        //     })
-        // }).catch((err: any) => {
-        //     toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-        // });
         //openAi version
         const idToastNative = toast.loading("Sending transaction please wait...")
         try {
@@ -280,23 +256,33 @@ export function Summary(props: any) {
             dispatch(removeSendedAddress(txToSend.addressesToSend.length));
             setIsCalculated(true);
             toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-            if (isConnected && network.id === 5) {
-                dispatch(fetchUserBalanceGoerli({ provider, address }))
-            }
+           
             if (isConnected && network.id === 1) {
                 dispatch(fetchUserBalanceEth({ provider, address }))
             }
-            else if (isConnected && network.id === 80001) {
-                dispatch(fetchUserBalanceMumbai({ provider, address }))
-            }
-            else if (isConnected && network.id === 97) {
-                dispatch(fetchUserBalanceBscT({ provider, address }))
+            // else if (isConnected && network.id === 5) {
+            //     dispatch(fetchUserBalanceGoerli({ provider, address }))
+            // }
+            else if (isConnected && network.id === 10) {
+                dispatch(fetchUserBalanceOptimism({ provider, address }))
             }
             else if (isConnected && network.id === 56) {
                 dispatch(fetchUserBalanceBsc({ provider, address }))
             }
+            else if (isConnected && network.id === 97) {
+                dispatch(fetchUserBalanceBscT({ provider, address }))
+            }
             else if (isConnected && network.id === 137) {
                 dispatch(fetchUserBalancePolygon({ provider, address }))
+            }
+            // else if (isConnected && network.id === 80001) {
+            //     dispatch(fetchUserBalanceMumbai({ provider, address }))
+            // }
+            else if (isConnected && network.id === 42161) {
+                dispatch(fetchUserBalanceArbitrum({ provider, address }))
+            }
+            else if(isConnected && network.id === 43114){
+                dispatch(fetchUserBalanceAvalanche({ provider, address }))
             }
         } catch (err) {
             toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -564,7 +550,6 @@ export function Summary(props: any) {
                 tx.wait().then((receipt: any) => {
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     if (isConnected && network.id === 5) {
-                        dispatch(fetchUserBalanceGoerli({ provider, address }))
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                         calculateTokenAndPayNative();
                     }
@@ -839,39 +824,70 @@ export function Summary(props: any) {
             toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose:2000, position: toast.POSITION.TOP_CENTER })
         });
     }
-    useEffect(() => {
-        console.log("networkSpeed", networkSpeed)
-            if (props.token.isOpen && networkSpeed) {
+    // useEffect(() => {
+    //     console.log("networkSpeed", networkSpeed)
+    //         if (props.token.isOpen && networkSpeed) {
 
-                if (props.isNative) {
-                    if (network.id === 97 || network.id === 56) {
-                        calculateNativeBSC();
-                    }
-                    else {
-                        calculateNative()
-                    }
-                }
-                else if (!props.isNativeFee) {
-                    if (network.id === 97 || network.id === 56) {
-                        calculateTokenAndPayNativeBSC()
-                    }
-                    else {
-                        calculateTokenAndPayNative()
-                    }
-                }
-                else {
-                    if (network.id === 97 || network.id === 56) {
-                        calculateTokenAndPayTokenBsc()
-                    }
-                    else {
-                        calculateTokenAndPayToken()
-                    }
+    //             if (props.isNative) {
+    //                 if (network.id === 97 || network.id === 56 || 10) {
+    //                     calculateNativeBSC();
+    //                 }
+    //                 else {
+    //                     calculateNative()
+    //                 }
+    //             }
+    //             else if (!props.isNativeFee) {
+    //                 if (network.id === 97 || network.id === 56 || 10) {
+    //                     calculateTokenAndPayNativeBSC()
+    //                 }
+    //                 else {
+    //                     calculateTokenAndPayNative()
+    //                 }
+    //             }
+    //             else {
+    //                 if (network.id === 97 || network.id === 56 || 10) {
+    //                     calculateTokenAndPayTokenBsc()
+    //                 }
+    //                 else {
+    //                     calculateTokenAndPayToken()
+    //                 }
                     
-                }
-            }
+    //             }
+    //         }
  
        
-    }, [addressesAndAmounts, networkSpeed]) // eslint-disable-line react-hooks/exhaustive-deps
+    // }, [addressesAndAmounts, networkSpeed]) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => {
+  console.log("networkSpeed", networkSpeed);
+
+  if (!props.token.isOpen || !networkSpeed) {
+    return;
+  }
+
+  switch (network.id) {
+    case 97:
+    case 56:
+    case 10:
+      if (props.isNative) {
+        calculateNativeBSC();
+      } else if (!props.isNativeFee) {
+        calculateTokenAndPayNativeBSC();
+      } else {
+        calculateTokenAndPayTokenBsc();
+      }
+      break;
+
+    default:
+      if (props.isNative) {
+        calculateNative();
+      } else if (!props.isNativeFee) {
+        calculateTokenAndPayNative();
+      } else {
+        calculateTokenAndPayToken();
+      }
+  }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+}, [addressesAndAmounts, networkSpeed]);
     const sendTransaction = async () => {
         if (props.isNative) {
             sendNativeTx()

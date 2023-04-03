@@ -1,53 +1,35 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { RootState } from '../store';
-
 export interface NetworkState {
   value: [] | any;
   selectedNetwork: any;
   status: 'idle' | 'loading' | 'failed';
 }
-
 const initialState: NetworkState = {
-  value:[
+  value: [
     {
-        name: "Ethereum",
-        icon: require("../../images/ethereum.png"),
-        id: 1,
-        isActive: false,
-        rpcUrl: '',
-        Currency: "ETH"
+      name: "Ethereum",
+      icon: require("../../images/ethereum.png"),
+      id: 1,
+      isActive: true,
+      rpcUrl: '',
+      Currency: "ETH"
     },
+    // {
+    //   name: "Goerli",
+    //   icon: require("../../images/ethereum.png"),
+    //   id: 5,
+    //   isActive: true,
+    //   Currency: 'WETH',
+    //   rpcUrl: ''
+    // },
     {
-        name: "Polygon Mumbai",
-        icon: require("../../images/polygon.png"),
-        id: 80001,
-        isActive: false,
-        Currency: 'MATIC',
-        rpcUrl: 'https://rpc-mumbai.matic.today'
-    },
-    {
-      name: "Polygon",
-      icon: require("../../images/polygon.png"),
-      id: 137,
+      name: "Optimism",
+      icon: require("../../images/optimism.png"),
+      id: 10,
       isActive: false,
-      Currency: 'MATIC',
-      rpcUrl: 'https://rpc-mainnet.maticvigil.com/'
-  },
-    {
-        name: "Goerli",
-        icon: require("../../images/ethereum.png"),
-        id: 5,
-        isActive: true,
-        Currency: 'WETH',
-        rpcUrl: ''
-    },
-    {
-        icon: require("../../images/binance.png"),
-        name: "Binance Smart Chain Testnet",
-        id: 97,
-        isActive: false,
-        Currency: 'tBNB',
-        rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
+      Currency: 'ETH',
+      rpcUrl: 'https://mainnet.optimism.io'
     },
     {
       icon: require("../../images/binance.png"),
@@ -56,8 +38,48 @@ const initialState: NetworkState = {
       isActive: false,
       Currency: 'BNB',
       rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
-  }
-],
+    },
+    {
+      icon: require("../../images/binance.png"),
+      name: "Binance Smart Chain Testnet",
+      id: 97,
+      isActive: false,
+      Currency: 'tBNB',
+      rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
+    },
+    {
+      name: "Polygon",
+      icon: require("../../images/polygon.png"),
+      id: 137,
+      isActive: false,
+      Currency: 'MATIC',
+      rpcUrl: 'https://rpc-mainnet.maticvigil.com/'
+    },
+    // {
+    //   name: "Polygon Mumbai",
+    //   icon: require("../../images/polygon.png"),
+    //   id: 80001,
+    //   isActive: false,
+    //   Currency: 'MATIC',
+    //   rpcUrl: 'https://rpc-mumbai.matic.today'
+    // },
+    {
+      name: "Arbitrum",
+      icon: require("../../images/arbitrum.png"),
+      id: 42161,
+      isActive: false,
+      Currency: 'ETH',
+      rpcUrl: 'https://1rpc.io/avax/c'
+    },
+    {
+      name: "Avalanche",
+      icon: require("../../images/avalanche.png"),
+      id: 43114,
+      isActive: false,
+      Currency: 'AVAX',
+      rpcUrl: 'https://arbitrum-one.public.blastapi.io'
+    },
+  ],
   status: 'idle',
   selectedNetwork: {
     name: "Goerli",
@@ -66,7 +88,7 @@ const initialState: NetworkState = {
     isActive: true,
     Currency: 'WETH',
     rpcUrl: ''
-},
+  },
 };
 
 export const networkSlice = createSlice({
@@ -74,7 +96,7 @@ export const networkSlice = createSlice({
   initialState,
   reducers: {
     changeSelectedNetwork: (state, action: PayloadAction<any>) => {
-      const  chainId  = action.payload.id;
+      const chainId = action.payload.id;
       state.value = state.value.map((network: any) => {
         if (network.id === chainId) {
           state.selectedNetwork = network;

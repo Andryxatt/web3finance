@@ -16,24 +16,34 @@ const TxHistory = () => {
     const getTxHistory = async () => {
         const txArray = [];
         let provider = undefined;
+        console.log("chain", chain)
         switch (chain.id) {
-            case 5:
-                provider = new ethers.providers.JsonRpcProvider(`https://goerli.infura.io/v3/${infuraApiKey}`);
+            case 1:
+                provider = new ethers.providers.JsonRpcProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
                 break;
-                case 1:
-                    provider = new ethers.providers.JsonRpcProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
-                    break;
+            // case 5:
+            //     provider = new ethers.providers.JsonRpcProvider(`https://goerli.infura.io/v3/${infuraApiKey}`);
+            //     break;
+            case 10:
+                provider = new ethers.providers.JsonRpcProvider(`https://optimism-mainnet.infura.io/${infuraApiKey}`);
+                break;
+            case 56:
+                provider = new ethers.providers.JsonRpcProvider(`https://bsc-dataseed.binance.org`);
+                break;
             case 97:
                 provider = new ethers.providers.JsonRpcProvider(`https://bsc.getblock.io/27578ce8-1ff1-4602-bbf2-127f8edcfc9f/testnet/`);
                 break;
-                case 56:
-                    provider = new ethers.providers.JsonRpcProvider(`https://bsc-dataseed.binance.org`);
-                    break;
-            case 80001:
-                provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/${infuraApiKey}`);
-                break;
             case 137:
                 provider = new ethers.providers.JsonRpcProvider('');
+                break;
+            // case 80001:
+            //     provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/${infuraApiKey}`);
+            //     break;
+            case 42161:
+                provider = new ethers.providers.JsonRpcProvider(`https://arbitrum-mainnet.infura.io/v3/${infuraApiKey}`);
+                break;
+            case 43114:
+                provider = new ethers.providers.JsonRpcProvider(`https://avalanche-mainnet.infura.io/v3/${infuraApiKey}`);
                 break;
             default:
                 break;
@@ -44,7 +54,6 @@ const TxHistory = () => {
         const multiSendFeeFilter = contractFeeShare.filters.FeeDetails(address, null, null, null, null);
         const multiSendTokenFilter = contractFeeShare.filters.MultiSend(address, null)
         const multiSendTokenTx = await contractFeeShare.queryFilter(multiSendTokenFilter);
-
         // const multiSendNativeTx = await contractFeeShare.queryFilter(multiSendNativeFilter, 8415257,  latestBlockNumber);
         const withdrawTx = await contractFeeShare.queryFilter(withdrawFilter);
         const depositTx = await contractFeeShare.queryFilter(depositFilter);
@@ -60,7 +69,7 @@ const TxHistory = () => {
         setLoading(false)
     }
     useEffect(() => {
-        if (chain !== undefined && address !== undefined && txHistory.length === 0) {
+        if (chain !== undefined && address !== undefined) {
             getTxHistory()
         }
         else {
@@ -73,7 +82,6 @@ const TxHistory = () => {
     const handlePageChange = (pageNumber) => {
         setCurrentPage(pageNumber);
     };
-
     const pageCount = Math.ceil(txHistory.length / itemsPerPage);
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -103,7 +111,6 @@ const TxHistory = () => {
                                 </tr>
                             )
                         })}
-
                     </tbody>
                 </table>}
             {txHistory.length === 0 && !loading && <div className='text-center text-gray-500 dark:text-gray-400'>No transactions found</div>}

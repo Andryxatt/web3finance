@@ -14,11 +14,11 @@ const HeaderFilters = () => {
             isSelected: false
         },
         {
-            name: "Inactive",
+            name: "Deposited",
             isSelected: false
         },
         {
-            name: "Deposited",
+            name: "Inactive",
             isSelected: false
         }
     ]);

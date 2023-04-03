@@ -1,7 +1,8 @@
 import twitter from '../images/twitter.svg'
+import telegram from '../images/telegram.svg'
 import discord from '../images/discord.svg'
 import facebook from '../images/facebook.svg'
-import telegram from '../images/telegram.svg'
+
 import medium from '../images/medium.svg'
 import reddit from '../images/reddit.svg'
 const SocialNetworks = (props:any) => {
