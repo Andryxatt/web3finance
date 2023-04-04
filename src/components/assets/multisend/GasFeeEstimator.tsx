@@ -192,6 +192,7 @@ const GasFeeEstimator = (props: any) => {
       },
 
     ]
+    console.log(chain.id)
     if (chain.id === 97 || chain.id === 56) {
       dispatch(getNetworkPriority(speeds))
       dispatch(setSelectedPriority(speeds[1]));

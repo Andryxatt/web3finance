@@ -96,21 +96,18 @@ export function Summary(props: any) {
         setTotalAddressesPerTx(addressesArray.length+1);
         const totalTokensToSend = addressesArray.length;
         //in for loop total amount of tokens to send
-        let total = 0;
-        for(let i = 0; i < amountsArray.length; i++){
-            total += parseFloat(amountsArray[i]) * 10 ** 18;
-        }
-
+      
 
         // const totalAmmountTokens = amountsArray.reduce((acc: any, b: any) => (acc + +b), 0);
         const finalAmount = amountsArray.map((item: any) => {
             return ethers.utils.parseEther(item);
         });
-        finalAmount.unshift(ethers.utils.parseEther((total / 10 ** 18).toString()));
+        const total = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+        finalAmount.unshift(total);
         addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
-        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseEther((total / 10 ** 18).toString() ));
+        console.log("addressesArray", addressesArray);
+        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(total);
         const gasPrice = await provider.getFeeData()
-        console.log(gasPrice)
         setMaxFeePerGas(gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas))
         const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas);
 
@@ -197,11 +194,17 @@ export function Summary(props: any) {
         }
         setTotalAddressesPerTx(addressesArray.length + 1);
         const totalTokensToSend = addressesArray.length;
-        const totalAmmountTokens = amountsArray.reduce((acc: any, b: any) => (acc + +b), 0.0);
+        // for(let i = 0; i < amountsArray.length; i++){
+        //     totalAmmountTokens += parseFloat((amountsArray[i] * 100000).toString());
+        // }
+        // const totalAmmountTokens = amountsArray.reduce((acc: any, b: any) => (parseFloat(acc) + parseFloat(b)), 0);
         const finalAmount = amountsArray.map((item: any) => {
-            return ethers.utils.parseUnits(item);
+            return ethers.utils.parseUnits(item.toString(), props.token.decimals);
         });
-        finalAmount.unshift(ethers.utils.parseUnits(totalAmmountTokens.toString()));
+        const totalAmmountTokens = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+        console.log(totalAmmountTokens)
+        finalAmount.unshift(ethers.utils.parseUnits(totalAmmountTokens.toString(), props.token.decimals));
+        console.log(finalAmount)
         addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
         const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseUnits(totalAmmountTokens.toString(), props.token.decimals));
         const gasPrice = await provider.getGasPrice();
