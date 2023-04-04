@@ -39,14 +39,14 @@ const initialState: NetworkState = {
       Currency: 'BNB',
       rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
     },
-    {
-      icon: require("../../images/binance.png"),
-      name: "Binance Smart Chain Testnet",
-      id: 97,
-      isActive: false,
-      Currency: 'tBNB',
-      rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
-    },
+    // {
+    //   icon: require("../../images/binance.png"),
+    //   name: "Binance Smart Chain Testnet",
+    //   id: 97,
+    //   isActive: false,
+    //   Currency: 'tBNB',
+    //   rpcUrl: 'https://data-seed-prebsc-1-s3.binance.org:8545'
+    // },
     {
       name: "Polygon",
       icon: require("../../images/polygon.png"),
@@ -82,11 +82,11 @@ const initialState: NetworkState = {
   ],
   status: 'idle',
   selectedNetwork: {
-    name: "Goerli",
+    name: "Ethereum",
     icon: require("../../images/ethereum.png"),
-    id: 5,
+    id: 1,
     isActive: true,
-    Currency: 'WETH',
+    Currency: 'ETH',
     rpcUrl: ''
   },
 };

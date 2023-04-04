@@ -13,13 +13,11 @@ import {
     fetchUserBalanceArbitrum,
     fetchTokensPricesAvalanche,
     fetchTokensPricesBsc,
-    fetchTokensPricesBscT,
     fetchTokensPricesEth,
     fetchTokensPricesOptimism,
     fetchTokensPricesPolygon,
     fetchUserBalanceAvalanche,
     fetchUserBalanceBsc,
-    fetchUserBalanceBscT,
     fetchUserBalanceEth,
     fetchUserBalanceOptimism,
     fetchUserBalancePolygon
@@ -62,11 +60,11 @@ const DepositWithdraw = (props: any) => {
                     dispatch(fetchUserBalanceBsc({ provider, address }))
                 })
             }
-            if (isConnected && network.id === 97) {
-                dispatch(fetchTokensPricesBscT({})).then(() => {
-                    dispatch(fetchUserBalanceBscT({ provider, address }))
-                })
-            }
+            // if (isConnected && network.id === 97) {
+            //     dispatch(fetchTokensPricesBscT({})).then(() => {
+            //         dispatch(fetchUserBalanceBscT({ provider, address }))
+            //     })
+            // }
             if (isConnected && network.id === 137) {
                 dispatch(fetchTokensPricesPolygon({})).then(() => {
                     dispatch(fetchUserBalancePolygon({ provider, address }))
@@ -115,11 +113,11 @@ const DepositWithdraw = (props: any) => {
                     dispatch(fetchUserBalanceBsc({ provider, address }))
                 })
             }
-            if (isConnected && network.id === 97) {
-                dispatch(fetchTokensPricesBscT({})).then(() => {
-                    dispatch(fetchUserBalanceBscT({ provider, address }))
-                })
-            }
+            // if (isConnected && network.id === 97) {
+            //     dispatch(fetchTokensPricesBscT({})).then(() => {
+            //         dispatch(fetchUserBalanceBscT({ provider, address }))
+            //     })
+            // }
             if (isConnected && network.id === 137) {
                 dispatch(fetchTokensPricesPolygon({})).then(() => {
                     dispatch(fetchUserBalancePolygon({ provider, address }))
@@ -144,21 +142,18 @@ const DepositWithdraw = (props: any) => {
         once: true,
     })
     const depositAmount = async (token: any, amount: any) => {
-        console.log(token, "token")
         const signer = await fetchSigner()
-        console.log(contractsAddresses[network.name][0], "network name")
         let contract = new Contract(token.address, RTokenAbi, signer);
-        console.log(contract, "contract")
         let checkAllowance = await contract.allowance(address, contractsAddresses[network.name][0].FeeShare);
         let feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
-        if (parseFloat(ethers.utils.formatUnits(checkAllowance._hex, token.decimal)) < amount!) {
+        if (checkAllowance._hex.toString() < ethers.utils.parseUnits(amount!.toString(), token.decimals)) {
             const idToastApprove = toast.loading("Approving please wait...")
-            await contract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 })
+            await contract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimals))
                 .then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(idToastApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         const idToastDepositApprove = toast.loading("Depositing please wait...")
-                        await feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
+                        await feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals), { gasLimit: 200000 }).then((result: any) => {
                             result.wait().then(async (recept: any) => {
                                 toast.update(idToastDepositApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                             })
@@ -172,7 +167,7 @@ const DepositWithdraw = (props: any) => {
         }
         else {
             const idToast2 = toast.loading("Depositing please wait...")
-            feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: 200000 }).then((result: any) => {
+            feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals), { gasLimit: 200000 }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
 
@@ -192,7 +187,7 @@ const DepositWithdraw = (props: any) => {
             toast.update(idToastWithdraw, { render: "Input correct amount", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
         }
         else {
-            feeShare.withdraw(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimal), { gasLimit: "210000" }).then((result: any) => {
+            feeShare.withdraw(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals), { gasLimit: "210000" }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToastWithdraw, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 }).catch((err: any) => {

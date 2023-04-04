@@ -87,31 +87,31 @@ export const tokenSlice = createSlice({
   name: 'token',
   initialState,
   reducers: {
-    changeTokenByNetwork: (state, action: PayloadAction<any>) => {
-      const { chainId } = action.payload;
-  const tokenizationMap = {
-    1: ethereumTokens.Tokenization,
-    // 5: goerliTokens.Tokenization,
-    10: optimismTokens.Tokenization,
-    56: bscTokens.Tokenization,
-    97: bscTestTokens.Tokenization,
-    137: polygonTokens.Tokenization,
-    43114: avxTokens.Tokenization,
-    42161:arbitrumTokens.Tokenization,
-    // 80001: mumbaiTokens.Tokenization,
-  };
-  const tokenization = tokenizationMap[chainId] || goerliTokens.Tokenization;
-  state.ethTokens = tokenization;
-  // state.goerliTokens = tokenization;
-  state.optimismTokens = tokenization;
-  state.bscTokens = tokenization;
-  state.bscTestTokens = tokenization;
-  state.polygonTokens = tokenization;
-  state.avalancheTokens = tokenization;
-  // state.mumbaiTokens = tokenization;
-  state.arbitrumTokens = tokenization;
+  //   changeTokenByNetwork: (state, action: PayloadAction<any>) => {
+  //     const { chainId } = action.payload;
+  // const tokenizationMap = {
+  //   1: ethereumTokens.Tokenization,
+  //   // 5: goerliTokens.Tokenization,
+  //   10: optimismTokens.Tokenization,
+  //   56: bscTokens.Tokenization,
+  //   97: bscTestTokens.Tokenization,
+  //   137: polygonTokens.Tokenization,
+  //   43114: avxTokens.Tokenization,
+  //   42161:arbitrumTokens.Tokenization,
+  //   // 80001: mumbaiTokens.Tokenization,
+  // };
+  // const tokenization = tokenizationMap[chainId] || goerliTokens.Tokenization;
+  // state.ethTokens = tokenization;
+  // // state.goerliTokens = tokenization;
+  // state.optimismTokens = tokenization;
+  // state.bscTokens = tokenization;
+  // state.bscTestTokens = tokenization;
+  // state.polygonTokens = tokenization;
+  // state.avalancheTokens = tokenization;
+  // // state.mumbaiTokens = tokenization;
+  // state.arbitrumTokens = tokenization;
 
-    },
+  //   },
     // getTokensPricesGoerli: (state, action: PayloadAction<any>) => {
     //   const { newTokens } = action.payload;
     //   state.goerliTokens = newTokens;
@@ -131,9 +131,9 @@ export const tokenSlice = createSlice({
     getTokensPricesBsc: (state, action: PayloadAction<any>) => {
       state.bscTokens = action.payload;
     },
-    getTokensPricesBscT: (state, action: PayloadAction<any>) => {
-      state.bscTestTokens = action.payload;
-    },
+    // getTokensPricesBscT: (state, action: PayloadAction<any>) => {
+    //   state.bscTestTokens = action.payload;
+    // },
     getTokensPricesAvalanche: (state, action: PayloadAction<any>) => {
       const { newTokens } = action.payload;
       state.avalancheTokens = newTokens;
@@ -167,9 +167,9 @@ export const tokenSlice = createSlice({
     getUserBalanceBsc: (state, action: PayloadAction<any>) => {
       state.bscTokens = action.payload;
     },
-    getUserBalanceBscT: (state, action: PayloadAction<any>) => {
-      state.bscTestTokens = action.payload;
-    },
+    // getUserBalanceBscT: (state, action: PayloadAction<any>) => {
+    //   state.bscTestTokens = action.payload;
+    // },
     getUserBalancePolygon: (state, action: PayloadAction<any>) => {
       state.polygonTokens = action.payload;
     },
@@ -180,7 +180,7 @@ export const tokenSlice = createSlice({
       state.sortBy = "price";
       const tokenMap: TokenMap = {
         1: state.ethTokens,
-        97: state.bscTestTokens,
+        // 97: state.bscTestTokens,
         56: state.bscTokens,
         // 80001: state.mumbaiTokens,
         137: state.polygonTokens,
@@ -209,7 +209,7 @@ export const tokenSlice = createSlice({
         // 5: state.goerliTokens,
         10: state.optimismTokens,
         56: state.bscTokens,
-        97: state.bscTestTokens,
+        // 97: state.bscTestTokens,
         137: state.polygonTokens,
         42161: state.arbitrumTokens,
         43114: state.avalancheTokens,
@@ -253,7 +253,7 @@ export const tokenSlice = createSlice({
         // 5: state.goerliTokens,
         10: state.optimismTokens,
         56: state.bscTokens,
-        97: state.bscTestTokens,
+        // 97: state.bscTestTokens,
         137: state.polygonTokens,
         42161:state.arbitrumTokens,
         // 80001: state.mumbaiTokens,
@@ -278,7 +278,7 @@ export const tokenSlice = createSlice({
         // 5: state.goerliTokens,
         10: state.optimismTokens,
         56: state.bscTokens,
-        97: state.bscTestTokens,
+        // 97: state.bscTestTokens,
         137: state.polygonTokens,
         42161: state.arbitrumTokens,
         // 80001: state.mumbaiTokens,
@@ -351,18 +351,18 @@ export const tokenSlice = createSlice({
           });
           break;
         }
-        case 97: {
-          state.bscTestTokens = state.bscTestTokens.map((token: Token) => {
-            if (token.name === name) {
-              token.isOpen = !token.isOpen;
-            }
-            else {
-              token.isOpen = false;
-            }
-            return token;
-          });
-          break;
-        }
+        // case 97: {
+        //   state.bscTestTokens = state.bscTestTokens.map((token: Token) => {
+        //     if (token.name === name) {
+        //       token.isOpen = !token.isOpen;
+        //     }
+        //     else {
+        //       token.isOpen = false;
+        //     }
+        //     return token;
+        //   });
+        //   break;
+        // }
         case 137: {
           state.polygonTokens = state.polygonTokens.map((token: Token) => {
             if (token.name === name) {
@@ -435,9 +435,9 @@ export const tokenSlice = createSlice({
     builder.addCase(fetchTokensPricesBsc.fulfilled, (state, action) => {
       state.bscTokens = action.payload;
     });
-    builder.addCase(fetchTokensPricesBscT.fulfilled, (state, action) => {
-      state.bscTestTokens = action.payload;
-    });
+    // builder.addCase(fetchTokensPricesBscT.fulfilled, (state, action) => {
+    //   state.bscTestTokens = action.payload;
+    // });
     builder.addCase(fetchTokensPricesPolygon.fulfilled, (state, action) => {
       state.polygonTokens = action.payload;
     });
@@ -456,9 +456,9 @@ export const tokenSlice = createSlice({
     builder.addCase(fetchUserBalanceArbitrum.fulfilled, (state, action) => {
       state.arbitrumTokens = action.payload;
     });
-    builder.addCase(fetchUserBalanceBscT.fulfilled, (state, action) => {
-      state.bscTestTokens = action.payload;
-    });
+    // builder.addCase(fetchUserBalanceBscT.fulfilled, (state, action) => {
+    //   state.bscTestTokens = action.payload;
+    // });
     builder.addCase(fetchUserBalancePolygon.fulfilled, (state, action) => {
       state.polygonTokens = action.payload;
     });
@@ -478,7 +478,6 @@ export const {
   filterByName,
   filterTokens,
 
-  changeTokenByNetwork,
 
   getUserBalanceBsc,
   getUserBalancePolygon,
@@ -592,28 +591,28 @@ export const currentTokensList = (state: RootState) => {
         });
       }
     }
-    case 97: {
-      if (state.token.filterBy === "Stablecoins") {
-        return state.token.bscTestTokens.filter((token: Token) => {
-          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-        });
-      }
-      else if (state.token.filterBy === "Inactive") {
-        return state.token.bscTestTokens.filter((token: Token) => {
-          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-        });
-      }
-      else if (state.token.filterBy === "Deposited") {
-        return state.token.bscTestTokens.filter((token: Token) => {
-          return token.isDeposit && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
-        });
-      }
-      else {
-        return state.token.bscTestTokens.filter((token: Token) => {
-          return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())
-        });
-      }
-    }
+    // case 97: {
+    //   if (state.token.filterBy === "Stablecoins") {
+    //     return state.token.bscTestTokens.filter((token: Token) => {
+    //       return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+    //     });
+    //   }
+    //   else if (state.token.filterBy === "Inactive") {
+    //     return state.token.bscTestTokens.filter((token: Token) => {
+    //       return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+    //     });
+    //   }
+    //   else if (state.token.filterBy === "Deposited") {
+    //     return state.token.bscTestTokens.filter((token: Token) => {
+    //       return token.isDeposit && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+    //     });
+    //   }
+    //   else {
+    //     return state.token.bscTestTokens.filter((token: Token) => {
+    //       return token.name.toLowerCase().includes(state.token.searchField.toLowerCase())
+    //     });
+    //   }
+    // }
     case 137: {
       if (state.token.filterBy === "Stablecoins") {
         return state.token.polygonTokens.filter((token: Token) => {
@@ -711,7 +710,7 @@ export const currentTokensList = (state: RootState) => {
 }
 export const eth = (state: RootState) => { return state.token.ethTokens }
 export const bsc = (state: RootState) => { return state.token.bscTokens }
-export const bscTest = (state: RootState) => { return state.token.bscTestTokens }
+// export const bscTest = (state: RootState) => { return state.token.bscTestTokens }
 export const polygon = (state: RootState) => { return state.token.polygonTokens }
 // export const goerli = (state: RootState) => { return state.token.goerliTokens }
 // export const mumbai = (state: RootState) => { return state.token.mumbaiTokens }
@@ -725,7 +724,7 @@ export const nativeBalance = (state: RootState) => {
     // 5: state.token.goerliTokens,
     10: state.token.mumbaiTokens,
     56: state.token.bscTokens,
-    97: state.token.bscTestTokens,
+    // 97: state.token.bscTestTokens,
     137: state.token.avalancheTokens,
     // 80001: state.token.mumbaiTokens,
     42161:state.token.arbitrumTokens,
@@ -775,7 +774,7 @@ export const fetchTokensPricesAvalanche = createAsyncThunk(
         return { ...token, tokenPrice: ethers.utils.formatUnits(avalanchePrice, 8), deposits: "-" }
       }
       else {
-        const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerAvalanche);
+        const tokenContract = new Contract(contractsAddresses["Avalanche"][0]["r" + token.name], RTokenAbi, providerAvalanche);
         const totalDeposits = await tokenContract.totalSupply();
         return { ...token, tokenPrice: ethers.utils.formatUnits(avalanchePrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, token.decimals) }
       }
@@ -797,7 +796,7 @@ export const fetchTokensPricesOptimism = createAsyncThunk(
         return { ...token, tokenPrice: ethers.utils.formatUnits(assetsPrices[index], 8), deposits: "-" }
       }
       else {
-        const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerOptimism);
+        const tokenContract = new Contract(contractsAddresses["Optimism"][0]["r" + token.name], RTokenAbi, providerOptimism);
          const totalDeposits = await tokenContract.totalSupply();
         return { ...token, tokenPrice: ethers.utils.formatUnits(assetsPrices[index], 8), deposits: ethers.utils.formatUnits(totalDeposits, token.decimals) }
       }
@@ -818,7 +817,7 @@ export const fetchTokensPricesArbitrum = createAsyncThunk(
         return { ...token, tokenPrice: ethers.utils.formatUnits(assetsPrices[index], 8), deposits: "-" }
       }
       else {
-        const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi,providerArbitrum);
+        const tokenContract = new Contract(contractsAddresses["Arbitrum"][0]["r" + token.name], RTokenAbi,providerArbitrum);
         const totalDeposits = await tokenContract.totalSupply();
         return { ...token, tokenPrice: ethers.utils.formatUnits(assetsPrices[index], 8), deposits: ethers.utils.formatUnits(totalDeposits, token.decimals) }
       }
@@ -838,7 +837,7 @@ export const fetchTokensPricesEth = createAsyncThunk(
         return { ...token, tokenPrice: ethers.utils.formatUnits(ethPrice, 8), deposits: "-" }
       }
       else {
-        const rTokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerInfura);
+        const rTokenContract = new Contract(contractsAddresses["Ethereum"][0]["r" + token.name], RTokenAbi, providerInfura);
         const totalDeposits = await rTokenContract.totalSupply();
         const decimals = await rTokenContract.decimals();
         return { ...token, tokenPrice: ethers.utils.formatUnits(ethPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
@@ -854,7 +853,7 @@ export const fetchTokensPricesPolygon = createAsyncThunk(
     const providerPolygon = new ethers.providers.JsonRpcProvider('https://rpc-mainnet.maticvigil.com/');
     const contractMumbai = new Contract(contractsAddresses["Polygon"][0].PriceOracle, OracleAbi, providerPolygon);
     const newPolygon = state.token.polygonTokens.map(async (token: any) => {
-      const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerPolygon);
+      const tokenContract = new Contract(contractsAddresses["Polygon"][0]["r" + token.name], RTokenAbi, providerPolygon);
       const polygonPrice = await contractMumbai.getAssetPrice(token.address);
       if (token.isNative) {
         return { ...token, tokenPrice: ethers.utils.formatUnits(polygonPrice, 8), deposits: "-" }
@@ -891,27 +890,27 @@ export const fetchTokensPricesPolygon = createAsyncThunk(
 //     return Promise.all(newMumbai);
 //   }
 // )
-export const fetchTokensPricesBscT = createAsyncThunk(
-  'token/getTokensPricesBscT',
-  async (args: any, { getState }) => {
-    const state = getState() as any;
-    const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
-    const contractBsc = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
-    const newBsc = state.token.bscTestTokens.map(async (token: any) => {
-      const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
-      const bscPrice = await contractBsc.getAssetPrice(token.address);
-      if (token.isNative) {
-        return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: "-" }
-      }
-      else {
-        const totalDeposits = await tokenContract.totalSupply();
-        const decimals = await tokenContract.decimals();
-        return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
-      }
-    })
-    return Promise.all(newBsc);
-  }
-)
+// export const fetchTokensPricesBscT = createAsyncThunk(
+//   'token/getTokensPricesBscT',
+//   async (args: any, { getState }) => {
+//     const state = getState() as any;
+//     const providerBsc = new ethers.providers.JsonRpcProvider('https://practical-cold-owl.bsc-testnet.discover.quiknode.pro/' + process.env.REACT_APP_QUICK_NODE_KEY);
+//     const contractBsc = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0].PriceOracle, OracleAbi, providerBsc);
+//     const newBsc = state.token.bscTestTokens.map(async (token: any) => {
+//       const tokenContract = new Contract(contractsAddresses["Binance Smart Chain Testnet"][0]["r" + token.name], RTokenAbi, providerBsc);
+//       const bscPrice = await contractBsc.getAssetPrice(token.address);
+//       if (token.isNative) {
+//         return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: "-" }
+//       }
+//       else {
+//         const totalDeposits = await tokenContract.totalSupply();
+//         const decimals = await tokenContract.decimals();
+//         return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: ethers.utils.formatUnits(totalDeposits, decimals) }
+//       }
+//     })
+//     return Promise.all(newBsc);
+//   }
+// )
 export const fetchTokensPricesBsc = createAsyncThunk(
   'token/getTokensPricesBsc',
   async (args: any, { getState }) => {
@@ -919,7 +918,7 @@ export const fetchTokensPricesBsc = createAsyncThunk(
     const providerBsc = new ethers.providers.JsonRpcProvider('https://bsc-dataseed.binance.org');
     const contractBsc = new Contract(contractsAddresses["Binance Smart Chain"][0].PriceOracle, OracleAbi, providerBsc);
     const newBsc = state.token.bscTokens.map(async (token: any) => {
-      const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerBsc);
+      const tokenContract = new Contract(contractsAddresses["Binance Smart Chain"][0]["r" + token.name], RTokenAbi, providerBsc);
       const bscPrice = await contractBsc.getAssetPrice(token.address);
       if (token.isNative) {
         return { ...token, tokenPrice: ethers.utils.formatUnits(bscPrice, 8), deposits: "-" }
@@ -961,7 +960,7 @@ export const fetchUserBalanceAvalanche = createAsyncThunk(
     const state = getState() as any;
     const { provider, address } = data;
     const newTokens = state.token.avalancheTokens.map(async (token: Token) => {
-      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+      const contractRToken = new Contract(contractsAddresses["Avalanche"][0]["r" + token.name], RTokenAbi, provider);
       if (token.isNative) {
         const userBalance = await provider.getBalance(address);
         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatEther(userBalance) }
@@ -983,7 +982,7 @@ export const fetchUserBalanceArbitrum = createAsyncThunk(
     const state = getState() as any;
     const { provider, address } = data;
     const newTokens = state.token.arbitrumTokens.map(async (token: Token) => {
-      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+      const contractRToken = new Contract(contractsAddresses["Arbitrum"][0]["r" + token.name], RTokenAbi, provider);
       if (token.isNative) {
         const userBalance = await provider.getBalance(address);
         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatEther(userBalance) }
@@ -1005,7 +1004,7 @@ export const fetchUserBalanceEth = createAsyncThunk(
     const state = getState() as any;
     const { provider, address } = data;
     const newTokens = state.token.ethTokens.map(async (token: Token) => {
-      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+      const contractRToken = new Contract(contractsAddresses["Ethereum"][0]["r" + token.name], RTokenAbi, provider);
       if (token.isNative) {
         const userBalance = await provider.getBalance(address);
         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatEther(userBalance) }
@@ -1028,7 +1027,7 @@ export const fetchUserBalanceOptimism = createAsyncThunk(
     const { address } = data;
     const provider = new ethers.providers.JsonRpcProvider('https://optimism-mainnet.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
     const newTokens = state.token.optimismTokens.map(async (token: Token) => {
-      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+      const contractRToken = new Contract(contractsAddresses["Optimism"][0]["r" + token.name], RTokenAbi, provider);
       if (token.isNative) {
         const userBalance = await provider.getBalance(address);
         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatEther(userBalance) }
@@ -1090,34 +1089,34 @@ export const fetchUserBalanceOptimism = createAsyncThunk(
 //     return Promise.all(newTokens);
 //   }
 // )
-export const fetchUserBalanceBscT = createAsyncThunk(
-  'token/getUserBalanceBscT',
-  async (data: any, { getState }) => {
-    const state = getState() as any;
-    const { provider, address } = data;
-    const newTokens = state.token.bscTestTokens.map(async (token: any) => {
-      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
-      if (token.isNative) {
-        const userBalance = await provider.getBalance(address);
-        return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatUnits(userBalance) }
-      }
-      else {
-        const contractToken = new Contract(token.address, RTokenAbi, provider);
-        const userBalanceToken = await contractToken.balanceOf(address);
-        const userBalanceDeposit = await contractRToken.balanceOf(address);
-        return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals), isDeposit: userBalanceDeposit.gt(0) }
-      }
-    })
-    return Promise.all(newTokens);
-  }
-)
+// export const fetchUserBalanceBscT = createAsyncThunk(
+//   'token/getUserBalanceBscT',
+//   async (data: any, { getState }) => {
+//     const state = getState() as any;
+//     const { provider, address } = data;
+//     const newTokens = state.token.bscTestTokens.map(async (token: any) => {
+//       const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+//       if (token.isNative) {
+//         const userBalance = await provider.getBalance(address);
+//         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatUnits(userBalance) }
+//       }
+//       else {
+//         const contractToken = new Contract(token.address, RTokenAbi, provider);
+//         const userBalanceToken = await contractToken.balanceOf(address);
+//         const userBalanceDeposit = await contractRToken.balanceOf(address);
+//         return { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance: ethers.utils.formatUnits(userBalanceToken, token.decimals), isDeposit: userBalanceDeposit.gt(0) }
+//       }
+//     })
+//     return Promise.all(newTokens);
+//   }
+// )
 export const fetchUserBalanceBsc = createAsyncThunk(
   'token/getUserBalanceBsc',
   async (data: any, { getState }) => {
     const state = getState() as any;
     const { provider, address } = data;
     const newTokens = state.token.bscTokens.map(async (token: any) => {
-      const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
+      const contractRToken = new Contract(contractsAddresses["Binance Smart Chain"][0]["r" + token.name], RTokenAbi, provider);
       if (token.isNative) {
         const userBalance = await provider.getBalance(address);
         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatUnits(userBalance) }

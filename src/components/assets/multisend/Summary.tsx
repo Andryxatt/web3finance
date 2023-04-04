@@ -9,7 +9,7 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { fetchUserBalancePolygon, fetchUserBalanceBsc, fetchUserBalanceBscT, fetchUserBalanceEth, fetchUserBalanceAvalanche, fetchUserBalanceOptimism, fetchUserBalanceArbitrum } from "../../../store/token/tokenSlice";
+import { fetchUserBalancePolygon, fetchUserBalanceBsc, fetchUserBalanceEth, fetchUserBalanceAvalanche, fetchUserBalanceOptimism, fetchUserBalanceArbitrum } from "../../../store/token/tokenSlice";
 import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner, signTypedData } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
@@ -108,14 +108,16 @@ export function Summary(props: any) {
         });
         finalAmount.unshift(ethers.utils.parseEther((total / 10 ** 18).toString()));
         addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
-        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseEther((total / 10 ** 18).toString()));
+        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseEther((total / 10 ** 18).toString() ));
         const gasPrice = await provider.getFeeData()
+        console.log(gasPrice)
         setMaxFeePerGas(gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas))
         const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas);
+
         const txInfo = {
             value: msgValue,
-            "maxFeePerGas": feePerGas,
-            "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')
+            "maxFeePerGas": gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas),
+            "maxPriorityFeePerGas": networkSpeed.maxPriorityFeePerGas
         }
 
         const txInform = {
@@ -137,13 +139,15 @@ export function Summary(props: any) {
                 setIsCalculated(true);
             }
             else {
+                console.log(addressesArray, finalAmount, txInfo)
                 const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, txInfo);
-
+               
+                console.log(unitsUsed)
                 setGasPrice(unitsUsed.mul(feePerGas).toString());
                 setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
                 setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(feePerGas.mul(unitsUsed))));
                 setTxToSend(txInform);
-                setAmmount((total / 10 ** 18).toString());
+                setAmmount((total / 10 ** props.token.decimals).toString());
                 setLoading(false);
                 setIsCalculated(true);
             }
@@ -199,7 +203,7 @@ export function Summary(props: any) {
         });
         finalAmount.unshift(ethers.utils.parseUnits(totalAmmountTokens.toString()));
         addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
-        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseEther(totalAmmountTokens.toString()));
+        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseUnits(totalAmmountTokens.toString(), props.token.decimals));
         const gasPrice = await provider.getGasPrice();
         const txInfo = {
             value: msgValue,
@@ -269,9 +273,9 @@ export function Summary(props: any) {
             else if (isConnected && network.id === 56) {
                 dispatch(fetchUserBalanceBsc({ provider, address }))
             }
-            else if (isConnected && network.id === 97) {
-                dispatch(fetchUserBalanceBscT({ provider, address }))
-            }
+            // else if (isConnected && network.id === 97) {
+            //     dispatch(fetchUserBalanceBscT({ provider, address }))
+            // }
             else if (isConnected && network.id === 137) {
                 dispatch(fetchUserBalancePolygon({ provider, address }))
             }
@@ -339,7 +343,7 @@ export function Summary(props: any) {
                 "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')
             }
             const finalAmount = amountsArray.map((item: any) => {
-                return ethers.utils.parseUnits(item);
+                return ethers.utils.parseUnits(item, props.token.decimals);
             });
             const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
             const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
@@ -349,7 +353,7 @@ export function Summary(props: any) {
                 setLoading(false);
                 setIsCalculated(true);
             }
-            if (+ethers.utils.formatUnits(isApproved, props.token.decimal) >= ammountT) {
+            if (+ethers.utils.formatUnits(isApproved, props.token.decimals) >= ammountT) {
                 const txInform = {
                     method: "multiSend(address,address[],uint256[])",
                     token: props.token.address,
@@ -393,7 +397,7 @@ export function Summary(props: any) {
                         txInfo,
                         isApproved: false
                     }
-                    const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimal);
+                    const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimals);
                     const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
     
                     setAmmount(ammountT.toString());
@@ -475,7 +479,7 @@ export function Summary(props: any) {
                 setLoading(false);
                 setIsCalculated(true);
             }
-            if (+ethers.utils.formatUnits(isApproved, props.token.decimal) >= ammountT) {
+            if (+ethers.utils.formatUnits(isApproved, props.token.decimals) >= ammountT) {
                 const txInform = {
                     method: "multiSend(address,address[],uint256[])",
                     token: props.token.address,
@@ -519,7 +523,7 @@ export function Summary(props: any) {
                     txInfo,
                     isApproved: false
                 }
-                const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimal);
+                const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimals);
                 const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
 
                 setAmmount(ammountT.toString());
@@ -544,7 +548,8 @@ export function Summary(props: any) {
 
         const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
         const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
-        if (parseFloat(ethers.utils.formatUnits(isApproved, props.token.decimal)) >= parseFloat(ammount)) {
+        console.log(parseFloat(ethers.utils.formatUnits(isApproved, props.token.decimals)), parseFloat(ammount))
+        if (parseFloat(ethers.utils.formatUnits(isApproved, props.token.decimals)) >= parseFloat(ammount)) {
             const idToastSendTokenNativeFee = toast.loading("Sending transaction please wait...")
             feeShare[txToSend.method](props.token.address, txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
                 tx.wait().then((receipt: any) => {
@@ -567,7 +572,7 @@ export function Summary(props: any) {
             const approveToast = toast.loading("Approving please wait...")
             if (network.id === 97) {
                 // const gasPrice = await provider.getGasPrice();
-                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimal)).then((res: any) => {
+                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimals)).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
@@ -581,7 +586,7 @@ export function Summary(props: any) {
                 })
             }
             else {
-                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimal), { "maxFeePerGas": maxFeePerGas, "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei') }).then((res: any) => {
+                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimals), { "maxFeePerGas": maxFeePerGas, "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei') }).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
@@ -643,7 +648,7 @@ export function Summary(props: any) {
         try{
             const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei'));
             const txFeeInToken = await feeShare["calculateTxfeeToken(address,uint256)"](props.token.address, ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed));
-            setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimal))
+            setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimals))
             const minimalForwarderContract = new Contract(contractsAddresses[network.name][0].MinimalForwarder, MinimalForwarderAbi, signer);
             const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')]) as any;
             if (totalAmmountTokensToSend > props.token.userBalanceDeposit) {
@@ -727,7 +732,7 @@ export function Summary(props: any) {
             const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, addressesArray, finalAmount, BigNumber.from(0));
             console.log(unitsUsed, "unitsUsed")
             const txFeeInToken = await feeShare["calculateTxfeeToken(address,uint256)"](props.token.address, ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed));
-            setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimal))
+            setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimals))
             const minimalForwarderContract = new Contract(contractsAddresses[network.name][0].MinimalForwarder, MinimalForwarderAbi, signer);
             const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesArray, finalAmount, 0]) as any;
             if (totalAmmountTokensToSend > props.token.userBalanceDeposit) {
