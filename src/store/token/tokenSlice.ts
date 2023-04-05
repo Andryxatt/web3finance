@@ -415,6 +415,54 @@ export const tokenSlice = createSlice({
         
       }
     },
+    closeAllElements : (state) => {
+      console.log("closeAllElements");
+        state.ethTokens = state.ethTokens.map((token: Token) => {
+          token.isOpen = false;
+          return token;
+        });
+        // state.goerliTokens = state.goerliTokens.map((token: Token) => {
+        //   token.isOpen = false;
+        //   return token;
+        // });
+        state.optimismTokens = state.optimismTokens.map((token: Token) => {
+          token.isOpen = false;
+          return token;
+        }
+        );
+        state.bscTokens = state.bscTokens.map((token: Token) => {
+          token.isOpen = false;
+          return token;
+        }
+        );
+        // state.bscTestTokens = state.bscTestTokens.map((token: Token) => {
+        //   token.isOpen = false;
+        //   return token;
+        // }
+        // );
+        state.polygonTokens = state.polygonTokens.map((token: Token) => {
+
+          token.isOpen = false;
+          return token;
+        } 
+        );
+        // state.mumbaiTokens = state.mumbaiTokens.map((token: Token) => {
+        //   token.isOpen = false;
+        //   return token;
+        // }
+        // );
+        state.arbitrumTokens = state.arbitrumTokens.map((token: Token) => {
+          token.isOpen = false;
+          return token;
+        }
+        );
+        state.avalancheTokens = state.avalancheTokens.map((token: Token) => {
+          token.isOpen = false;
+          return token;
+        }
+        );
+    },
+    
   },
   extraReducers: (builder) => {
     // builder.addCase(fetchTokensPricesGoerli.fulfilled, (state, action) => {
@@ -477,7 +525,7 @@ export const {
   openElement,
   filterByName,
   filterTokens,
-
+  closeAllElements,
 
   getUserBalanceBsc,
   getUserBalancePolygon,

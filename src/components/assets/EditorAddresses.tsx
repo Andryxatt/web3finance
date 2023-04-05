@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import EditorFile from "./EditorFile";
 import 'react-toastify/dist/ReactToastify.css';
 import EditorManual from "./EditorManual";
@@ -22,6 +22,11 @@ const EditorAddresses = (props: any) => {
             toast( "You need to input at least one address and amount!", {type: "error", autoClose: 2000,icon:"🚨", isLoading: false, position: toast.POSITION.TOP_CENTER })
         }
     }
+    useEffect(() => {
+        return () => {
+            setIsPreview(true);
+        }
+    }, [])
     const toogleNativeFee = () => {
         setIsNativeFee(!isNativeFee);
     }
@@ -33,6 +38,7 @@ const EditorAddresses = (props: any) => {
         setIsPreview(!isPreview);
         dispatch(updateAddressesToSend([]));
     }
+  
     return (
         <>
             {

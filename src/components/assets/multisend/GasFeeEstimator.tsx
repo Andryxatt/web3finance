@@ -11,7 +11,7 @@ const GasFeeEstimator = (props: any) => {
   // const nativeTokenPrice = useAppSelector(nativeBalance);
   const { chain } = useNetwork();
   const [selectedSpeed, setSelectedSpeed] = useState("Average");
-  const [subscribed, setSubscribed] = useState(false);
+  const [subscribed] = useState(false);
   const historicalBlocks = 20;
   const infuraApiKey = process.env.REACT_APP_INFURA_KEY;
   const providerUrls = {
@@ -205,8 +205,8 @@ const GasFeeEstimator = (props: any) => {
       feeCalculate();
       const web3 = new Web3(Web3.givenProvider);
       var subscription = web3.eth.subscribe('newBlockHeaders', function (error, result) {
+        console.log('Subscribed!');
         if (!error) {
-          setSubscribed(true)
           feeCalculate()
         }
       })

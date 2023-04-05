@@ -10,6 +10,7 @@ const Row = (props: any) => {
     const network = useAppSelector(currentNetwork)
     const { isConnected } = useAccount()
     const {chain} = useNetwork()
+  
     return (
         <div className={
             (props.token.isOpen ?

@@ -1,6 +1,7 @@
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { selectNetwork,  changeSelectedNetwork } from "../../store/network/networkSlice";
 import { useSwitchNetwork } from "wagmi";
+import { closeAllElements } from "../../store/token/tokenSlice";
 const HeaderNetworks = () => {
     const {switchNetwork} = useSwitchNetwork()
     const networks = useAppSelector(selectNetwork);
@@ -15,7 +16,7 @@ const HeaderNetworks = () => {
                             <img className="w-[30px] mr-5 md:mr-0" src={network.icon} alt={network.name} />
                             <h2 className="group-hover:underline text-lg font-bold">{network.name === "Binance Smart Chain" ? "BSC" : network.name}</h2>
                         </div> :
-                        <div key={index} onClick={() => {dispatch(changeSelectedNetwork(network)); switchNetwork(network.id)}} className="group w-full md:min-h-0 md:pb-2 md:pt-2 cursor-pointer sm:flex-col flex flex-row items-center justify-center">
+                        <div key={index} onClick={() => {dispatch(changeSelectedNetwork(network)); dispatch(closeAllElements()); switchNetwork(network.id)}} className="group w-full md:min-h-0 md:pb-2 md:pt-2 cursor-pointer sm:flex-col flex flex-row items-center justify-center">
                             <img className="w-[30px] mr-5 md:mr-0" src={network.icon} alt={network.name} />
                             <h2 className="group-hover:underline text-lg font-bold">{network.name === "Binance Smart Chain" ? "BSC" : network.name}</h2>
                         </div>
