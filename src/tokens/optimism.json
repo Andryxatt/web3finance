@@ -79,7 +79,7 @@
             "userBalance": "0",
             "userBalanceDeposit": "0",
             "isOpen": false,
-            "isNative":true,
+            "isNative":false,
             "isStablecoin":false,
             "inactive":false,
             "isDeposit":false

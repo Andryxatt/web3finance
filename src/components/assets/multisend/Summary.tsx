@@ -243,6 +243,100 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
     }
+    const calculateNativeOptimism = async () => {
+        setIsCalculated(false)
+        setError(false);
+        setErrorMessage('');
+        const signer = await fetchSigner()
+        const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
+        const feePerAddressNative = await feeShare["calculateFee()"]();
+        if (addressesAndAmounts.length === 0) {
+            setTotalTransactions(0)
+        }
+        else {
+            setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+        }
+        let addressesArray = [];
+        let amountsArray = [];
+        if (addressesAndAmounts.length === 0) {
+            addressesArray = [];
+            amountsArray = [];
+        }
+        else if (addressesAndAmounts.length > 253) {
+            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                return item.address;
+            });
+            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                return item.amount.toString().trim();
+            });
+        }
+        else {
+            addressesArray = addressesAndAmounts.map((item: any) => {
+                return item.address;
+            });
+            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                return item.amount.toString().trim();
+            });
+        }
+        setTotalAddressesPerTx(addressesArray.length + 1);
+        const totalTokensToSend = addressesArray.length;
+        // for(let i = 0; i < amountsArray.length; i++){
+        //     totalAmmountTokens += parseFloat((amountsArray[i] * 100000).toString());
+        // }
+        // const totalAmmountTokens = amountsArray.reduce((acc: any, b: any) => (parseFloat(acc) + parseFloat(b)), 0);
+        const finalAmount = amountsArray.map((item: any) => {
+            return ethers.utils.parseUnits(item.toString(), props.token.decimals);
+        });
+        const totalAmmountTokens = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+       
+        finalAmount.unshift(ethers.utils.parseUnits(totalAmmountTokens.toString(), props.token.decimals));
+        addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
+        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(ethers.utils.parseUnits(totalAmmountTokens.toString(), props.token.decimals));
+        const gasPrice = await provider.getGasPrice();
+        console.log(gasPrice, "gasPrice")
+        const txInfo = {
+            value: msgValue,
+            gasPrice: gasPrice
+        }
+
+        const txInform = {
+            method: "multiSend(address[],uint256[])",
+            token: props.token.address,
+            addressesToSend: addressesArray,
+            finalAmount,
+            txInfo,
+            isApproved: true
+        }
+        try {
+            if (addressesAndAmounts.length === 0) {
+                setGasPrice("0");
+                setTxFee("0");
+                setTotalFee("0");
+                setTxToSend(txInform);
+                setAmmount("0");
+                setLoading(false);
+                setIsCalculated(true);
+            }
+            else {
+                const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, txInfo);
+
+                setGasPrice(unitsUsed.mul(gasPrice).toString());
+                setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
+                setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(gasPrice.mul(unitsUsed))));
+                setTxToSend(txInform);
+                setAmmount(totalAmmountTokens.toString());
+                setLoading(false);
+                setIsCalculated(true);
+            }
+
+        }
+        catch {
+            setError(true);
+            setErrorMessage(`You don't have enough balance to pay fee.Your token balance is ${!props.isNativeFee ? parseFloat(props.token.userBalance).toFixed(4) + props.token.name : parseFloat(props.token.userBalanceDeposit).toFixed(4) + props.token.name}`)
+            setLoading(false);
+            setIsCalculated(true);
+        }
+    }
     const sendNativeTx = async () => {
         //openAi version
         const idToastNative = toast.loading("Sending transaction please wait...")
@@ -998,7 +1092,7 @@ export function Summary(props: any) {
         switch (network.id) {
             case 97:
             case 56:
-            case 10:
+           
                 if (props.isNative) {
                     calculateNativeBSC();
                 } else if (!props.isNativeFee) {
@@ -1007,7 +1101,15 @@ export function Summary(props: any) {
                     calculateTokenAndPayTokenBsc();
                 }
                 break;
-
+                case 10:
+                    if (props.isNative) {
+                        calculateNativeOptimism();
+                    } else if (!props.isNativeFee) {
+                        calculateTokenAndPayNativeBSC();
+                    } else {
+                        calculateTokenAndPayTokenBsc();
+                    }
+                    break;
             default:
                 if (props.isNative) {
                     calculateNative();
