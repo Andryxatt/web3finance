@@ -111,7 +111,6 @@ const TxHistory = () => {
                 const depositTx = await contractFeeShare.queryFilter(depositFilter,0, "latest");
                 const multiSendFeeTx = await contractFeeShare.queryFilter(multiSendFeeFilter,0, "latest");
                 const txHist = [...multiSendTokenTx, ...withdrawTx, ...depositTx, ...multiSendFeeTx].sort((a: any, b: any) => b.blockNumber - a.blockNumber);
-                console.log("txHist", txHist)
                 for (let i = 0; i < txHist.length; i++) {
                     const block = await provider.getBlock(txHist[i].blockNumber);
                     const newElem = { id: i + 1, timestamp: block.timestamp, transactionHash: txHist[i].transactionHash, event: txHist[i].event, blockNumber: txHist[i].blockNumber, data: txHist[i].data }
