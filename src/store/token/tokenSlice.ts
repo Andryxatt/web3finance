@@ -669,7 +669,7 @@ export const currentTokensList = (state: RootState) => {
       }
       else if (state.token.filterBy === "Inactive") {
         return state.token.polygonTokens.filter((token: Token) => {
-          return token.isStablecoin && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
+          return token.inactive && token.name.toLowerCase().includes(state.token.searchField.toLowerCase());
         });
       }
       else if (state.token.filterBy === "Deposited") {
