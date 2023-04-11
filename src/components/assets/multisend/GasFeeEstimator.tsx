@@ -11,7 +11,6 @@ const GasFeeEstimator = (props: any) => {
   // const nativeTokenPrice = useAppSelector(nativeBalance);
   const { chain } = useNetwork();
   const [selectedSpeed, setSelectedSpeed] = useState("Average");
-  const [subscribed] = useState(false);
   const historicalBlocks = 20;
   const infuraApiKey = process.env.REACT_APP_INFURA_KEY;
   const providerUrls = {
@@ -192,7 +191,6 @@ const GasFeeEstimator = (props: any) => {
       },
 
     ]
-    console.log(chain.id)
     if (chain.id === 97 || chain.id === 56) {
       dispatch(getNetworkPriority(speeds))
       dispatch(setSelectedPriority(speeds[1]));
@@ -202,30 +200,30 @@ const GasFeeEstimator = (props: any) => {
       dispatch(setSelectedPriority(speedsOptimism[1]));
     }
     else {
+      console.log('chain', chain)
       feeCalculate();
       const web3 = new Web3(Web3.givenProvider);
       var subscription = web3.eth.subscribe('newBlockHeaders', function (error, result) {
-        console.log('Subscribed!');
-        if (!error) {
-          feeCalculate()
+        if (error) {
+   
+          console.error(error);
+        } else {
+          console.log('Successfully subscribed!');
+          console.log(result);
+          feeCalculate();
         }
       })
-      // if(!subscribed){
-      //   subscription.unsubscribe(function (error, success) {
-      //     if (success)
-      //       console.log('Successfully unsubscribed!');
-      //   });
-      // }
       return () => {
-        subscription.unsubscribe(function (error, success) {
-          if (success)
-            console.log('Successfully unsubscribed!');
-        });
+         subscription.unsubscribe(function (error, success) {
+           if (success)
+             console.log('Successfully unsubscribed!');
+         });
       }
     }
+    
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subscribed])
-
+  }, [])
+ 
   const selectPriority = async (e: any) => {
     setSelectedSpeed(e.speedName);
     dispatch(updateSpeedSelected(e.speedName));

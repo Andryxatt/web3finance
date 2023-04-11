@@ -776,7 +776,7 @@ export const nativeBalance = (state: RootState) => {
     137: state.token.avalancheTokens,
     // 80001: state.token.mumbaiTokens,
     42161:state.token.arbitrumTokens,
-    43115: state.token.avalancheTokens,
+    43114: state.token.avalancheTokens,
   };
 
   const selectedNetworkId = state.network.selectedNetwork.id;
@@ -834,7 +834,11 @@ export const fetchTokensPricesOptimism = createAsyncThunk(
   'token/getTokensPricesOptimism',
   async (args: any, { getState }) => {
     const state = getState() as any;
-    const providerOptimism = new ethers.providers.JsonRpcProvider('https://optimism-mainnet.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
+    //providerInfura
+    // const providerOptimism = new ethers.providers.JsonRpcProvider('https://optimism-mainnet.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
+   //provider Alchemy
+    const providerOptimism = new ethers.providers.JsonRpcProvider('https://opt-mainnet.g.alchemy.com/v2/IZcTWl8yY9G_lnKiSJupPvSI-Q752SXj');
+    
     const contractOptimism = new Contract(contractsAddresses["Optimism"][0].PriceOracle, OracleAbi, providerOptimism);
     const assetsPrices = await contractOptimism.getAssetsPrices(state.token.optimismTokens.map((token: any) => token.address));
     const newOptimism = state.token.optimismTokens.map(async (token: any, index:number) => {
@@ -1073,7 +1077,7 @@ export const fetchUserBalanceOptimism = createAsyncThunk(
   async (data: any, { getState }) => {
     const state = getState() as any;
     const { address } = data;
-    const provider = new ethers.providers.JsonRpcProvider('https://optimism-mainnet.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
+    const provider = new ethers.providers.JsonRpcProvider('https://opt-mainnet.g.alchemy.com/v2/IZcTWl8yY9G_lnKiSJupPvSI-Q752SXj');
     const newTokens = state.token.optimismTokens.map(async (token: Token) => {
       const contractRToken = new Contract(contractsAddresses["Optimism"][0]["r" + token.name], RTokenAbi, provider);
       if (token.isNative) {

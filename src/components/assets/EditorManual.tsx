@@ -52,7 +52,7 @@ const EditorManual = () => {
         theme: myTheme
     });
     const showExample = () => {
-        let exampleAddress = "0x5E8aC7D1BC6214e4CF2bE9dA175b9b9Ec1B94102, 0.1 \n0x4A7Df03838d2A4c9A9B81a3a0099dF500c0Bb102, 0.01 \n0x6538E7d6e90c14FC19045765BB474A6D781c5075, 0.03";
+        let exampleAddress = "0x5E8aC7D1BC6214e4CF2bE9dA175b9b9Ec1B94102, 0.00000001 \n0x4A7Df03838d2A4c9A9B81a3a0099dF500c0Bb102, 0.0000000001 \n0x6538E7d6e90c14FC19045765BB474A6D781c5075, 0.0000000000003";
         setCodeMirrorElement(exampleAddress)
     }
     const validate = useCallback(() => {

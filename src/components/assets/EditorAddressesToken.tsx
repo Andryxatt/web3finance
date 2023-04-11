@@ -70,7 +70,6 @@ const EditorAddressesToken = (props: any) => {
             }
         })
         validateAddressContract().then((res) => {
-            console.log(res, "validateAddressContract")
             if (res) {
                 setIsValidate(true);
                 setMessageErrorAddress("");

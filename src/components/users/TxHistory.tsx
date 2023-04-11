@@ -25,7 +25,7 @@ const TxHistory = () => {
             //     provider = new ethers.providers.JsonRpcProvider(`https://goerli.infura.io/v3/${infuraApiKey}`);
             //     break;
             case 10:
-                provider = new ethers.providers.JsonRpcProvider(`https://optimism-mainnet.infura.io/${infuraApiKey}`);
+                provider = new ethers.providers.JsonRpcProvider(`https://opt-mainnet.g.alchemy.com/v2/IZcTWl8yY9G_lnKiSJupPvSI-Q752SXj`);
                 break;
             case 56:
                 provider = new ethers.providers.JsonRpcProvider(`https://bsc.getblock.io/27578ce8-1ff1-4602-bbf2-127f8edcfc9f/mainnet/`);
@@ -49,7 +49,7 @@ const TxHistory = () => {
                 break;
         }
         console.log("chain", chain.name)
-        if(chain){
+        if (chain) {
             let name = "";
             switch (chain.name) {
                 case "BNB Smart Chain":
@@ -67,53 +67,51 @@ const TxHistory = () => {
 
             }
             const contractFeeShare = new ethers.Contract(contractAddresses[name][0].FeeShare, FeeShareAbi, provider);
-           console.log("contractFeeShare", contractFeeShare)
+            console.log("contractFeeShare", contractFeeShare)
             const depositFilter = contractFeeShare.filters.Deposit(address, null);
             const withdrawFilter = contractFeeShare.filters.Withdraw(address, null);
             const multiSendFeeFilter = contractFeeShare.filters.FeeDetails(address, null, null, null, null);
             const multiSendTokenFilter = contractFeeShare.filters.MultiSend(address, null)
             console.log("multiSendTokenFilter", multiSendTokenFilter)
-            if(chain.name === "BNB Smart Chain"){
-               const blockNumber = await provider.getBlockNumber()
-                const countQueries =  Math.ceil((blockNumber - 27120421) / 5000);
+            if (chain.name === "BNB Smart Chain") {
+                const blockNumber = await provider.getBlockNumber()
+                const countQueries = Math.ceil((blockNumber - 27120421) / 5000);
                 let startBlock = 27120421;
                 let endBlock = startBlock + 5000;
                 let txHist = [];
-             for(let i = 0; i < countQueries; i++){
-                const multiSendTokenTx = await contractFeeShare.queryFilter(multiSendTokenFilter, startBlock, endBlock);
-                // const multiSendNativeTx = await contractFeeShare.queryFilter(multiSendNativeFilter, 8415257,  latestBlockNumber);
-                const withdrawTx = await contractFeeShare.queryFilter(withdrawFilter,startBlock, endBlock);
-                const depositTx = await contractFeeShare.queryFilter(depositFilter,startBlock, endBlock);
-                const multiSendFeeTx = await contractFeeShare.queryFilter(multiSendFeeFilter,startBlock, endBlock);
-                startBlock = endBlock;
-                endBlock = startBlock + 5000;
-                const array = [...multiSendTokenTx, ...withdrawTx, ...depositTx, ...multiSendFeeTx]
-                txHist = [...txHist, ...array]
-             }
-             console.log("txHist", txHist)
-             for (let i = 0; i < txHist.length; i++) {
-                const block = await provider.getBlock(txHist[i].blockNumber);
-                const newElem = { id: i + 1, timestamp: block.timestamp, transactionHash: txHist[i].transactionHash, event: txHist[i].event, blockNumber: txHist[i].blockNumber, data: txHist[i].data }
-                txArray.push(newElem)
-            }
-            dispatch(loadTransactionHistory(txArray))
-            setLoading(false)
+                for (let i = 0; i < countQueries; i++) {
+                    const multiSendTokenTx = await contractFeeShare.queryFilter(multiSendTokenFilter, startBlock, endBlock);
+                    // const multiSendNativeTx = await contractFeeShare.queryFilter(multiSendNativeFilter, 8415257,  latestBlockNumber);
+                    const withdrawTx = await contractFeeShare.queryFilter(withdrawFilter, startBlock, endBlock);
+                    const depositTx = await contractFeeShare.queryFilter(depositFilter, startBlock, endBlock);
+                    const multiSendFeeTx = await contractFeeShare.queryFilter(multiSendFeeFilter, startBlock, endBlock);
+                    startBlock = endBlock;
+                    endBlock = startBlock + 5000;
+                    const array = [...multiSendTokenTx, ...withdrawTx, ...depositTx, ...multiSendFeeTx]
+                    txHist = [...txHist, ...array]
+                }
+                for (let i = 0; i < txHist.length; i++) {
+                    const block = await provider.getBlock(txHist[i].blockNumber);
+                    const newElem = { id: i + 1, timestamp: block.timestamp, transactionHash: txHist[i].transactionHash, event: txHist[i].event, blockNumber: txHist[i].blockNumber, data: txHist[i].data }
+                    txArray.push(newElem)
+                }
+                dispatch(loadTransactionHistory(txArray))
+                setLoading(false)
             }
             else {
- 
                 const depositFilter = contractFeeShare.filters.Deposit(address, null);
                 const withdrawFilter = contractFeeShare.filters.Withdraw(address, null);
                 const multiSendFeeFilter = contractFeeShare.filters.FeeDetails(address, null, null, null, null);
                 const multiSendTokenFilter = contractFeeShare.filters.MultiSend(address, null)
-                const multiSendTokenTx = await contractFeeShare.queryFilter(multiSendTokenFilter,0, "latest");
+                const multiSendTokenTx = await contractFeeShare.queryFilter(multiSendTokenFilter, 0, "latest");
                 // const multiSendNativeTx = await contractFeeShare.queryFilter(multiSendNativeFilter, 8415257,  latestBlockNumber);
-                const withdrawTx = await contractFeeShare.queryFilter(withdrawFilter,0, "latest");
-                const depositTx = await contractFeeShare.queryFilter(depositFilter,0, "latest");
-                const multiSendFeeTx = await contractFeeShare.queryFilter(multiSendFeeFilter,0, "latest");
+                const withdrawTx = await contractFeeShare.queryFilter(withdrawFilter, 0, "latest");
+                const depositTx = await contractFeeShare.queryFilter(depositFilter, 0, "latest");
+                const multiSendFeeTx = await contractFeeShare.queryFilter(multiSendFeeFilter, 0, "latest");
                 const txHist = [...multiSendTokenTx, ...withdrawTx, ...depositTx, ...multiSendFeeTx].sort((a: any, b: any) => b.blockNumber - a.blockNumber);
                 for (let i = 0; i < txHist.length; i++) {
                     const block = await provider.getBlock(txHist[i].blockNumber);
-                    const newElem = { id: i + 1, timestamp: block.timestamp, transactionHash: txHist[i].transactionHash, event: txHist[i].event, blockNumber: txHist[i].blockNumber, data: txHist[i].data }
+                    const newElem = { id: i + 1, timestamp: block.timestamp, transactionHash: txHist[i].transactionHash, event: txHist[i].event, blockNumber: txHist[i].blockNumber, data: txHist[i].data, txLink: `https://${chain.name.toLowerCase()}.etherscan.io/tx/${txHist[i].transactionHash}` }
                     txArray.push(newElem)
                 }
                 dispatch(loadTransactionHistory(txArray))
