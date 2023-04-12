@@ -13,6 +13,33 @@ const TxHistory = () => {
     const { chain } = useNetwork()
     const [loading, setLoading] = useState(true);
     const infuraApiKey = process.env.REACT_APP_INFURA_KEY;
+    const [selectedScanName, setSelectedScanName] = useState<any>();
+    const scans = [
+        {
+            name: "etherscan",
+            url: "https://etherscan.io/tx/"
+        },
+        {
+            name: "bscscan",
+            url: "https://bscscan.com/tx/"
+        },
+        {
+            name: "polygonscan",
+            url: "https://polygonscan.com/tx/"
+        },
+        {
+            name: "arbiscan",
+            url: "https://arbiscan.io/tx/"
+        },
+        {
+            name: "optimisscans",
+            url: "https://optimistic.etherscan.io/tx/"
+        },
+        {
+            name: "avaxscan",
+            url: "https://snowtrace.io/tx/"
+        }
+    ]
     const getTxHistory = async () => {
         const txArray = [];
         let provider = undefined;
@@ -20,30 +47,36 @@ const TxHistory = () => {
         switch (chain.id) {
             case 1:
                 provider = new ethers.providers.JsonRpcProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
+                setSelectedScanName(scans[0])
                 break;
             // case 5:
             //     provider = new ethers.providers.JsonRpcProvider(`https://goerli.infura.io/v3/${infuraApiKey}`);
             //     break;
             case 10:
                 provider = new ethers.providers.JsonRpcProvider(`https://opt-mainnet.g.alchemy.com/v2/IZcTWl8yY9G_lnKiSJupPvSI-Q752SXj`);
+                setSelectedScanName(scans[4])
                 break;
             case 56:
                 provider = new ethers.providers.JsonRpcProvider(`https://bsc.getblock.io/27578ce8-1ff1-4602-bbf2-127f8edcfc9f/mainnet/`);
+                setSelectedScanName(scans[1])
                 break;
             case 97:
                 provider = new ethers.providers.JsonRpcProvider(`https://bsc.getblock.io/27578ce8-1ff1-4602-bbf2-127f8edcfc9f/testnet/`);
                 break;
             case 137:
                 provider = new ethers.providers.JsonRpcProvider(`https://polygon-mainnet.infura.io/v3/4f36124f93704ca1a5bc5e78ffac2245`);
+                setSelectedScanName(scans[2])
                 break;
             // case 80001:
             //     provider = new ethers.providers.JsonRpcProvider(`https://polygon-mumbai.infura.io/v3/${infuraApiKey}`);
             //     break;
             case 42161:
                 provider = new ethers.providers.JsonRpcProvider(`https://arbitrum-mainnet.infura.io/v3/${infuraApiKey}`);
+                setSelectedScanName(scans[3])
                 break;
             case 43114:
                 provider = new ethers.providers.JsonRpcProvider(`https://avalanche-mainnet.infura.io/v3/${infuraApiKey}`);
+                setSelectedScanName(scans[5])
                 break;
             default:
                 break;
@@ -158,7 +191,7 @@ const TxHistory = () => {
                                     <td className='px-6 py-4'>{tx.id}</td>
                                     <td className='px-6 py-4'>{new Date(tx.timestamp * 1000).toLocaleDateString("en-US")}</td>
                                     <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{tx.event === "FeeDetails" ? "MultiSendFee" : tx.event}</td>
-                                    <td className='px-6 py-4'><a className='text-blue-900 hover:underline ' href={`https://goerli.etherscan.io/tx/${tx.transactionHash}`} target="_blank" rel="noreferrer">{`${tx.transactionHash}`.substring(0, 20)}...{`${tx.transactionHash}`.substring(`${tx.transactionHash}`.length - 4)}`{ }</a></td>
+                                    <td className='px-6 py-4'><a className='text-blue-900 hover:underline ' href={`${selectedScanName.url}${tx.transactionHash}`} target="_blank" rel="noreferrer">{`${tx.transactionHash}`.substring(0, 20)}...{`${tx.transactionHash}`.substring(`${tx.transactionHash}`.length - 4)}`{ }</a></td>
                                 </tr>
                             )
                         })}

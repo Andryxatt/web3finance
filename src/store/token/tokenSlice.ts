@@ -1336,18 +1336,24 @@ export const fetchUserBalanceSingleToken = createAsyncThunk(
   }
 )
 export const fetchTokensPricesSingleToken = createAsyncThunk(
-  'token/getTokensPricesSingleToken',
+  'token/fetchTokensPricesSingleToken',
   async (args: any, { getState }) => {
-    const { token, networkName, provider } = args;
-    const tokenContract = new Contract(contractsAddresses[networkName][0]["r" + token.name], RTokenAbi, provider);
-    const totalDeposits = await tokenContract.totalSupply();
-    const decimals = await tokenContract.decimals();
-    const newToken = { ...token, deposits: token.isNative ? "-" : ethers.utils.formatUnits(totalDeposits, decimals) };
+    try {
+      const { token, networkName, provider } = args;
+      const contractAddress = contractsAddresses[networkName][0]['r' + token.name];
+      const tokenContract = new Contract(contractAddress, RTokenAbi, provider);
+      const totalSupply = await tokenContract.totalSupply();
+      const decimals = await tokenContract.decimals();
+      const deposits = token.isNative ? '-' : ethers.utils.formatUnits(totalSupply, decimals);
+      const newToken = { ...token, deposits };
 
-    Promise.resolve(newToken);
-    return { token: newToken, network: networkName }
+      return { token: newToken, network: networkName };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
-)
+);
 // export const fetchUserBalanceMumbai = createAsyncThunk(
 //   'token/getUserBalanceMumbai',
 //   async (data: any, { getState }) => {
