@@ -5,6 +5,7 @@ export interface NetworkState {
   selectedNetwork: any;
   status: 'idle' | 'loading' | 'failed';
 }
+
 const initialState: NetworkState = {
   value: [
     {

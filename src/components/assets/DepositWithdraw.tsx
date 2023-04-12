@@ -8,84 +8,31 @@ import { currentNetwork } from "../../store/network/networkSlice";
 import { useAppSelector } from "../../store/hooks";
 import { fetchSigner } from '@wagmi/core'
 import { useAccount } from "wagmi";
-// import {
-//     fetchTokensPricesArbitrum,
-//     fetchUserBalanceArbitrum,
-//     fetchTokensPricesAvalanche,
-//     fetchTokensPricesBsc,
-//     fetchTokensPricesEth,
-//     fetchTokensPricesOptimism,
-//     fetchTokensPricesPolygon,
-//     fetchUserBalanceAvalanche,
-//     fetchUserBalanceBsc,
-//     fetchUserBalanceEth,
-//     fetchUserBalanceOptimism,
-//     fetchUserBalancePolygon
-// } from "../../store/token/tokenSlice";
 const DepositWithdraw = (props: any) => {
-    // const dispatch = useAppDispatch();
-    // const provider = useProvider()
     const network = useAppSelector(currentNetwork);
     const [ammount, setAmmount] = useState(0);
     //provider wagmi
     const { address } = useAccount();
-    // const [feeShareAddress, setFeeShareAddress] = useState()
-    // useEffect(() => {
-    //     if (network) {
-    //         setFeeShareAddress(contractsAddresses[network.name][0].FeeShare)
+    // const updateToken = () => {
+    //     if(isConnected && provider && network){
+    //         dispatch(fetchUserBalanceSingleToken({address,token,networkName, provider}))
+    //             // dispatch(fetchTokensPricesSingleToken({token, networkName}))
+               
     //     }
-    // }, [network])
+    // }
+    // useEffect(()=>{
+    //     updateToken()
+    // },[updated])
+
     // useContractEvent({
     //     address: feeShareAddress,
     //     abi: FeeShareAbi,
     //     eventName: 'Deposit',
     //     listener(node, label, owner) {
-    //         if (isConnected && network.id === 1) {
-    //             dispatch(fetchTokensPricesEth({})).then(() => {
-    //                 dispatch(fetchUserBalanceEth({ provider, address }))
-    //             })
-    //         }
-    //         // if (isConnected && network.id === 5) {
-    //         //     dispatch(fetchTokensPricesGoerli({})).then(() => {
-    //         //         dispatch(fetchUserBalanceGoerli({ provider, address }))
-    //         //     })
-    //         // }
-    //         if (isConnected && network.id === 10) {
-    //             dispatch(fetchTokensPricesOptimism({})).then(() => {
-    //                 dispatch(fetchUserBalanceOptimism({ provider, address }))
-    //             })
-    //         }
-    //         if (isConnected && network.id === 56) {
-    //             dispatch(fetchTokensPricesBsc({})).then(() => {
-    //                 dispatch(fetchUserBalanceBsc({ provider, address }))
-    //             })
-    //         }
-    //         // if (isConnected && network.id === 97) {
-    //         //     dispatch(fetchTokensPricesBscT({})).then(() => {
-    //         //         dispatch(fetchUserBalanceBscT({ provider, address }))
-    //         //     })
-    //         // }
-    //         if (isConnected && network.id === 137) {
-    //             dispatch(fetchTokensPricesPolygon({})).then(() => {
-    //                 dispatch(fetchUserBalancePolygon({ provider, address }))
-    //             })
-    //         }
-    //         // if (isConnected && network.id === 80001) {
-    //         //     dispatch(fetchTokensPricesMumbai({})).then(() => {
-    //         //         dispatch(fetchUserBalanceMumbai({ provider, address }))
-    //         //     })
-    //         // }
-    //         if (isConnected && network.id === 42161) {
-    //             dispatch(fetchTokensPricesArbitrum({})).then(() => {
-    //                 dispatch(fetchUserBalanceArbitrum({ provider, address }))
-    //             })
-    //         }
-    //         if (isConnected && network.id === 43114) {
-    //             dispatch(fetchTokensPricesAvalanche({})).then(() => {
-    //                 dispatch(fetchUserBalanceAvalanche({ provider, address }))
-    //             })
-    //         }
-    //     },
+           
+    //     }
+               
+    //         },
     //     once: true,
     // })
     // useContractEvent({
@@ -93,50 +40,10 @@ const DepositWithdraw = (props: any) => {
     //     abi: FeeShareAbi,
     //     eventName: 'Withdraw',
     //     listener(node, label, owner) {
-    //         if (isConnected && network.id === 1) {
-    //             dispatch(fetchTokensPricesEth({})).then(() => {
-    //                 dispatch(fetchUserBalanceEth({ provider, address }))
-    //             })
-    //         }
-    //         // if (isConnected && network.id === 5) {
-    //         //     dispatch(fetchTokensPricesGoerli({})).then(() => {
-    //         //         dispatch(fetchUserBalanceGoerli({ provider, address }))
-    //         //     })
-    //         // }
-    //         if (isConnected && network.id === 10) {
-    //             dispatch(fetchTokensPricesOptimism({})).then(() => {
-    //                 dispatch(fetchUserBalanceOptimism({ provider, address }))
-    //             })
-    //         }
-    //         if (isConnected && network.id === 56) {
-    //             dispatch(fetchTokensPricesBsc({})).then(() => {
-    //                 dispatch(fetchUserBalanceBsc({ provider, address }))
-    //             })
-    //         }
-    //         // if (isConnected && network.id === 97) {
-    //         //     dispatch(fetchTokensPricesBscT({})).then(() => {
-    //         //         dispatch(fetchUserBalanceBscT({ provider, address }))
-    //         //     })
-    //         // }
-    //         if (isConnected && network.id === 137) {
-    //             dispatch(fetchTokensPricesPolygon({})).then(() => {
-    //                 dispatch(fetchUserBalancePolygon({ provider, address }))
-    //             })
-    //         }
-    //         // if (isConnected && network.id === 80001) {
-    //         //     dispatch(fetchTokensPricesMumbai({})).then(() => {
-    //         //         dispatch(fetchUserBalanceMumbai({ provider, address }))
-    //         //     })
-    //         // }
-    //         if (isConnected && network.id === 42161) {
-    //             dispatch(fetchTokensPricesArbitrum({})).then(() => {
-    //                 dispatch(fetchUserBalanceArbitrum({ provider, address }))
-    //             })
-    //         }
-    //         if (isConnected && network.id === 43114) {
-    //             dispatch(fetchTokensPricesAvalanche({})).then(() => {
-    //                 dispatch(fetchUserBalanceAvalanche({ provider, address }))
-    //             })
+    //         if(isConnected){
+    //             dispatch(fetchUserBalanceSingleToken({address,token,networkName, provider})).then(()=>{
+    //                 dispatch(fetchTokensPricesSingleToken({token, networkName, provider}))
+    //                })
     //         }
     //     },
     //     once: true,
@@ -151,7 +58,7 @@ const DepositWithdraw = (props: any) => {
         let checkAllowance = await contract.allowance(address, contractsAddresses[network.name][0].FeeShare);
         let feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         if (ethers.utils.formatUnits(checkAllowance._hex.toString(), token.decimals) < amount!.toString()) {
-            const idToastApprove = toast.loading("Approving please wait...")
+            const idToastApprove = toast.loading("Approving please wait...", {autoClose:5000})
             await contract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(amount!.toString(), token.decimals))
                 .then((res: any) => {
                     res.wait().then(async (receipt: any) => {
@@ -160,6 +67,7 @@ const DepositWithdraw = (props: any) => {
                         await feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                             result.wait().then(async (recept: any) => {
                                 toast.update(idToastDepositApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                               
                             })
                         }).catch((err: any) => {
                             toast.update(idToastDepositApprove, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -174,7 +82,7 @@ const DepositWithdraw = (props: any) => {
             feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-
+                    
                 })
             }).catch((err: any) => {
                 toast.update(idToast2, { render: "Your transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -198,6 +106,7 @@ const DepositWithdraw = (props: any) => {
             feeShare.withdraw(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals), { gasLimit: "210000" }).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToastWithdraw, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                    
                 }).catch((err: any) => {
                     toast.update(idToastWithdraw, { render: "Transaction rejected", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })

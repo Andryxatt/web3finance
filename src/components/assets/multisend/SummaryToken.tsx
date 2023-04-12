@@ -57,7 +57,6 @@ export function SummaryToken(props: any) {
     const [userTokenBalance, setUserTokenBalance] = useState("0");
     const [tokenDecimals, setTokenDecimals] = useState(0);
     const [tokenSymbol, setTokenSymbol] = useState("");
-    const [maxFeePerGas, setMaxFeePerGas] = useState<any>();
     const calculateTokenAndPayNative = async () => {
         setIsCalculated(false);
         setLoading(false);
@@ -113,27 +112,26 @@ export function SummaryToken(props: any) {
                 const feePerAddressNative = ethers.utils.parseUnits("200000000000000000", 'wei');
                 const msgValue = feePerAddressNative;
                 const gasPrice = await provider.getFeeData();
-                setMaxFeePerGas(gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas))
                 const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas)
                 const txInfo = {
                     value: msgValue,
                     "maxFeePerGas": feePerGas,
                     "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')
                 }
-              
+
                 const isApproved = await tokenErc20.allowance(address, contractsAddresses[network.name][0].FeeShare);
-                if (ethers.utils.formatUnits(ammountT,decimals) > userBalanceToken) {
+                if (ethers.utils.formatUnits(ammountT, decimals) > userBalanceToken) {
                     setError(true);
                     setErrorMessage(`You don't have enough tokens to send transaction. Need ${ethers.utils.formatUnits(ammountT, decimals)} ${symbol} but you have ${userBalanceToken} ${symbol}`)
                     setLoading(false);
                     setIsCalculated(true);
                 }
-                if (+ethers.utils.formatUnits(isApproved, decimals) >= +ethers.utils.formatUnits(ammountT,decimals)) {
+                if (+ethers.utils.formatUnits(isApproved, decimals) >= +ethers.utils.formatUnits(ammountT, decimals)) {
                     const txInform = {
                         method: "multiSend(address,address[],uint256[])",
                         token: props.tokenAddress,
                         addressesToSend: addressesArray,
-                        finalAmount:ammountT,
+                        finalAmount,
                         txInfo,
                         isApproved: true
                     }
@@ -175,29 +173,17 @@ export function SummaryToken(props: any) {
                             method: "multiSend(address,address[],uint256[])",
                             token: props.tokenAddress,
                             addressesToSend: addressesArray,
-                            finalAmount:ammountT,
+                            finalAmount,
                             txInfo,
                             isApproved: false
                         }
                         const unitsUsed = await tokenErc20.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountT);
-                        if (totalFee > native[0].userBalance) {
-                            setAmmount(ethers.utils.formatUnits(ammountT, decimals));
-                            setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
-                            setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
-                            setTxToSend(txInform);
-                            setErrorMessage("You don't have enough balance to pay the fee")
-                            setError(true);
-                            setLoading(false);
-                            setIsCalculated(true);
-                        }
-                        else {
-                            setAmmount(ethers.utils.formatUnits(ammountT, decimals));
-                            setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
-                            setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
-                            setTxToSend(txInform);
-                            setLoading(false);
-                            setIsCalculated(true);
-                        }
+                        setAmmount(ethers.utils.formatUnits(ammountT, decimals));
+                        setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
+                        setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setTxToSend(txInform);
+                        setLoading(false);
+                        setIsCalculated(true);
                         if (addressesAndAmounts.length === 0) {
                             setTotalTransactions(0)
                         }
@@ -218,6 +204,7 @@ export function SummaryToken(props: any) {
             setIsCalculated(true);
         }
     }
+
     const calculateTokenAndPayNativeBSC = async () => {
         console.log("calculateTokenAndPayNativeBSC")
         setIsCalculated(false);
@@ -263,7 +250,7 @@ export function SummaryToken(props: any) {
                 });
             }
             setTotalAddressesPerTx(addressesArray.length);
-            
+
             const finalAmount = amountsArray.map((item: any) => {
                 return ethers.utils.parseUnits(item);
             });
@@ -271,15 +258,14 @@ export function SummaryToken(props: any) {
             setAmmount(ethers.utils.formatUnits(ammountT, decimals));
             const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
             const gasPrice = await signer.provider.getGasPrice();
-            console.log("gasPrice", gasPrice)
             const txInfo = {
                 value: msgValue,
                 gasPrice
             }
-          
+
             const tokenContract = new Contract(props.tokenAddress, RTokenAbi, signer);
             const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
-            if (+ethers.utils.formatUnits(ammountT,decimals) > +ethers.utils.formatUnits(userBalanceToken,decimals) ) {
+            if (+ethers.utils.formatUnits(ammountT, decimals) >= +ethers.utils.formatUnits(userBalanceToken, decimals)) {
                 setError(true);
                 setErrorMessage(`You don't have enough tokens to send transaction. Need ${ethers.utils.formatUnits(ammountT, decimals)} ${symbol} but you have ${userBalanceToken} ${symbol}`)
                 setLoading(false);
@@ -290,7 +276,7 @@ export function SummaryToken(props: any) {
                     method: "multiSend(address,address[],uint256[])",
                     token: props.tokenAddress,
                     addressesToSend: addressesArray,
-                    finalAmount:ammountT,
+                    finalAmount,
                     txInfo,
                     isApproved: true
                 }
@@ -325,7 +311,7 @@ export function SummaryToken(props: any) {
                     method: "multiSend(address,address[],uint256[])",
                     token: props.tokenAddress,
                     addressesToSend: addressesArray,
-                    finalAmount:ammountT,
+                    finalAmount,
                     txInfo,
                     isApproved: false
                 }
@@ -402,22 +388,22 @@ export function SummaryToken(props: any) {
                 value: msgValue,
                 gasPrice
             }
-          
+
             const tokenContract = new Contract(props.tokenAddress, RTokenAbi, signer);
             const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
-            console.log(ethers.utils.formatUnits(ammountT,decimals), ethers.utils.formatUnits(userBalanceToken,decimals))
-            if (ethers.utils.formatUnits(ammountT,decimals) > ethers.utils.formatUnits(userBalanceToken,decimals)) {
+            console.log(ethers.utils.formatUnits(ammountT, decimals), ethers.utils.formatUnits(userBalanceToken, decimals))
+            if (ethers.utils.formatUnits(ammountT, decimals) > ethers.utils.formatUnits(userBalanceToken, decimals)) {
                 setError(true);
                 setErrorMessage(`You don't have enough tokens to send transaction. Need ${ethers.utils.formatUnits(ammountT, decimals)} ${symbol} but you have ${userBalanceToken} ${symbol}`)
                 setLoading(false);
                 setIsCalculated(true);
             }
-            if (+ethers.utils.formatUnits(isApproved,tokenDecimals) >= +ethers.utils.formatUnits(ammountT,tokenDecimals)) {
+            if (+ethers.utils.formatUnits(isApproved, tokenDecimals) >= +ethers.utils.formatUnits(ammountT, tokenDecimals)) {
                 const txInform = {
                     method: "multiSend(address,address[],uint256[])",
-                    token: props.token.address,
+                    token: props.tokenAddress,
                     addressesToSend: addressesArray,
-                    finalAmount:ammountT,
+                    finalAmount,
                     txInfo,
                     isApproved: true
                 }
@@ -447,12 +433,11 @@ export function SummaryToken(props: any) {
                 }
             }
             else {
-
                 const txInform = {
                     method: "multiSend(address,address[],uint256[])",
                     token: props.tokenAddress,
                     addressesToSend: addressesArray,
-                    finalAmount:ammountT,
+                    finalAmount,
                     txInfo,
                     isApproved: false
                 }
@@ -485,20 +470,15 @@ export function SummaryToken(props: any) {
             feeShare[txToSend.method](props.tokenAddress, txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
                 tx.wait().then((receipt: any) => {
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                  if(network.id === 56) {
-                        // dispatch(fetchUserBalanceBsc({ provider, address }))
-                        dispatch(removeSendedAddress(txToSend.addressesToSend.length))
+                    dispatch(removeSendedAddress(txToSend.addressesToSend.length))
+                    if (network.id === 56) {
                         calculateTokenAndPayNativeBSC();
                     }
-                    else if(network.id === 10) {
-                        // dispatch(fetchUserBalanceBscTest({ provider, address }))
-                        dispatch(removeSendedAddress(txToSend.addressesToSend.length))
+                    else if (network.id === 10) {
                         calculateTokenAndPayNativeOptimism();
                     }
                     else {
-                            // dispatch(fetchUserBalanceGoerli({ provider, address }))
-                            dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                            calculateTokenAndPayNative();
+                        calculateTokenAndPayNative();
                     }
                 }).catch((err: any) => {
                     console.log(err, "err")
@@ -511,78 +491,42 @@ export function SummaryToken(props: any) {
         }
         else {
             const approveToast = toast.loading("Approving please wait...")
-            if (network.id === 97) {
-                const gasPrice = await provider.getGasPrice();
-                tokenErc20.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, decimals), gasPrice).then((res: any) => {
-                    res.wait().then(async (receipt: any) => {
-                        toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                        setTxToSend({ ...txToSend, isApproved: true });
-                        if(network.id === 56) {
-                            // dispatch(fetchUserBalanceBsc({ provider, address }))
-                            dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                            calculateTokenAndPayNativeBSC();
-                        }
-                        else if(network.id === 10) {
-                            // dispatch(fetchUserBalanceBscTest({ provider, address }))
-                            dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                            calculateTokenAndPayNativeOptimism();
-                        }
-                        else {
-                                // dispatch(fetchUserBalanceGoerli({ provider, address }))
-                                dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                                calculateTokenAndPayNative();
-                        }
-                    }).catch((err: any) => {
-                        toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                    });
+            const gasPrice = await provider.getGasPrice();
+            tokenErc20.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, decimals), gasPrice).then((res: any) => {
+                res.wait().then(async (receipt: any) => {
+                    toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                    setTxToSend({ ...txToSend, isApproved: true });
+                    dispatch(removeSendedAddress(txToSend.addressesToSend.length))
+                    if (network.id === 56) {
+                        calculateTokenAndPayNativeBSC();
+                    }
+                    else if (network.id === 10) {
+                        calculateTokenAndPayNativeOptimism();
+                    }
+                    else {
+                        calculateTokenAndPayNative();
+                    }
                 }).catch((err: any) => {
                     toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                })
-            }
-            else {
-                tokenErc20.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, decimals), { "maxFeePerGas": maxFeePerGas, "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei') }).then((res: any) => {
-                    res.wait().then(async (receipt: any) => {
-                        toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                        setTxToSend({ ...txToSend, isApproved: true });
-                        if(network.id === 56) {
-                            // dispatch(fetchUserBalanceBsc({ provider, address }))
-                            dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                            calculateTokenAndPayNativeBSC();
-                        }
-                        else if(network.id === 10) {
-                            // dispatch(fetchUserBalanceBscTest({ provider, address }))
-                            dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                            calculateTokenAndPayNativeOptimism();
-                        }
-                        else {
-                                // dispatch(fetchUserBalanceGoerli({ provider, address }))
-                                dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                                calculateTokenAndPayNative();
-                        }
-                    }).catch((err: any) => {
-                        toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                    });
-                }).catch((err: any) => {
-                    toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                })
-            }
+                });
+            }).catch((err: any) => {
+                toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            })
         }
     }
     useEffect(() => {
         console.log("networkSpeed", networkSpeed)
-        if(networkSpeed){
+        if (networkSpeed) {
             if (network.id === 97 || network.id === 56) {
                 calculateTokenAndPayNativeBSC()
             }
-            else if(network.id === 10){
+            else if (network.id === 10) {
                 calculateTokenAndPayNativeOptimism()
             }
             else {
                 calculateTokenAndPayNative()
             }
         }
-            
-
     }, [addressesAndAmounts, networkSpeed]) // eslint-disable-line react-hooks/exhaustive-deps
     const sendTransaction = async () => {
         sendTokenAndPayNative()
@@ -599,7 +543,7 @@ export function SummaryToken(props: any) {
                             <div className="flex flex-col w-full">
                                 <div className="px-3 py-3 flex flex-col border-b-2">
                                     <span className="text-xl text-blue-900 font-bold">
-                                        { totalAddressesPerTx}
+                                        {totalAddressesPerTx}
                                     </span>
                                     <span className="text-xs text-gray-400">Total number of addresses </span>
                                 </div>

@@ -9,7 +9,6 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { fetchUserBalancePolygon, fetchUserBalanceBsc, fetchUserBalanceEth, fetchUserBalanceAvalanche, fetchUserBalanceOptimism, fetchUserBalanceArbitrum } from "../../../store/token/tokenSlice";
 import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner, signTypedData } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
@@ -340,34 +339,6 @@ export function Summary(props: any) {
             dispatch(removeSendedAddress(txToSend.addressesToSend.length));
             setIsCalculated(true);
             toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-
-            if (isConnected && network.id === 1) {
-                dispatch(fetchUserBalanceEth({ provider, address }))
-            }
-            // else if (isConnected && network.id === 5) {
-            //     dispatch(fetchUserBalanceGoerli({ provider, address }))
-            // }
-            else if (isConnected && network.id === 10) {
-                dispatch(fetchUserBalanceOptimism({ provider, address }))
-            }
-            else if (isConnected && network.id === 56) {
-                dispatch(fetchUserBalanceBsc({ provider, address }))
-            }
-            // else if (isConnected && network.id === 97) {
-            //     dispatch(fetchUserBalanceBscT({ provider, address }))
-            // }
-            else if (isConnected && network.id === 137) {
-                dispatch(fetchUserBalancePolygon({ provider, address }))
-            }
-            // else if (isConnected && network.id === 80001) {
-            //     dispatch(fetchUserBalanceMumbai({ provider, address }))
-            // }
-            else if (isConnected && network.id === 42161) {
-                dispatch(fetchUserBalanceArbitrum({ provider, address }))
-            }
-            else if (isConnected && network.id === 43114) {
-                dispatch(fetchUserBalanceAvalanche({ provider, address }))
-            }
         } catch (err) {
             toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
         }
@@ -502,7 +473,6 @@ export function Summary(props: any) {
         }
 
     }
-
     const calculateTokenAndPayNativeBSC = async () => {
         setIsCalculated(false);
         setLoading(false);
@@ -728,7 +698,7 @@ export function Summary(props: any) {
                         method: "multiSend(address,address[],uint256[])",
                         token: props.token.address,
                         addressesToSend: addressesArray,
-                        finalAmount: ammountT,
+                        finalAmount,
                         txInfo,
                         isApproved: false
                     }
@@ -758,9 +728,7 @@ export function Summary(props: any) {
     }
     const sendTokenAndPayNative = async () => {
         const signer = await fetchSigner()
-
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
-
         const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
         const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
         if (parseFloat(ethers.utils.formatUnits(isApproved, props.token.decimals)) >= parseFloat(ammount)) {
@@ -776,7 +744,6 @@ export function Summary(props: any) {
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                         calculateTokenAndPayNative();
                     }
-
                 }).catch((err: any) => {
                     console.log(err, "err")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -797,6 +764,11 @@ export function Summary(props: any) {
                         setTxToSend({ ...txToSend, isApproved: true });
                         await calculateTokenAndPayNativeBSC()
                         await sendTokenAndPayNative()
+                        // if(isConnected && provider && network){
+                        //     dispatch(fetchUserBalanceSingleToken({address,token:props.token,networkName:network.name, provider})).then(()=>{
+                        //      dispatch(fetchTokensPricesSingleToken({token:props.token, networkName:network.name, provider}))
+                        //     })
+                        // }
                     }).catch((err: any) => {
                         toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     });
@@ -822,8 +794,6 @@ export function Summary(props: any) {
         }
     }
     const sendTokenAndPayNativeOptimism = async () => {
-        // const provider = new ethers.providers.JsonRpcProvider('https://mainnet.optimism.io')
-        // const signer = provider.getSigner(address)
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
@@ -834,8 +804,8 @@ export function Summary(props: any) {
             feeShare[txToSend.method](props.token.address, txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
                 tx.wait().then((receipt: any) => {
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                        dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                        calculateTokenAndPayNativeOptimism();
+                    dispatch(removeSendedAddress(txToSend.addressesToSend.length))
+                    calculateTokenAndPayNativeOptimism();
                 }).catch((err: any) => {
                     console.log(err, "err")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -1026,7 +996,7 @@ export function Summary(props: any) {
     const calculateTokenAndPayTokenOptimism = async () => {
         setIsCalculated(false);
         setError(false);
-       const signer = await fetchSigner()
+        const signer = await fetchSigner()
         //get signer drom provider
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         //first 
@@ -1155,6 +1125,7 @@ export function Summary(props: any) {
         contractForwarder.execute(dataBuffer.values, dataBuffer.signature).then((result: any) => {
             result.wait().then((receipt: any) => {
                 toast.update(toastSendSigned, { render: "Transaction sended successfully", type: "success", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
+                
             })
         }).catch((error: any) => {
             console.log(error, "error")

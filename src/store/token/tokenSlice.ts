@@ -87,31 +87,31 @@ export const tokenSlice = createSlice({
   name: 'token',
   initialState,
   reducers: {
-  //   changeTokenByNetwork: (state, action: PayloadAction<any>) => {
-  //     const { chainId } = action.payload;
-  // const tokenizationMap = {
-  //   1: ethereumTokens.Tokenization,
-  //   // 5: goerliTokens.Tokenization,
-  //   10: optimismTokens.Tokenization,
-  //   56: bscTokens.Tokenization,
-  //   97: bscTestTokens.Tokenization,
-  //   137: polygonTokens.Tokenization,
-  //   43114: avxTokens.Tokenization,
-  //   42161:arbitrumTokens.Tokenization,
-  //   // 80001: mumbaiTokens.Tokenization,
-  // };
-  // const tokenization = tokenizationMap[chainId] || goerliTokens.Tokenization;
-  // state.ethTokens = tokenization;
-  // // state.goerliTokens = tokenization;
-  // state.optimismTokens = tokenization;
-  // state.bscTokens = tokenization;
-  // state.bscTestTokens = tokenization;
-  // state.polygonTokens = tokenization;
-  // state.avalancheTokens = tokenization;
-  // // state.mumbaiTokens = tokenization;
-  // state.arbitrumTokens = tokenization;
+    //   changeTokenByNetwork: (state, action: PayloadAction<any>) => {
+    //     const { chainId } = action.payload;
+    // const tokenizationMap = {
+    //   1: ethereumTokens.Tokenization,
+    //   // 5: goerliTokens.Tokenization,
+    //   10: optimismTokens.Tokenization,
+    //   56: bscTokens.Tokenization,
+    //   97: bscTestTokens.Tokenization,
+    //   137: polygonTokens.Tokenization,
+    //   43114: avxTokens.Tokenization,
+    //   42161:arbitrumTokens.Tokenization,
+    //   // 80001: mumbaiTokens.Tokenization,
+    // };
+    // const tokenization = tokenizationMap[chainId] || goerliTokens.Tokenization;
+    // state.ethTokens = tokenization;
+    // // state.goerliTokens = tokenization;
+    // state.optimismTokens = tokenization;
+    // state.bscTokens = tokenization;
+    // state.bscTestTokens = tokenization;
+    // state.polygonTokens = tokenization;
+    // state.avalancheTokens = tokenization;
+    // // state.mumbaiTokens = tokenization;
+    // state.arbitrumTokens = tokenization;
 
-  //   },
+    //   },
     // getTokensPricesGoerli: (state, action: PayloadAction<any>) => {
     //   const { newTokens } = action.payload;
     //   state.goerliTokens = newTokens;
@@ -120,7 +120,7 @@ export const tokenSlice = createSlice({
       const { newTokens } = action.payload;
       state.optimismTokens = newTokens;
     },
-     getTokensPricesArbitrum: (state, action: PayloadAction<any>) => {
+    getTokensPricesArbitrum: (state, action: PayloadAction<any>) => {
       const { newTokens } = action.payload;
       state.arbitrumTokens = newTokens;
     },
@@ -148,6 +148,26 @@ export const tokenSlice = createSlice({
     //   const { newTokens } = action.payload;
     //   state.goerliTokens = newTokens;
     // },
+    getTokensPricesSingleToken: (state, action: PayloadAction<any>) => {
+      console.log('getUserBalanceSingleToken');
+      const { token, chainId } = action.payload;
+      if (chainId === 1) state.ethTokens = [...state.ethTokens, token];
+      if (chainId === 10) state.optimismTokens = [...state.optimismTokens, token];
+      if (chainId === 56) state.bscTokens = [...state.bscTokens, token];
+      if (chainId === 137) state.polygonTokens = [...state.polygonTokens, token];
+      if (chainId === 43114) state.avalancheTokens = [...state.avalancheTokens, token];
+      if (chainId === 42161) state.arbitrumTokens = [...state.arbitrumTokens, token];
+    },
+    getUserBalanceSingleToken: (state, action: PayloadAction<any>) => {
+      console.log('getUserBalanceSingleToken');
+      const { token, chainId } = action.payload;
+      if (chainId === 1) state.ethTokens = [...state.ethTokens, token];
+      if (chainId === 10) state.optimismTokens = [...state.optimismTokens, token];
+      if (chainId === 56) state.bscTokens = [...state.bscTokens, token];
+      if (chainId === 137) state.polygonTokens = [...state.polygonTokens, token];
+      if (chainId === 43114) state.avalancheTokens = [...state.avalancheTokens, token];
+      if (chainId === 42161) state.arbitrumTokens = [...state.arbitrumTokens, token];
+    },
     getUserBalanceArbitrum: (state, action: PayloadAction<any>) => {
       const { newTokens } = action.payload;
       state.arbitrumTokens = newTokens;
@@ -255,7 +275,7 @@ export const tokenSlice = createSlice({
         56: state.bscTokens,
         // 97: state.bscTestTokens,
         137: state.polygonTokens,
-        42161:state.arbitrumTokens,
+        42161: state.arbitrumTokens,
         // 80001: state.mumbaiTokens,
         43114: state.avalancheTokens,
       };
@@ -270,7 +290,7 @@ export const tokenSlice = createSlice({
         state.sortType = "asc";
       }
     },
-    
+
     sortTokenByTokenName: (state, action: PayloadAction<any>) => {
       state.sortBy = "name";
       const tokens = {
@@ -292,7 +312,7 @@ export const tokenSlice = createSlice({
       tokenList.sort(sortFunction);
       state.sortType = state.sortType === "asc" ? "desc" : "asc";
     },
-    
+
     filterTokens: (state, action: PayloadAction<any>) => {
       state.filterBy = action.payload.filter;
     },
@@ -411,58 +431,58 @@ export const tokenSlice = createSlice({
           });
           break;
         }
-        
-        
+
+
       }
     },
-    closeAllElements : (state) => {
+    closeAllElements: (state) => {
       console.log("closeAllElements");
-        state.ethTokens = state.ethTokens.map((token: Token) => {
-          token.isOpen = false;
-          return token;
-        });
-        // state.goerliTokens = state.goerliTokens.map((token: Token) => {
-        //   token.isOpen = false;
-        //   return token;
-        // });
-        state.optimismTokens = state.optimismTokens.map((token: Token) => {
-          token.isOpen = false;
-          return token;
-        }
-        );
-        state.bscTokens = state.bscTokens.map((token: Token) => {
-          token.isOpen = false;
-          return token;
-        }
-        );
-        // state.bscTestTokens = state.bscTestTokens.map((token: Token) => {
-        //   token.isOpen = false;
-        //   return token;
-        // }
-        // );
-        state.polygonTokens = state.polygonTokens.map((token: Token) => {
+      state.ethTokens = state.ethTokens.map((token: Token) => {
+        token.isOpen = false;
+        return token;
+      });
+      // state.goerliTokens = state.goerliTokens.map((token: Token) => {
+      //   token.isOpen = false;
+      //   return token;
+      // });
+      state.optimismTokens = state.optimismTokens.map((token: Token) => {
+        token.isOpen = false;
+        return token;
+      }
+      );
+      state.bscTokens = state.bscTokens.map((token: Token) => {
+        token.isOpen = false;
+        return token;
+      }
+      );
+      // state.bscTestTokens = state.bscTestTokens.map((token: Token) => {
+      //   token.isOpen = false;
+      //   return token;
+      // }
+      // );
+      state.polygonTokens = state.polygonTokens.map((token: Token) => {
 
-          token.isOpen = false;
-          return token;
-        } 
-        );
-        // state.mumbaiTokens = state.mumbaiTokens.map((token: Token) => {
-        //   token.isOpen = false;
-        //   return token;
-        // }
-        // );
-        state.arbitrumTokens = state.arbitrumTokens.map((token: Token) => {
-          token.isOpen = false;
-          return token;
-        }
-        );
-        state.avalancheTokens = state.avalancheTokens.map((token: Token) => {
-          token.isOpen = false;
-          return token;
-        }
-        );
+        token.isOpen = false;
+        return token;
+      }
+      );
+      // state.mumbaiTokens = state.mumbaiTokens.map((token: Token) => {
+      //   token.isOpen = false;
+      //   return token;
+      // }
+      // );
+      state.arbitrumTokens = state.arbitrumTokens.map((token: Token) => {
+        token.isOpen = false;
+        return token;
+      }
+      );
+      state.avalancheTokens = state.avalancheTokens.map((token: Token) => {
+        token.isOpen = false;
+        return token;
+      }
+      );
     },
-    
+
   },
   extraReducers: (builder) => {
     // builder.addCase(fetchTokensPricesGoerli.fulfilled, (state, action) => {
@@ -519,6 +539,101 @@ export const tokenSlice = createSlice({
     // builder.addCase(fetchTokensPricesMumbai.fulfilled, (state, action) => {
     //   state.mumbaiTokens = action.payload;
     // });
+    builder.addCase(fetchTokensPricesSingleToken.fulfilled, (state, action) => {
+      console.log(action.payload);
+      //need to update the token in current network token list
+      switch (action.payload.network) {
+        case "Binance Smart Chain": {
+          state.bscTokens = state.bscTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, deposits: action.payload.token.deposits};
+          });
+          break;
+        }
+        case "Ethereum": {
+          state.ethTokens = state.ethTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, deposits: action.payload.token.deposits};
+          });
+          break;
+        }
+        case "Polygon": {
+          state.polygonTokens = state.polygonTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, deposits: action.payload.token.deposits};
+          });
+          break;
+        }
+        case "Avalanche": {
+          state.avalancheTokens = state.avalancheTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, deposits: action.payload.token.deposits};
+          }
+          );
+          break;
+        }
+        case "Arbitrum": {
+          state.arbitrumTokens = state.arbitrumTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, deposits: action.payload.token.deposits};
+          }
+          );
+          break;
+        }
+        case "Optimism": {
+          state.optimismTokens = state.optimismTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, deposits: action.payload.token.deposits};
+          }
+          );
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      });
+    builder.addCase(fetchUserBalanceSingleToken.fulfilled, (state, action) => {
+      console.log(action.payload);
+      switch (action.payload.network) {
+        case "Binance Smart Chain": {
+          state.bscTokens = state.bscTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+          });
+          break;
+        }
+        case "Ethereum": {
+          state.ethTokens = state.ethTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+          });
+          break;
+        }
+        case "Polygon": {
+          state.polygonTokens = state.polygonTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+          });
+          break;
+        }
+        case "Avalanche": {
+          state.avalancheTokens = state.avalancheTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+          }
+          );
+          break;
+        }
+        case "Arbitrum": {
+          state.arbitrumTokens = state.arbitrumTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+          }
+          );
+          break;
+        }
+        case "Optimism": {
+          state.optimismTokens = state.optimismTokens.map((token: Token) => {
+            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+          }
+          );
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+    });
   }
 });
 export const {
@@ -775,7 +890,7 @@ export const nativeBalance = (state: RootState) => {
     // 97: state.token.bscTestTokens,
     137: state.token.avalancheTokens,
     // 80001: state.token.mumbaiTokens,
-    42161:state.token.arbitrumTokens,
+    42161: state.token.arbitrumTokens,
     43114: state.token.avalancheTokens,
   };
 
@@ -836,12 +951,12 @@ export const fetchTokensPricesOptimism = createAsyncThunk(
     const state = getState() as any;
     //providerInfura
     // const providerOptimism = new ethers.providers.JsonRpcProvider('https://optimism-mainnet.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
-   //provider Alchemy
+    //provider Alchemy
     const providerOptimism = new ethers.providers.JsonRpcProvider('https://opt-mainnet.g.alchemy.com/v2/IZcTWl8yY9G_lnKiSJupPvSI-Q752SXj');
-    
+
     const contractOptimism = new Contract(contractsAddresses["Optimism"][0].PriceOracle, OracleAbi, providerOptimism);
     const assetsPrices = await contractOptimism.getAssetsPrices(state.token.optimismTokens.map((token: any) => token.address));
-    const newOptimism = state.token.optimismTokens.map(async (token: any, index:number) => {
+    const newOptimism = state.token.optimismTokens.map(async (token: any, index: number) => {
       // Add a delay of 1 second before making each request
       await new Promise(resolve => setTimeout(resolve, 3000));
       if (token.isNative) {
@@ -849,7 +964,7 @@ export const fetchTokensPricesOptimism = createAsyncThunk(
       }
       else {
         const tokenContract = new Contract(contractsAddresses["Optimism"][0]["r" + token.name], RTokenAbi, providerOptimism);
-         const totalDeposits = await tokenContract.totalSupply();
+        const totalDeposits = await tokenContract.totalSupply();
         return { ...token, tokenPrice: ethers.utils.formatUnits(assetsPrices[index], 8), deposits: ethers.utils.formatUnits(totalDeposits, token.decimals) }
       }
     })
@@ -863,13 +978,13 @@ export const fetchTokensPricesArbitrum = createAsyncThunk(
     const providerArbitrum = new ethers.providers.JsonRpcProvider('https://arbitrum-mainnet.infura.io/v3/' + process.env.REACT_APP_INFURA_KEY);
     const contractArbitrum = new Contract(contractsAddresses["Arbitrum"][0].PriceOracle, OracleAbi, providerArbitrum);
     const assetsPrices = await contractArbitrum.getAssetsPrices(state.token.arbitrumTokens.map((token: any) => token.address));
-    const newArbitrum = state.token.arbitrumTokens.map(async (token: any, index:number) => {
+    const newArbitrum = state.token.arbitrumTokens.map(async (token: any, index: number) => {
       // const arbitrumPrice = await contractArbitrum.getAssetPrice(token.address);
       if (token.isNative) {
         return { ...token, tokenPrice: ethers.utils.formatUnits(assetsPrices[index], 8), deposits: "-" }
       }
       else {
-        const tokenContract = new Contract(contractsAddresses["Arbitrum"][0]["r" + token.name], RTokenAbi,providerArbitrum);
+        const tokenContract = new Contract(contractsAddresses["Arbitrum"][0]["r" + token.name], RTokenAbi, providerArbitrum);
         const totalDeposits = await tokenContract.totalSupply();
         return { ...token, tokenPrice: ethers.utils.formatUnits(assetsPrices[index], 8), deposits: ethers.utils.formatUnits(totalDeposits, token.decimals) }
       }
@@ -1203,6 +1318,34 @@ export const fetchUserBalancePolygon = createAsyncThunk(
       }
     })
     return Promise.all(newTokens);
+  }
+)
+export const fetchUserBalanceSingleToken = createAsyncThunk(
+  'token/getUserBalanceSingleToken',
+  async (data: any, { getState }) => {
+    const { address, token, networkName, provider } = data;
+    console.log(address, token, networkName)
+    const contractRToken = new Contract(contractsAddresses[networkName][0]["r" + token.name], RTokenAbi, provider);
+    const contractToken = new Contract(token.address, RTokenAbi, provider);
+    const userBalanceDeposit = await contractRToken.balanceOf(address);
+    const userBalance = await provider.getBalance(address);
+    const userBalanceToken = await contractToken.balanceOf(address);
+    const newToken = { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalance, token.decimals), userBalance:token.isNative ? ethers.utils.formatUnits(userBalanceToken, token.decimals) : ethers.utils.formatUnits(userBalanceToken, token.decimals), isDeposit: userBalanceDeposit.gt(0) }
+    Promise.resolve(newToken);
+    return { token: newToken, network: networkName }
+  }
+)
+export const fetchTokensPricesSingleToken = createAsyncThunk(
+  'token/getTokensPricesSingleToken',
+  async (args: any, { getState }) => {
+    const { token, networkName, provider } = args;
+    const tokenContract = new Contract(contractsAddresses[networkName][0]["r" + token.name], RTokenAbi, provider);
+    const totalDeposits = await tokenContract.totalSupply();
+    const decimals = await tokenContract.decimals();
+    const newToken = { ...token, deposits: token.isNative ? "-" : ethers.utils.formatUnits(totalDeposits, decimals) };
+
+    Promise.resolve(newToken);
+    return { token: newToken, network: networkName }
   }
 )
 // export const fetchUserBalanceMumbai = createAsyncThunk(
