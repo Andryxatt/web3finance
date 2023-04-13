@@ -16,6 +16,7 @@ import FeeShareAbi from "./../../../contracts/FeeShare.json";
 import RTokenAbi from "./../../../contracts/RTokenAbi.json";
 import MinimalForwarderAbi from "./../../../contracts/MinimalForwarderAbi.json";
 import { toast } from "react-toastify";
+import { fetchUserBalanceSingleToken } from "../../../store/token/tokenSlice";
 interface TxInformation {
     method: any;
     token: any;
@@ -30,7 +31,6 @@ export function Summary(props: any) {
     const networkSpeed = useAppSelector(selectedSpeed)
     const dispatch = useAppDispatch();
     const network = useAppSelector(currentNetwork);
-    const provider = useProvider();
     const { chain } = useNetwork();
     const { address, isConnected } = useAccount();
     //Preloader
@@ -39,6 +39,7 @@ export function Summary(props: any) {
     const [totalTransactions, setTotalTransactions] = useState(0);
     const [txFee, setTxFee] = useState("0");
     const [gasPrice, setGasPrice] = useState("0");
+    const provider = useProvider();
     const [totalFee, setTotalFee] = useState("0");
     //Totak ammount of tokens to send 
     const [ammount, setAmmount] = useState("0");
@@ -57,7 +58,6 @@ export function Summary(props: any) {
     const [isCalculated, setIsCalculated] = useState(false);
 
     const [maxFeePerGas, setMaxFeePerGas] = useState<any>();
-
     const calculateNative = async () => {
         setIsCalculated(false)
         setError(false);
@@ -92,7 +92,6 @@ export function Summary(props: any) {
         const totalTokensToSend = addressesArray.length;
         //in for loop total amount of tokens to send
 
-        // const totalAmmountTokens = amountsArray.reduce((acc: any, b: any) => (acc + +b), 0);
         const finalAmount = amountsArray.map((item: any) => {
             return ethers.utils.parseEther(item);
         });
@@ -106,7 +105,7 @@ export function Summary(props: any) {
 
         const txInfo = {
             value: msgValue,
-            "maxFeePerGas": feePerGas,
+            "maxFeePerGas": networkSpeed.maxFeePerGas,
             "maxPriorityFeePerGas": networkSpeed.maxPriorityFeePerGas
         }
 
@@ -335,10 +334,15 @@ export function Summary(props: any) {
             const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
             const tx = await feeShare[txToSend.method](txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo);
             const receipt = await tx.wait();
-            console.log(receipt);
-            dispatch(removeSendedAddress(txToSend.addressesToSend.length));
-            setIsCalculated(true);
-            toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            if (receipt.status === 1) {
+                toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
+                dispatch(removeSendedAddress(txToSend.addressesToSend.length));
+                setIsCalculated(true);
+                dispatch(fetchUserBalanceSingleToken({ address: address, roken: props.token, networkName: network.name, provider }))
+            }
+            else {
+                toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
+            }
         } catch (err) {
             toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
         }
@@ -575,8 +579,7 @@ export function Summary(props: any) {
                         txInfo,
                         isApproved: false
                     }
-                    const ammountToApprove = ethers.utils.parseUnits(totalAmmountTokensToSend.toString(), props.token.decimals);
-                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountToApprove);
+                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountT);
                     setAmmount(ethers.utils.formatUnits(ammountT, props.token.decimals));
                     setGasPrice(gasPrice.mul(unitsUsed).toString());
                     setTotalFee(ethers.utils.formatUnits(gasPrice.mul(unitsUsed)));
@@ -739,6 +742,7 @@ export function Summary(props: any) {
                     if (isConnected && network.id === 56) {
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                         calculateTokenAndPayNativeBSC();
+                        dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                     }
                     else {
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
@@ -806,6 +810,7 @@ export function Summary(props: any) {
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                     calculateTokenAndPayNativeOptimism();
+                    dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                 }).catch((err: any) => {
                     console.log(err, "err")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -833,6 +838,7 @@ export function Summary(props: any) {
     const calculateTokenAndPayToken = async () => {
         setIsCalculated(false);
         setError(false);
+        setErrorMessage("");
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         //first 
@@ -873,12 +879,13 @@ export function Summary(props: any) {
         const calculateFeeAsset = await feeShare["calculateFee(address)"](props.token.address);
         setTotalAddressesPerTx(addressesArray.length)
         try {
-            const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei'));
+            const gasPrice = await provider.getFeeData();
+            const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, addressesArray, finalAmount, gasPrice.maxPriorityFeePerGas);
             const txFeeInToken = await feeShare["calculateTxfeeToken(address,uint256)"](props.token.address, ethers.utils.parseUnits(networkSpeed.maxFeePerGasFloat, 'gwei').mul(unitsUsed));
             setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimals))
             const minimalForwarderContract = new Contract(contractsAddresses[network.name][0].MinimalForwarder, MinimalForwarderAbi, signer);
-            const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')]) as any;
-            if (totalAmmountTokensToSend > props.token.userBalanceDeposit) {
+            const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesArray, finalAmount, gasPrice.maxPriorityFeePerGas]) as any;
+            if (+ethers.utils.formatUnits(ammountT) > +props.token.userBalanceDeposit) {
                 setError(true);
                 setErrorMessage("You don't have enough balance token to pay the fee")
                 setIsCalculated(true);
@@ -887,10 +894,10 @@ export function Summary(props: any) {
             const values = {
                 from: address,
                 to: contractsAddresses[network.name][0].FeeShare,
-                value: 0,
-                gas: "210000",
-                nonce: nonce.toString(),
+                value: ethers.BigNumber.from(0),
+                nonce: ethers.BigNumber.from(nonce),
                 data: dataMessage,
+                gas: "21000000",
             }
 
             const txInform = {
@@ -969,7 +976,7 @@ export function Summary(props: any) {
                 value: ethers.BigNumber.from(0),
                 nonce: ethers.BigNumber.from(nonce),
                 data: dataMessage,
-                gas: 210000,
+                gasLimit: "210000",
             }
 
             const txInform = {
@@ -1103,9 +1110,9 @@ export function Summary(props: any) {
                 from: req.from,
                 to: req.to,
                 value: ethers.BigNumber.from("0"),
-                gas: ethers.BigNumber.from("210000"),
-                nonce: req.nonce.toString(),
-                data: req.data.toString(),
+                gas: ethers.BigNumber.from("21000000"),
+                nonce: req.nonce,
+                data: req.data,
             },
         })
         return signature;
@@ -1115,23 +1122,40 @@ export function Summary(props: any) {
         const dataBuffer = { 'values': signedTxToSend, 'signature': signature }
         const priviteKey = process.env.REACT_APP_KEY_PAYER_MAIN
         const walletPrivateKey = new Wallet(priviteKey);
-        const toastSendSigned = toast.loading("Sending transaction please waite...")
+
         let walletSigner = walletPrivateKey.connect(provider)
         const contractForwarder = new ethers.Contract(
             contractsAddresses[network.name][0].MinimalForwarder,
             MinimalForwarderAbi,
             walletSigner
         );
-        contractForwarder.execute(dataBuffer.values, dataBuffer.signature).then((result: any) => {
-            result.wait().then((receipt: any) => {
-                toast.update(toastSendSigned, { render: "Transaction sended successfully", type: "success", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
-                
-            })
+
+        const tx = await contractForwarder.execute(dataBuffer.values, dataBuffer.signature);
+        const toastSendSigned = toast.loading("Sending transaction please waite...")
+        console.log(tx, "tx")
+        tx.wait().then((receipt: any) => {
+            console.log(error, "error")
+            toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER })
         }).catch((error: any) => {
             console.log(error, "error")
             toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
         });
+        //    .then((result: any) => {
+        //     const toastSendSigned = toast.loading("Sending transaction please waite...")
+        //     result.wait().then((receipt: any) => {
+        //         toast.update(toastSendSigned, { render: "Transaction sended successfully", type: "success", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
+        //         console.log(receipt, "receipt")
+        //         dispatch(fetchUserBalanceSingleToken({address,token:props.token,networkName:network.name, provider}))
+        //     }).catch((error: any) => {
+        //         console.log(error, "error")
+        //         toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
+        //     });
+        // }).catch((error: any) => {
+        //     console.log(error, "error")
+        //     toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER })
+        // });
     }
+
     useEffect(() => {
         if (!props.token.isOpen) {
             props.showPrev();
@@ -1185,81 +1209,83 @@ export function Summary(props: any) {
             else {
                 sendTokenAndPayNative()
             }
-
         }
         else {
             sendSignedTransaction()
         }
     }
     return (
-        <div className="mb-3">
-            {
-                loading ? <div className="loader-container justify-center flex">
-                    <div className="spinner"></div>
-                </div> :
-                    <div>
-                        <h3 className="mb-1">Summary</h3>
-                        <div className={` ${!isCalculated ? 'blur-sm' : ''} bg-white flex flex-row w-full sm:flex-col rounded-md`}>
-                            <div className="flex flex-col w-full">
-                                <div className="px-3 py-3 flex flex-col border-b-2">
-                                    <span className="text-xl text-blue-900 font-bold">
-                                        {props.isNative ? totalAddressesPerTx - 1 : totalAddressesPerTx}
-                                    </span>
-                                    <span className="text-xs text-gray-400">Total number of addresses </span>
-                                </div>
-                                <div className="px-3 py-3 flex flex-col border-b-2">
-                                    <span className="text-xl text-blue-900 font-bold">
-                                        {totalTransactions}
-                                    </span>
-                                    <span className="text-xs text-gray-400">Total number of transactions needed </span>
-                                </div>
-                                <div className="px-3 py-3 flex flex-col">
-                                    <span className="text-xl text-blue-900 font-bold">
+        <>
+            <div className="mb-3">
+                {
+                    loading ? <div className="loader-container justify-center flex">
+                        <div className="spinner"></div>
+                    </div> :
+                        <div>
+                            <h3 className="mb-1">Summary</h3>
+                            <div className={` ${!isCalculated ? 'blur-sm' : ''} bg-white flex flex-row w-full sm:flex-col rounded-md`}>
+                                <div className="flex flex-col w-full">
+                                    <div className="px-3 py-3 flex flex-col border-b-2">
+                                        <span className="text-xl text-blue-900 font-bold">
+                                            {props.isNative ? totalAddressesPerTx - 1 : totalAddressesPerTx}
+                                        </span>
+                                        <span className="text-xs text-gray-400">Total number of addresses </span>
+                                    </div>
+                                    <div className="px-3 py-3 flex flex-col border-b-2">
+                                        <span className="text-xl text-blue-900 font-bold">
+                                            {totalTransactions}
+                                        </span>
+                                        <span className="text-xs text-gray-400">Total number of transactions needed </span>
+                                    </div>
+                                    <div className="px-3 py-3 flex flex-col">
+                                        <span className="text-xl text-blue-900 font-bold">
+                                            {
+                                                props.isNativeFee ? `${parseFloat(totalFee).toFixed(12)} - ${props.token.name}` : `${parseFloat(totalFee).toFixed(12)} - ${chain?.nativeCurrency.symbol}`
+                                            }
+                                        </span>
                                         {
-                                            props.isNativeFee ? `${parseFloat(totalFee).toFixed(12)} - ${props.token.name}` : `${parseFloat(totalFee).toFixed(12)} - ${chain?.nativeCurrency.symbol}`
+                                            props.isNativeFee ? "" : <span className="text-gray-400 text-sm"> {txFee} commision fee  + {ethers.utils.formatEther(gasPrice)} transaction fee </span>
                                         }
-                                    </span>
-                                    {
-                                        props.isNativeFee ? "" : <span className="text-gray-400 text-sm"> {txFee} commision fee  + {ethers.utils.formatEther(gasPrice)} transaction fee </span>
-                                    }
-                                    <span className="text-xs text-gray-400">Approximate cost of operation </span>
+                                        <span className="text-xs text-gray-400">Approximate cost of operation </span>
+                                    </div>
+                                </div>
+                                <div className="flex flex-col border-l-2 w-full">
+                                    <div className="px-3 py-3 flex flex-col border-b-2">
+                                        <span className="text-xl text-blue-900 font-bold">
+                                            {parseFloat(ammount).toFixed(4)} {props.token.name}
+                                        </span>
+                                        <span className="text-xs text-gray-400">Total number of tokens to be sent </span>
+                                    </div>
+                                    <div className="px-3 py-3 flex flex-col border-b-2">
+                                        <span className="text-xl text-blue-900 font-bold">
+                                            {!props.isNativeFee ? `${parseFloat(props.token.userBalance).toFixed(4)} ${props.token.name}` : `${parseFloat(props.token.userBalanceDeposit).toFixed(4)}  ${props.token.name}`}
+                                        </span>
+                                        <span className={" text-xs text-gray-400"}>
+                                            Your token balance {props.isNativeFee ? " deposited" : ""}
+                                        </span>
+                                    </div>
+                                    <div className="px-3 py-3 flex flex-col">
+                                        <span className="text-xl text-blue-900 font-bold">
+                                            {parseFloat(totalFee).toFixed(4)} {props.isNativeFee ? props.token.name : chain?.nativeCurrency.symbol} + {parseFloat(ammount).toFixed(4)}  {props.token.name}
+                                        </span>
+                                        <span className="text-xs text-gray-400">
+                                            Total amount to send per transaction
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div className="flex flex-col border-l-2 w-full">
-                                <div className="px-3 py-3 flex flex-col border-b-2">
-                                    <span className="text-xl text-blue-900 font-bold">
-                                        {parseFloat(ammount).toFixed(4)} {props.token.name}
-                                    </span>
-                                    <span className="text-xs text-gray-400">Total number of tokens to be sent </span>
-                                </div>
-                                <div className="px-3 py-3 flex flex-col border-b-2">
-                                    <span className="text-xl text-blue-900 font-bold">
-                                        {!props.isNativeFee ? `${parseFloat(props.token.userBalance).toFixed(4)} ${props.token.name}` : `${parseFloat(props.token.userBalanceDeposit).toFixed(4)}  ${props.token.name}`}
-                                    </span>
-                                    <span className={" text-xs text-gray-400"}>
-                                        Your token balance {props.isNativeFee ? " deposited" : ""}
-                                    </span>
-                                </div>
-                                <div className="px-3 py-3 flex flex-col">
-                                    <span className="text-xl text-blue-900 font-bold">
-                                        {parseFloat(totalFee).toFixed(4)} {props.isNativeFee ? props.token.name : chain?.nativeCurrency.symbol} + {parseFloat(ammount).toFixed(4)}  {props.token.name}
-                                    </span>
-                                    <span className="text-xs text-gray-400">
-                                        Total amount to send per transaction
-                                    </span>
-                                </div>
+                            {errorMessage ? <MultiSendError error={errorMessage} /> : null}
+                            <div className="mt-2 flex sm:flex-col w-full">
+                                <button className="bg-blue-500 text-white font-bold px-5 py-1 mr-2 sm:mr-0 sm:mb-2 rounded-md" onClick={props.showPrev}>Prev</button>
+                                {!isCalculated || error ?
+                                    <button className="bg-neutral-400 text-white font-bold px-5 py-1 rounded-md backdrop:blur-md" disabled>Send</button> :
+                                    <button className="bg-neutral-800 text-white font-bold px-5 py-1 rounded-md" onClick={sendTransaction}>Send</button>}
                             </div>
                         </div>
-                        {errorMessage ? <MultiSendError error={errorMessage} /> : null}
-                        <div className="mt-2 flex sm:flex-col w-full">
-                            <button className="bg-blue-500 text-white font-bold px-5 py-1 mr-2 sm:mr-0 sm:mb-2 rounded-md" onClick={props.showPrev}>Prev</button>
-                            {!isCalculated || error ?
-                                <button className="bg-neutral-400 text-white font-bold px-5 py-1 rounded-md backdrop:blur-md" disabled>Send</button> :
-                                <button className="bg-neutral-800 text-white font-bold px-5 py-1 rounded-md" onClick={sendTransaction}>Send</button>}
-                        </div>
-                    </div>
-            }
-        </div>
+                }
+            </div>
+        </>
+
     )
 }
 export default Summary;

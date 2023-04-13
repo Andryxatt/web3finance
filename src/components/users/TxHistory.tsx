@@ -43,7 +43,6 @@ const TxHistory = () => {
     const getTxHistory = async () => {
         const txArray = [];
         let provider = undefined;
-        console.log("chain", chain)
         switch (chain.id) {
             case 1:
                 provider = new ethers.providers.JsonRpcProvider(`https://mainnet.infura.io/v3/${infuraApiKey}`);
@@ -81,7 +80,6 @@ const TxHistory = () => {
             default:
                 break;
         }
-        console.log("chain", chain.name)
         if (chain) {
             let name = "";
             switch (chain.name) {
@@ -100,12 +98,10 @@ const TxHistory = () => {
 
             }
             const contractFeeShare = new ethers.Contract(contractAddresses[name][0].FeeShare, FeeShareAbi, provider);
-            console.log("contractFeeShare", contractFeeShare)
             const depositFilter = contractFeeShare.filters.Deposit(address, null);
             const withdrawFilter = contractFeeShare.filters.Withdraw(address, null);
             const multiSendFeeFilter = contractFeeShare.filters.FeeDetails(address, null, null, null, null);
             const multiSendTokenFilter = contractFeeShare.filters.MultiSend(address, null)
-            console.log("multiSendTokenFilter", multiSendTokenFilter)
             if (chain.name === "BNB Smart Chain") {
                 const blockNumber = await provider.getBlockNumber()
                 const countQueries = Math.ceil((blockNumber - 27120421) / 5000);

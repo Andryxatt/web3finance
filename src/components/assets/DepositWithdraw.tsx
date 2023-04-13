@@ -6,11 +6,15 @@ import RTokenAbi from '../../contracts/RTokenAbi.json';
 import FeeShareAbi from '../../contracts/FeeShare.json';
 import { currentNetwork } from "../../store/network/networkSlice";
 import { useAppSelector } from "../../store/hooks";
+import { useAppDispatch } from "../../store/hooks";
 import { fetchSigner } from '@wagmi/core'
-import { useAccount } from "wagmi";
+import { useAccount, useProvider } from "wagmi";
+import { fetchUserBalanceSingleToken } from "../../store/token/tokenSlice";
 const DepositWithdraw = (props: any) => {
     const network = useAppSelector(currentNetwork);
     const [ammount, setAmmount] = useState(0);
+    const dispatch = useAppDispatch();
+    const provider = useProvider()
     //provider wagmi
     const { address } = useAccount();
     // const updateToken = () => {
@@ -53,6 +57,7 @@ const DepositWithdraw = (props: any) => {
             toast.error("Amount must be greater than 0")
             return
         }
+        
         const signer = await fetchSigner()
         let contract = new Contract(token.address, RTokenAbi, signer);
         let checkAllowance = await contract.allowance(address, contractsAddresses[network.name][0].FeeShare);
@@ -67,7 +72,7 @@ const DepositWithdraw = (props: any) => {
                         await feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                             result.wait().then(async (recept: any) => {
                                 toast.update(idToastDepositApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                               
+                               dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
                             })
                         }).catch((err: any) => {
                             toast.update(idToastDepositApprove, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -82,7 +87,7 @@ const DepositWithdraw = (props: any) => {
             feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                    
+                    dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
                 })
             }).catch((err: any) => {
                 toast.update(idToast2, { render: "Your transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -103,10 +108,10 @@ const DepositWithdraw = (props: any) => {
             toast.update(idToastWithdraw, { render: "Input correct amount", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
         }
         else {
-            feeShare.withdraw(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals), { gasLimit: "210000" }).then((result: any) => {
+            feeShare.withdraw(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToastWithdraw, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                    
+                    dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
                 }).catch((err: any) => {
                     toast.update(idToastWithdraw, { render: "Transaction rejected", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
@@ -116,13 +121,11 @@ const DepositWithdraw = (props: any) => {
         }
     }
     const setMaxDeposit = () => {
-        console.log("Deposit")
         if (props.token.userBalance) {
             setAmmount(parseFloat(props.token.userBalance))
         }
     }
     const setMaxWithdraw = () => {
-        console.log("Withdraw")
         if (props.token.userBalanceDeposit) {
             setAmmount(parseFloat(props.token.userBalanceDeposit))
         }

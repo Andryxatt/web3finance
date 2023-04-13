@@ -7,7 +7,7 @@ const PreviewResultToken = (props:any) =>{
         <div className="w-full">
             <GasFeeEstimator/>
             <ListOfRecipients/>
-            <SummaryToken showPrev={props.showPrev} tokenAddress={props.tokenAddress}/>
+            <SummaryToken showPrev={props.showPrev} isOpen={props.isOpen} tokenAddress={props.tokenAddress}/>
         </div>
     )
 }

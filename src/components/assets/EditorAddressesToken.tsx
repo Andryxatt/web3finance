@@ -113,7 +113,7 @@ const EditorAddressesToken = (props: any) => {
                             </div>
                         </div>
                     </div> :
-                    <PreviewResultToken tokenAddress={tokenAddress} showPrev={showPrev} />
+                    <PreviewResultToken tokenAddress={tokenAddress} isOpen={props.isOpen} showPrev={showPrev} />
             }
         </>
     )

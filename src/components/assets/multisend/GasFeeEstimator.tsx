@@ -5,7 +5,7 @@ import { useNetwork } from "wagmi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 // import {nativeBalance} from "../../../store/token/tokenSlice";
 import { getNetworkPriority, networkSpeedsArray, setSelectedPriority, updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
-const GasFeeEstimator = (props: any) => {
+const GasFeeEstimator = () => {
   const speeds = useAppSelector(networkSpeedsArray);
   const dispatch = useAppDispatch();
   // const nativeTokenPrice = useAppSelector(nativeBalance);
@@ -30,7 +30,7 @@ const GasFeeEstimator = (props: any) => {
   async function feeCalculate() {
     const provider = new Web3.providers.HttpProvider(getProviderUrl(chain.id));
     const web3 = new Web3(provider);
-    web3.eth.getFeeHistory(historicalBlocks, "pending", [15, 55, 85]).then((feeHistory) => {
+    web3.eth.getFeeHistory(historicalBlocks, "pending", [10, 40, 70]).then((feeHistory) => {
       const blocks = formatFeeHistory(feeHistory, false);
 
       const slow = avg(blocks.map(b => b.priorityFeePerGas[0]));
@@ -124,106 +124,96 @@ const GasFeeEstimator = (props: any) => {
   //   const price = parseFloat(ethers.utils.formatUnits(maxFeePerGasFloat.toString(),'gwei')) * parseFloat(nativeTokenPrice[0].tokenPrice)
   //  return price
   // }
-  useEffect(() => {
-    const speeds = [
-      {
-        "speedName": "Low",
-        "maxPriorityFeePerGas": 5,
-        "baseFeePerGas": 0,
-        "baseFeeFloat": "0",
-        "maxPriorityFeePerGasFloat": "5",
-        "maxFeePerGas": 5,
-        "maxFeePerGasFloat": "5",
-        "selected": false
-      },
-      {
-        "speedName": "Average",
-        "maxPriorityFeePerGas": 5,
-        "baseFeePerGas": 0,
-        "baseFeeFloat": "0",
-        "maxPriorityFeePerGasFloat": "5",
-        "maxFeePerGas": 5,
-        "maxFeePerGasFloat": "5",
-        "selected": true
-      },
-      {
-        "speedName": "Fast",
-        "maxPriorityFeePerGas": 5,
-        "baseFeePerGas": 0,
-        "baseFeeFloat": "0",
-        "maxPriorityFeePerGasFloat": "5",
-        "maxFeePerGas": 5,
-        "maxFeePerGasFloat": "5",
-        "selected": false
-      },
+  const speedsBSC = [
+    {
+      "speedName": "Low",
+      "maxPriorityFeePerGas": 5,
+      "baseFeePerGas": 0,
+      "baseFeeFloat": "0",
+      "maxPriorityFeePerGasFloat": "5",
+      "maxFeePerGas": 5,
+      "maxFeePerGasFloat": "5",
+      "selected": false
+    },
+    {
+      "speedName": "Average",
+      "maxPriorityFeePerGas": 5,
+      "baseFeePerGas": 0,
+      "baseFeeFloat": "0",
+      "maxPriorityFeePerGasFloat": "5",
+      "maxFeePerGas": 5,
+      "maxFeePerGasFloat": "5",
+      "selected": true
+    },
+    {
+      "speedName": "Fast",
+      "maxPriorityFeePerGas": 5,
+      "baseFeePerGas": 0,
+      "baseFeeFloat": "0",
+      "maxPriorityFeePerGasFloat": "5",
+      "maxFeePerGas": 5,
+      "maxFeePerGasFloat": "5",
+      "selected": false
+    },
 
-    ]
-    const speedsOptimism = [
-      {
-        "speedName": "Low",
-        "maxPriorityFeePerGas": 0.1,
-        "baseFeePerGas": 0,
-        "baseFeeFloat": "0",
-        "maxPriorityFeePerGasFloat": "0.1",
-        "maxFeePerGas": 0.1,
-        "maxFeePerGasFloat": "0.1",
-        "selected": false
-      },
-      {
-        "speedName": "Average",
-        "maxPriorityFeePerGas": 0.2,
-        "baseFeePerGas": 0,
-        "baseFeeFloat": "0",
-        "maxPriorityFeePerGasFloat": "0.2",
-        "maxFeePerGas": 0.2,
-        "maxFeePerGasFloat": "0.2",
-        "selected": true
-      },
-      {
-        "speedName": "Fast",
-        "maxPriorityFeePerGas": 0.3,
-        "baseFeePerGas": 0,
-        "baseFeeFloat": "0",
-        "maxPriorityFeePerGasFloat": "0.3",
-        "maxFeePerGas": 0.3,
-        "maxFeePerGasFloat": "0.3",
-        "selected": false
-      },
+  ]
+  const speedsOptimism = [
+    {
+      "speedName": "Low",
+      "maxPriorityFeePerGas": 0.1,
+      "baseFeePerGas": 0,
+      "baseFeeFloat": "0",
+      "maxPriorityFeePerGasFloat": "0.1",
+      "maxFeePerGas": 0.1,
+      "maxFeePerGasFloat": "0.1",
+      "selected": false
+    },
+    {
+      "speedName": "Average",
+      "maxPriorityFeePerGas": 0.2,
+      "baseFeePerGas": 0,
+      "baseFeeFloat": "0",
+      "maxPriorityFeePerGasFloat": "0.2",
+      "maxFeePerGas": 0.2,
+      "maxFeePerGasFloat": "0.2",
+      "selected": true
+    },
+    {
+      "speedName": "Fast",
+      "maxPriorityFeePerGas": 0.3,
+      "baseFeePerGas": 0,
+      "baseFeeFloat": "0",
+      "maxPriorityFeePerGasFloat": "0.3",
+      "maxFeePerGas": 0.3,
+      "maxFeePerGasFloat": "0.3",
+      "selected": false
+    },
 
-    ]
-    if (chain.id === 97 || chain.id === 56) {
-      dispatch(getNetworkPriority(speeds))
-      dispatch(setSelectedPriority(speeds[1]));
-    }
-    else if (chain.id === 10) {
-      dispatch(getNetworkPriority(speedsOptimism))
-      dispatch(setSelectedPriority(speedsOptimism[1]));
-    }
-    else {
-      console.log('chain', chain)
-      feeCalculate();
-      const web3 = new Web3(Web3.givenProvider);
-      var subscription = web3.eth.subscribe('newBlockHeaders', function (error, result) {
+  ]
+  useEffect(() =>{
+    const web3 = new Web3(Web3.givenProvider);
+    const subscription = web3.eth.subscribe('newBlockHeaders', function (error, result) {
         if (error) {
-   
           console.error(error);
         } else {
-          console.log('Successfully subscribed!');
-          console.log(result);
-          feeCalculate();
+          if (chain.id === 97 || chain.id === 56) {
+            dispatch(getNetworkPriority(speedsBSC))
+            dispatch(setSelectedPriority(speedsBSC[1]));
+          }
+          else if (chain.id === 10) {
+            dispatch(getNetworkPriority(speedsOptimism))
+            dispatch(setSelectedPriority(speedsOptimism[1]));
+          }
+          else {
+            feeCalculate();
+          }
         }
       })
       return () => {
-         subscription.unsubscribe(function (error, success) {
-           if (success)
-             console.log('Successfully unsubscribed!');
-         });
-      }
-    }
-    
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        subscription.unsubscribe();
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
- 
   const selectPriority = async (e: any) => {
     setSelectedSpeed(e.speedName);
     dispatch(updateSpeedSelected(e.speedName));

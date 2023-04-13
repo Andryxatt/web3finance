@@ -27,7 +27,6 @@ const TopNavigation = () => {
     const isMobile =  useMediaQuery({ query: '(max-width: 650px)' })
     const [hidden, setHidden] = React.useState(true);
     const showModal = () => {
-        console.log("Show modal")
        setHidden(!hidden);
     }
 

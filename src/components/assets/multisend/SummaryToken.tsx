@@ -146,15 +146,11 @@ export function SummaryToken(props: any) {
                     }
                     else {
                         const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.tokenAddress, addressesArray, finalAmount, txInfo);
-                        console.log(unitsUsed)
                         setTxToSend(txInform);
                         setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
                         setTxFee(ethers.utils.formatUnits(feePerAddressNative))
                         const totalFee = ethers.utils.formatEther(feePerAddressNative.add(feePerGas.mul(unitsUsed)))
-                        console.log(totalFee, native[0].userBalance)
-                        if (totalFee > native[0].userBalance) {
-                            console.log(totalFee, native[0].userBalance)
-                        }
+                       
                         setTotalFee(totalFee);
 
                         setIsCalculated(true);
@@ -206,7 +202,6 @@ export function SummaryToken(props: any) {
     }
 
     const calculateTokenAndPayNativeBSC = async () => {
-        console.log("calculateTokenAndPayNativeBSC")
         setIsCalculated(false);
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
@@ -491,8 +486,7 @@ export function SummaryToken(props: any) {
         }
         else {
             const approveToast = toast.loading("Approving please wait...")
-            const gasPrice = await provider.getGasPrice();
-            tokenErc20.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, decimals), gasPrice).then((res: any) => {
+            tokenErc20.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, decimals)).then((res: any) => {
                 res.wait().then(async (receipt: any) => {
                     toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     setTxToSend({ ...txToSend, isApproved: true });
@@ -515,7 +509,6 @@ export function SummaryToken(props: any) {
         }
     }
     useEffect(() => {
-        console.log("networkSpeed", networkSpeed)
         if (networkSpeed) {
             if (network.id === 97 || network.id === 56) {
                 calculateTokenAndPayNativeBSC()
@@ -528,6 +521,15 @@ export function SummaryToken(props: any) {
             }
         }
     }, [addressesAndAmounts, networkSpeed]) // eslint-disable-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        return () => {
+            if (props.isOpen) {
+                props.showPrev();
+            }
+        }
+       
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.isOpen])
     const sendTransaction = async () => {
         sendTokenAndPayNative()
     }

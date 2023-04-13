@@ -1,7 +1,7 @@
 import Row from "./Row";
 import TableHeader from "./TableHeader";
 import { useAccount, useNetwork, useProvider } from "wagmi";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import {
     currentTokensList,
@@ -26,6 +26,7 @@ const Table = () => {
     const dispatch = useAppDispatch();
     const { address, isConnected } = useAccount()
     const tokens = useAppSelector(currentTokensList)
+    const [isOpen, setIsOpen] = useState(false);
     const provider = useProvider()
     useEffect(() => {
         const fetchTokenPricesAndBalance = async (fetchUserBalance, fetchPrices, networkId) => {
@@ -75,9 +76,13 @@ const Table = () => {
     useEffect(() => {
         if (chain !== undefined) {
             dispatch(changeSelectedNetwork(chain))
+            setIsOpen(false)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [chain])
+   const handleOpen = () => {
+        setIsOpen(!isOpen)
+   }
     return (
         <>
             <ToastContainer />
@@ -85,7 +90,7 @@ const Table = () => {
             {tokens && tokens.map((token: any, index: number) => {
                 return <Row key={index} token={token} />
             })}
-            <RowToken />
+            <RowToken isOpen={isOpen} handleOpen={handleOpen} />
         </>
     )
 }
