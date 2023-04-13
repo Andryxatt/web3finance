@@ -8,7 +8,6 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { nativeBalance } from "../../../store/token/tokenSlice";
 import { useAccount, useProvider, useNetwork } from "wagmi";
 import { fetchSigner } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
@@ -28,7 +27,7 @@ interface TxInformation {
     isApproved: boolean;
 }
 export function SummaryToken(props: any) {
-    const native = useAppSelector(nativeBalance);
+    // const native = useAppSelector(nativeBalance);
 
     const networkSpeed = useAppSelector(selectedSpeed)
     const dispatch = useAppDispatch();
