@@ -131,8 +131,6 @@ const WalletModal = () => {
               ))}
             </div>
         }
-
-
       </Modal>
     </>
   );

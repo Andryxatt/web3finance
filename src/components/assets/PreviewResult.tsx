@@ -12,7 +12,7 @@ const PreviewResult = (props:any) =>{
     }, [])
     return (
         <div className="w-full">
-           <GasFeeEstimator/>
+            <GasFeeEstimator/>
             <ListOfRecipients/>
             <Summary showPrev={props.showPrev} isNative={props.isNative} token={props.token} isNativeFee={props.isNativeFee}/>
         </div>

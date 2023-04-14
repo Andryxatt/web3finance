@@ -87,7 +87,7 @@ const DepositWithdraw = (props: any) => {
             feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToast2, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                    dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
+                  await dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
                 })
             }).catch((err: any) => {
                 toast.update(idToast2, { render: "Your transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -111,7 +111,7 @@ const DepositWithdraw = (props: any) => {
             feeShare.withdraw(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                 result.wait().then(async (recept: any) => {
                     toast.update(idToastWithdraw, { render: "Withdraw succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                    dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
+                  await dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
                 }).catch((err: any) => {
                     toast.update(idToastWithdraw, { render: "Transaction rejected", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })

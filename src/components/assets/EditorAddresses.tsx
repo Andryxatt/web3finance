@@ -24,6 +24,7 @@ const EditorAddresses = (props: any) => {
     }
     useEffect(() => {
         return () => {
+            console.log("unmounting");
             setIsPreview(true);
         }
     }, [])

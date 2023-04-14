@@ -349,6 +349,7 @@ export const tokenSlice = createSlice({
           break;
         }
         case 56: {
+          //update single token in array
           state.bscTokens = state.bscTokens.map((token: Token) => {
             if (token.name === name) {
               token.isOpen = !token.isOpen;

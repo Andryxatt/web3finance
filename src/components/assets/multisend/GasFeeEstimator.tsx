@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { ethers } from "ethers";
 import Web3 from "web3";
-import { useNetwork } from "wagmi";
+import { useNetwork, useProvider } from "wagmi";
 import { useAppDispatch, useAppSelector } from "../../../store/hooks";
 // import {nativeBalance} from "../../../store/token/tokenSlice";
 import { getNetworkPriority, networkSpeedsArray, setSelectedPriority, updateSpeedSelected } from "../../../store/multiDeposit/multiDepositSlice";
 const GasFeeEstimator = () => {
+  const provid = useProvider();
   const speeds = useAppSelector(networkSpeedsArray);
   const dispatch = useAppDispatch();
   // const nativeTokenPrice = useAppSelector(nativeBalance);
@@ -37,35 +38,35 @@ const GasFeeEstimator = () => {
       const average = avg(blocks.map(b => b.priorityFeePerGas[1]));
       const fast = avg(blocks.map(b => b.priorityFeePerGas[2]));
       web3.eth.getBlock("pending").then((block) => {
-        const baseFee = Number(block.baseFeePerGas);
+        const baseFee = Number(block.baseFeePerGas) + 1000000000;
         let speeds = [{
           "speedName": "Low",
-          "maxPriorityFeePerGas": slow,
+          "maxPriorityFeePerGas": parseFloat(ethers.utils.formatUnits(slow, 'gwei')),
           "baseFeePerGas": baseFee,
-          "baseFeeFloat": parseFloat(ethers.utils.formatUnits(baseFee, 'gwei')).toFixed(2),
-          "maxPriorityFeePerGasFloat": parseFloat(ethers.utils.formatUnits(slow, 'gwei')).toFixed(2),
-          "maxFeePerGas": slow + baseFee,
-          "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(slow + baseFee, 'gwei')).toFixed(2),
+          "baseFeeFloat": parseFloat(ethers.utils.formatUnits(baseFee, 'gwei')).toFixed(9),
+          "maxPriorityFeePerGasFloat": parseFloat(ethers.utils.formatUnits(slow, 'gwei')).toFixed(9),
+          "maxFeePerGas": parseFloat(ethers.utils.formatUnits(slow + baseFee, 'gwei')),
+          "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(slow + baseFee, 'gwei')).toFixed(9),
           "selected": false
         },
         {
           "speedName": "Average",
-          "maxPriorityFeePerGas": average,
+          "maxPriorityFeePerGas": parseFloat(ethers.utils.formatUnits(average, 'gwei')),
           "baseFeePerGas": baseFee,
-          "baseFeeFloat": parseFloat(ethers.utils.formatUnits(baseFee, 'gwei')).toFixed(2),
-          "maxPriorityFeePerGasFloat": parseFloat(ethers.utils.formatUnits(average, 'gwei')).toFixed(2),
-          "maxFeePerGas": average + baseFee,
-          "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(average + baseFee, 'gwei')).toFixed(2),
+          "baseFeeFloat": parseFloat(ethers.utils.formatUnits(baseFee, 'gwei')).toFixed(9),
+          "maxPriorityFeePerGasFloat": parseFloat(ethers.utils.formatUnits(average, 'gwei')).toFixed(9),
+          "maxFeePerGas": parseFloat(ethers.utils.formatUnits(average + baseFee, 'gwei')),
+          "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(average + baseFee, 'gwei')).toFixed(9),
           "selected": false
         },
         {
           "speedName": "High",
-          "maxPriorityFeePerGas": fast,
+          "maxPriorityFeePerGas": parseFloat(ethers.utils.formatUnits(fast, 'gwei')),
           "baseFeePerGas": baseFee,
-          "baseFeeFloat": parseFloat(ethers.utils.formatUnits(baseFee, 'gwei')).toFixed(2),
-          "maxPriorityFeePerGasFloat": parseFloat(ethers.utils.formatUnits(fast, 'gwei')).toFixed(2),
-          "maxFeePerGas": fast + baseFee,
-          "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(baseFee + fast, 'gwei')).toFixed(2),
+          "baseFeeFloat": parseFloat(ethers.utils.formatUnits(baseFee, 'gwei')).toFixed(9),
+          "maxPriorityFeePerGasFloat": parseFloat(ethers.utils.formatUnits(fast, 'gwei')).toFixed(9),
+          "maxFeePerGas": parseFloat(ethers.utils.formatUnits(fast + baseFee, 'gwei')),
+          "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(baseFee + fast, 'gwei')).toFixed(9),
           "selected": false
         }];
         if (setSelectedSpeed === undefined) {
@@ -157,6 +158,39 @@ const GasFeeEstimator = () => {
     },
 
   ]
+  const speedsARB = [
+    {
+      "speedName": "Low",
+      "maxPriorityFeePerGas": 0.1,
+      "baseFeePerGas": 0.1,
+      "baseFeeFloat": "0.1",
+      "maxPriorityFeePerGasFloat": "0.1",
+      "maxFeePerGas": 0.1,
+      "maxFeePerGasFloat": "0.1",
+      "selected": false
+    },
+    {
+      "speedName": "Average",
+      "maxPriorityFeePerGas": 0.1,
+      "baseFeePerGas": 0.1,
+      "baseFeeFloat": "0.1",
+      "maxPriorityFeePerGasFloat": "0.1",
+      "maxFeePerGas": 0.1,
+      "maxFeePerGasFloat": "0.1",
+      "selected": true
+    },
+    {
+      "speedName": "Fast",
+      "maxPriorityFeePerGas": 0.1,
+      "baseFeePerGas": 0.1,
+      "baseFeeFloat": "0.1",
+      "maxPriorityFeePerGasFloat": "0.1",
+      "maxFeePerGas": 0.1,
+      "maxFeePerGasFloat": "0.1",
+      "selected": false
+    },
+
+  ]
   const speedsOptimism = [
     {
       "speedName": "Low",
@@ -191,29 +225,99 @@ const GasFeeEstimator = () => {
 
   ]
   useEffect(() =>{
-    const web3 = new Web3(Web3.givenProvider);
-    const subscription = web3.eth.subscribe('newBlockHeaders', function (error, result) {
-        if (error) {
-          console.error(error);
-        } else {
-          if (chain.id === 97 || chain.id === 56) {
-            dispatch(getNetworkPriority(speedsBSC))
-            dispatch(setSelectedPriority(speedsBSC[1]));
-          }
-          else if (chain.id === 10) {
-            dispatch(getNetworkPriority(speedsOptimism))
-            dispatch(setSelectedPriority(speedsOptimism[1]));
-          }
-          else {
-            feeCalculate();
-          }
-        }
-      })
+    if (chain.id === 97 || chain.id === 56) {
+      dispatch(getNetworkPriority(speedsBSC))
+      dispatch(setSelectedPriority(speedsBSC[1]));
+    }
+    else if (chain.id === 10) {
+      dispatch(getNetworkPriority(speedsOptimism))
+      dispatch(setSelectedPriority(speedsOptimism[1]));
+    }
+    else if (chain.id === 137) {
+       provid.on("block", async (blockNumber) => {
+        // This line of code listens to the block mining and every time a block is mined, it will return blocknumber.
+        if (chain.id === 137) {
+          fetch('https://gasstation-mainnet.matic.network/v2').then((res) => res.json()).then((data) => {
+            console.log('data', data)
+            let speedsPolygon = [
+              {
+                "speedName": "Low",
+                "maxPriorityFeePerGas": data.safeLow.maxPriorityFee,
+                "baseFeePerGas": data.estimatedBaseFee,
+                "baseFeeFloat": parseFloat(data.estimatedBaseFee).toFixed(2),
+                "maxPriorityFeePerGasFloat": parseFloat(data.safeLow.maxPriorityFee).toFixed(2),
+                "maxFeePerGas": data.safeLow.maxFee,
+                "maxFeePerGasFloat": parseFloat(data.safeLow.maxFee).toFixed(2),
+                "selected": false
+              },
+              {
+                "speedName": "Average",
+                "maxPriorityFeePerGas": data.standard.maxPriorityFee,
+                "baseFeePerGas": data.estimatedBaseFee,
+                "baseFeeFloat": parseFloat(data.estimatedBaseFee).toFixed(2),
+                "maxPriorityFeePerGasFloat": parseFloat(data.standard.maxPriorityFee).toFixed(2),
+                "maxFeePerGas": data.standard.maxFee,
+                "maxFeePerGasFloat": parseFloat(data.standard.maxFee).toFixed(2),
+                "selected": false
+              },
+              {
+                "speedName": "High",
+                "maxPriorityFeePerGas": data.fast.maxPriorityFee,
+                "baseFeePerGas": data.estimatedBaseFee,
+                "baseFeeFloat": parseFloat(data.estimatedBaseFee).toFixed(2),
+                "maxPriorityFeePerGasFloat": parseFloat(data.fast.maxPriorityFee).toFixed(2),
+                "maxFeePerGas": data.fast.maxFee,
+                "maxFeePerGasFloat": parseFloat(data.fast.maxFee).toFixed(2),
+                "selected": false
+              }
+            ]
+            if (setSelectedSpeed === undefined) {
+            speedsPolygon = speedsPolygon.map((speed, index) => {
+                if (index === 1) {
+                  dispatch(setSelectedPriority(speed))
+                  return { ...speed, selected: true }
+                  
+                } else {
+                  return { ...speed, selected: false }
+                }
+              })
+            }
+            else {
+              speedsPolygon = speedsPolygon.map((speed, index) => {
+                if (speed.speedName === setSelectedSpeed.name) {
+                  return { ...speed, selected: true }
+                } else {
+                  return { ...speed, selected: false }
+                }
+              })
+            }
+            dispatch(getNetworkPriority(speedsPolygon))
+          })
+      }
+      });
       return () => {
-        subscription.unsubscribe();
-      };
+        provid.removeAllListeners("block");
+      }
+    }
+    else if(chain.id === 42161){
+      dispatch(getNetworkPriority(speedsARB))
+      dispatch(setSelectedPriority(speedsARB[1]));
+    }
+    else{
+      provid.on("block", (blockNumber) => {
+        console.log('blockNumber', blockNumber)
+        feeCalculate();
+      });
+      return () => {
+        provid.removeAllListeners();
+      }
+    }
+  
+    
       // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+ 
   const selectPriority = async (e: any) => {
     setSelectedSpeed(e.speedName);
     dispatch(updateSpeedSelected(e.speedName));
