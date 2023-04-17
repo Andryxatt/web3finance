@@ -104,21 +104,23 @@ export function SummaryToken(props: any) {
                 }
                 setTotalAddressesPerTx(addressesArray.length);
                 const finalAmount = amountsArray.map((item: any) => {
-                    return ethers.utils.parseUnits(item);
+                    return ethers.utils.parseUnits(item, decimals);
                 });
                 const ammountT = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
                 setAmmount(ethers.utils.formatUnits(ammountT, decimals));
                 const feePerAddressNative = ethers.utils.parseUnits("200000000000000000", 'wei');
                 const msgValue = feePerAddressNative;
                 const gasPrice = await provider.getFeeData();
-                const feePerGas = gasPrice.maxFeePerGas.sub(gasPrice.maxPriorityFeePerGas).add(networkSpeed.maxPriorityFeePerGas)
+                console.log(gasPrice)
+                const feePerGas = gasPrice.maxFeePerGas.add(gasPrice.maxPriorityFeePerGas)
                 const txInfo = {
                     value: msgValue,
-                    "maxFeePerGas": feePerGas,
-                    "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGasFloat, 'gwei')
+                    "maxFeePerGas": gasPrice.maxFeePerGas,
+                    "maxPriorityFeePerGas": gasPrice.maxPriorityFeePerGas,
                 }
-
+                console.log(tokenErc20, "tokenErc20")
                 const isApproved = await tokenErc20.allowance(address, contractsAddresses[network.name][0].FeeShare);
+                console.log(isApproved, "isApproved")
                 if (ethers.utils.formatUnits(ammountT, decimals) > userBalanceToken) {
                     setError(true);
                     setErrorMessage(`You don't have enough tokens to send transaction. Need ${ethers.utils.formatUnits(ammountT, decimals)} ${symbol} but you have ${userBalanceToken} ${symbol}`)

@@ -45,7 +45,7 @@ const TopNavigation = () => {
                         <button onClick={showModal} type="button" id="button-close-nav" className="hidden sm:block self-end mt-5 mr-5 sm:text-white xs:text:wh md:text-white z-11"><CloseIcon/></button>
                         <ul className="flex flex-row md:flex-col p-2">
                             {links.map((link, index) => <NavigationLink key={index} link={link.link} name={link.name} />)}
-                        </ul>NavigationLink
+                        </ul>
                      <div className="flex flex-row pt-2 ml-3">
                     <a className="mr-2" href="https://web.telegram.org/z/"><img alt="telegram" className="w-[30px] h-[30px]" src={isMobile ? telegramWhite:telegram}/></a>
                     <a href="https://twitter.com/i/oauth2/authorize?response_type=code&client_id=TVFJdTV6SWFHdHdiVVdvclFZMVo6MTpjaQ&redirect_uri=https%3A%2F%2Ffaucets.chain.link%2Fapi%2Ftwitter%2Fcallback&state=state&scope=tweet.read%20users.read&code_challenge=challenge&code_challenge_method=plain"><img alt="twitter" className="w-[30px] h-[30px]" src={isMobile ? twitterWhite:twitter}/></a>

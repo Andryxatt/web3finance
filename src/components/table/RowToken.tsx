@@ -10,7 +10,7 @@ const RowToken = (props: any) => {
     const { isConnected } = useAccount()
     useEffect(() => {
         return () => {
-            props.handleOpen(false)
+            props.handleOpen(!props.isOpen)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])

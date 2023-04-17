@@ -1,16 +1,25 @@
-import EditorAddresses from '../assets/EditorAddresses';
 import AnimatedDots from '../AnimatedDots';
 import { openElement } from '../../store/token/tokenSlice';
 import { currentNetwork } from "../../store/network/networkSlice";
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useAccount,  useNetwork } from 'wagmi';
+import Editors from '../assets/Editors';
+import PreviewResult from '../assets/PreviewResult';
+import { useState } from 'react';
 
 const Row = (props: any) => {
     const dispatch = useAppDispatch();
     const network = useAppSelector(currentNetwork)
     const { isConnected } = useAccount()
     const {chain} = useNetwork()
-  
+    const [isNativeFee, setIsNativeFee] = useState(false);
+    const [isPreview, setIsPreview] = useState(true);
+    const toogleNativeFee = () => {
+        setIsNativeFee(!isNativeFee);
+    }
+    const showPreview = () => {
+        setIsPreview(!isPreview);
+    }
     return (
         <div className={
             (props.token.isOpen ?
@@ -42,9 +51,24 @@ const Row = (props: any) => {
                     {props.token.isNative ? "" : props.token.userBalanceDeposit === "0" ? <AnimatedDots /> : parseFloat(props.token.userBalanceDeposit).toFixed(2)}
                 </div>
             </div>
-            <div className={props.token.isOpen ? "isopen mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5 flex" : "hidden isopen"}>
-                <EditorAddresses token={props.token} isNative={props.token.isNative} />
+            <div className={props.token.isOpen ? "isopen mr-3 ml-3 mt-2 bg-blue-200 rounded-md px-5 py-5 mb-5 flex flex-col" : "hidden isopen"}>
+                {/* <EditorAddresses token={props.token} isNative={props.token.isNative} /> */}
+               
+                
+                {
+                   isPreview ?
+                            <>
+                            <Editors token={props.token} isNativeFee={isNativeFee} handleNativeFee={toogleNativeFee}/>
+                            <button className="bg-blue-500 max-w-[200px] text-white font-bold px-3 py-1 sm:mt-2 sm:mb-2 rounded-md" onClick={showPreview}>Next</button>
+                            </>
+                            
+                       
+                 :
+                        <PreviewResult isNativeFee={isNativeFee} token={props.token} isNative={props.token.isNative} showPrev={showPreview} />
+                }
+              
             </div>
+            
         </div>
     )
 }

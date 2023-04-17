@@ -76,6 +76,7 @@ export const multiDepositSlice = createSlice({
     updateSpeedSelected: (state, action) =>{
       //update state array with selected speed
       const newState = state.networkPriority.map((speed:SpeedNetwork) => speed.speedName === action.payload ? {...speed, selected: true} : {...speed, selected: false}); 
+      console.log(newState, "newState");
       state.selectedPriority = newState.filter((speed:SpeedNetwork) => speed.selected)[0];
       state.networkPriority = newState;
     }

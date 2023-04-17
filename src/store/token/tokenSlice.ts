@@ -46,6 +46,7 @@ export const CHAIN_SORT_TYPE_MAP: ChainSortTypeMap = {
   137: "asc",
   43114: "asc",
   42161: "asc",
+  80001: "asc",
 };
 export interface TokenMap {
   [id: number]: Token[];
@@ -156,6 +157,7 @@ export const tokenSlice = createSlice({
       if (chainId === 137) state.polygonTokens = [...state.polygonTokens, token];
       if (chainId === 43114) state.avalancheTokens = [...state.avalancheTokens, token];
       if (chainId === 42161) state.arbitrumTokens = [...state.arbitrumTokens, token];
+      // if(chainId === 80001) state.mumbaiTokens = [...state.mumbaiTokens, token]
     },
     getUserBalanceArbitrum: (state, action: PayloadAction<any>) => {
       const { newTokens } = action.payload;
@@ -290,7 +292,7 @@ export const tokenSlice = createSlice({
         // 97: state.bscTestTokens,
         137: state.polygonTokens,
         42161: state.arbitrumTokens,
-        // 80001: state.mumbaiTokens,
+        //  80001: state.mumbaiTokens,
         43114: state.avalancheTokens
       };
       const id = action.payload.id in tokens ? action.payload.id : 5;
@@ -1030,7 +1032,7 @@ export const fetchTokensPricesPolygon = createAsyncThunk(
 //     const providerMumbai = new ethers.providers.JsonRpcProvider('https://polygon-mumbai.g.alchemy.com/v2/' + process.env.REACT_APP_MUMBAI_KEY);
 //     const contractMumbai = new Contract(contractsAddresses["Polygon Mumbai"][0].PriceOracle, OracleAbi, providerMumbai);
 //     const newMumbai = state.token.mumbaiTokens.map(async (token: any) => {
-//       const tokenContract = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, providerMumbai);
+//       const tokenContract = new Contract(contractsAddresses["Polygon Mumbai"][0]["r" + token.name], RTokenAbi, providerMumbai);
 //       const mumbaiPrice = await contractMumbai.getAssetPrice(token.address);
 //       if (token.isNative) {
 //         return { ...token, tokenPrice: ethers.utils.formatUnits(mumbaiPrice, 8), deposits: "-" }
@@ -1357,6 +1359,7 @@ export const fetchUserBalanceSingleToken = createAsyncThunk(
 //         return { ...token, userBalanceDeposit: "0", userBalance: ethers.utils.formatUnits(userBalance, 18) }
 //       }
 //       else {
+//         console.log(state.network.selectedNetwork.name, "")
 //         const contractRToken = new Contract(contractsAddresses[state.network.selectedNetwork.name][0]["r" + token.name], RTokenAbi, provider);
 //         const contractToken = new Contract(token.address, RTokenAbi, provider);
 //         const userBalanceToken = await contractToken.balanceOf(address);

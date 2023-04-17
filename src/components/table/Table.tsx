@@ -17,6 +17,8 @@ import {
     fetchTokensPricesOptimism,
     fetchTokensPricesArbitrum,
     fetchUserBalanceArbitrum,
+    // fetchUserBalanceMumbai,
+    // fetchTokensPricesMumbai,
 } from "../../store/token/tokenSlice";
 import { changeSelectedNetwork } from "../../store/network/networkSlice";
 import { ToastContainer } from "react-toastify";
@@ -52,6 +54,9 @@ const Table = () => {
             else if (chain.id === 137) {
                 fetchTokenPricesAndBalance(fetchUserBalancePolygon,fetchTokensPricesPolygon, 137);
             }
+            // else if(chain.id === 80001){
+            //     fetchTokenPricesAndBalance(fetchUserBalanceMumbai,fetchTokensPricesMumbai, 80001);
+            // }
             else if (chain.id === 43114) {
                 fetchTokenPricesAndBalance(fetchUserBalanceAvalanche,fetchTokensPricesAvalanche, 43114);
             }

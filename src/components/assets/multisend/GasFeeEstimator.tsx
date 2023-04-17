@@ -9,6 +9,7 @@ const GasFeeEstimator = () => {
   const provid = useProvider();
   const speeds = useAppSelector(networkSpeedsArray);
   const dispatch = useAppDispatch();
+  const [blockNumber, setBlockNumber] = useState(null);
   // const nativeTokenPrice = useAppSelector(nativeBalance);
   const { chain } = useNetwork();
   const [selectedSpeed, setSelectedSpeed] = useState("Average");
@@ -21,7 +22,7 @@ const GasFeeEstimator = () => {
     56: "https://bsc-dataseed.binance.org/",
     97: "https://data-seed-prebsc-1-s1.binance.org:8545/",
     137: "https://rpc-mainnet.maticvigil.com/",
-    // 80001: `https://polygon-mumbai.infura.io/v3/${infuraApiKey}`,
+    //  80001: `https://polygon-mumbai.infura.io/v3/${infuraApiKey}`,
     42161: `https://arbitrum-mainnet.infura.io/v3/${infuraApiKey}`,
     43114: `https://avalanche-mainnet.infura.io/v3/${infuraApiKey}`
   };
@@ -69,7 +70,7 @@ const GasFeeEstimator = () => {
           "maxFeePerGasFloat": parseFloat(ethers.utils.formatUnits(baseFee + fast, 'gwei')).toFixed(9),
           "selected": false
         }];
-        if (setSelectedSpeed === undefined) {
+        if (selectedSpeed === undefined) {
           speeds = speeds.map((speed, index) => {
             if (index === 1) {
               return { ...speed, selected: true }
@@ -234,9 +235,8 @@ const GasFeeEstimator = () => {
       dispatch(setSelectedPriority(speedsOptimism[1]));
     }
     else if (chain.id === 137) {
-       provid.on("block", async (blockNumber) => {
+      const timeOut =  setInterval(() => {
         // This line of code listens to the block mining and every time a block is mined, it will return blocknumber.
-        if (chain.id === 137) {
           fetch('https://gasstation-mainnet.matic.network/v2').then((res) => res.json()).then((data) => {
             console.log('data', data)
             let speedsPolygon = [
@@ -271,7 +271,8 @@ const GasFeeEstimator = () => {
                 "selected": false
               }
             ]
-            if (setSelectedSpeed === undefined) {
+            if (selectedSpeed === undefined) {
+              console.log('setSelectedSpeed', selectedSpeed)
             speedsPolygon = speedsPolygon.map((speed, index) => {
                 if (index === 1) {
                   dispatch(setSelectedPriority(speed))
@@ -284,7 +285,8 @@ const GasFeeEstimator = () => {
             }
             else {
               speedsPolygon = speedsPolygon.map((speed, index) => {
-                if (speed.speedName === setSelectedSpeed.name) {
+                if (speed.speedName === selectedSpeed) {
+                  dispatch(setSelectedPriority(speed))
                   return { ...speed, selected: true }
                 } else {
                   return { ...speed, selected: false }
@@ -293,29 +295,32 @@ const GasFeeEstimator = () => {
             }
             dispatch(getNetworkPriority(speedsPolygon))
           })
-      }
-      });
+        }, 5000
+      )
+      
       return () => {
-        provid.removeAllListeners("block");
-      }
+        clearTimeout(timeOut)
+      };
     }
     else if(chain.id === 42161){
       dispatch(getNetworkPriority(speedsARB))
       dispatch(setSelectedPriority(speedsARB[1]));
     }
     else{
-      provid.on("block", (blockNumber) => {
-        console.log('blockNumber', blockNumber)
+      provid.on("block", (newBlockNumber) => {
+        if (newBlockNumber !== blockNumber) {
+          setBlockNumber(newBlockNumber);
+        }
         feeCalculate();
       });
       return () => {
-        provid.removeAllListeners();
-      }
+        provid.off("block");
+      };
     }
   
     
       // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [blockNumber])
 
  
   const selectPriority = async (e: any) => {
