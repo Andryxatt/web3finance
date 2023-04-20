@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useAccount,  useNetwork } from 'wagmi';
 import Editors from '../assets/Editors';
 import PreviewResult from '../assets/PreviewResult';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const Row = (props: any) => {
     const dispatch = useAppDispatch();
@@ -20,6 +20,12 @@ const Row = (props: any) => {
     const showPreview = () => {
         setIsPreview(!isPreview);
     }
+    useEffect(() => {
+        if (props.token.isOpen && props.tokenRowIsOpen) {
+            props.handleOpen()
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.token.isOpen])
     return (
         <div className={
             (props.token.isOpen ?

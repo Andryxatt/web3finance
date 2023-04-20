@@ -8,7 +8,7 @@ import {
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
-import { useAccount, useProvider, useNetwork } from "wagmi";
+import { useAccount, useNetwork } from "wagmi";
 import { fetchSigner } from '@wagmi/core';
 import contractsAddresses from "./../../../contracts/AddressesContracts.json";
 import FeeShareAbi from "./../../../contracts/FeeShare.json";
@@ -32,7 +32,6 @@ export function SummaryToken(props: any) {
     const networkSpeed = useAppSelector(selectedSpeed)
     const dispatch = useAppDispatch();
     const network = useAppSelector(currentNetwork);
-    const provider = useProvider();
     const { chain } = useNetwork();
     const { address } = useAccount();
     //Preloader
@@ -110,17 +109,14 @@ export function SummaryToken(props: any) {
                 setAmmount(ethers.utils.formatUnits(ammountT, decimals));
                 const feePerAddressNative = ethers.utils.parseUnits("200000000000000000", 'wei');
                 const msgValue = feePerAddressNative;
-                const gasPrice = await provider.getFeeData();
-                console.log(gasPrice)
-                const feePerGas = gasPrice.maxFeePerGas.add(gasPrice.maxPriorityFeePerGas)
+                const maxFeePerGas = ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei');
+                const maxPriorityFeePerGas = ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(1), 'gwei');
                 const txInfo = {
                     value: msgValue,
-                    "maxFeePerGas": gasPrice.maxFeePerGas,
-                    "maxPriorityFeePerGas": gasPrice.maxPriorityFeePerGas,
+                    "maxFeePerGas": maxFeePerGas,
+                    "maxPriorityFeePerGas": maxPriorityFeePerGas,
                 }
-                console.log(tokenErc20, "tokenErc20")
                 const isApproved = await tokenErc20.allowance(address, contractsAddresses[network.name][0].FeeShare);
-                console.log(isApproved, "isApproved")
                 if (ethers.utils.formatUnits(ammountT, decimals) > userBalanceToken) {
                     setError(true);
                     setErrorMessage(`You don't have enough tokens to send transaction. Need ${ethers.utils.formatUnits(ammountT, decimals)} ${symbol} but you have ${userBalanceToken} ${symbol}`)
@@ -146,16 +142,25 @@ export function SummaryToken(props: any) {
                         setIsCalculated(true);
                     }
                     else {
-                        const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.tokenAddress, addressesArray, finalAmount, txInfo);
+                        try {
+                            const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.tokenAddress, addressesArray, finalAmount, txInfo);
                         setTxToSend(txInform);
-                        setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
+                        setGasPrice(ethers.utils.formatEther(maxFeePerGas.mul(unitsUsed)));
                         setTxFee(ethers.utils.formatUnits(feePerAddressNative))
-                        const totalFee = ethers.utils.formatEther(feePerAddressNative.add(feePerGas.mul(unitsUsed)))
+                        const totalFee = ethers.utils.formatEther(feePerAddressNative.add(maxFeePerGas.mul(unitsUsed)))
                        
                         setTotalFee(totalFee);
 
                         setIsCalculated(true);
                         setLoading(false);
+                        }
+                        catch (error) {
+                            console.log(error)
+                            setError(true);
+                            setErrorMessage(error.data.message);
+                            setLoading(false);
+                            setIsCalculated(true);
+                        }
                     }
                     if (addressesAndAmounts.length === 0) {
                         setTotalTransactions(0)
@@ -176,8 +181,8 @@ export function SummaryToken(props: any) {
                         }
                         const unitsUsed = await tokenErc20.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountT);
                         setAmmount(ethers.utils.formatUnits(ammountT, decimals));
-                        setGasPrice(ethers.utils.formatEther(feePerGas.mul(unitsUsed)));
-                        setTotalFee(ethers.utils.formatUnits(feePerGas.mul(unitsUsed)));
+                        setGasPrice(ethers.utils.formatEther(maxFeePerGas.mul(unitsUsed)));
+                        setTotalFee(ethers.utils.formatUnits(maxFeePerGas.mul(unitsUsed)));
                         setTxToSend(txInform);
                         setLoading(false);
                         setIsCalculated(true);
@@ -190,6 +195,10 @@ export function SummaryToken(props: any) {
                     }
                     catch (err) {
                         console.log(err)
+                        setError(true);
+                        setErrorMessage("Not enough AVAX to send transaction.")
+                        setLoading(false);
+                        setIsCalculated(true);
                     }
                 }
             }
@@ -491,7 +500,6 @@ export function SummaryToken(props: any) {
                 res.wait().then(async (receipt: any) => {
                     toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     setTxToSend({ ...txToSend, isApproved: true });
-                    dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                     if (network.id === 56) {
                         calculateTokenAndPayNativeBSC();
                     }

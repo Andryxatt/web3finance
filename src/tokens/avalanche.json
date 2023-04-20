@@ -1,6 +1,7 @@
 {
     "Tokenization": [
         {
+            "id": 1,
             "name": "USDT",
             "decimals": 6,
             "address": "0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7",
@@ -15,6 +16,7 @@
             "isDeposit":false
         },
         {
+            "id": 2,
             "name":"USDC",
             "decimals": 6,
             "address": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
@@ -29,6 +31,7 @@
             "isDeposit":false
         },
         {
+            "id": 3,
             "name":"BUSD",
             "decimals": 18,
             "address": "0x9C9e5fD8bbc25984B178FdCE6117Defa39d2db39",
@@ -43,6 +46,7 @@
             "isDeposit":false
         },
         {
+            "id": 4,
             "name":"WAVAX",
             "decimals": 18,
             "address": "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
@@ -57,6 +61,7 @@
             "isDeposit":false
         },
         {
+            "id": 5,
             "name":"AVAX",
             "decimals": 18,
             "address": "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
@@ -71,6 +76,7 @@
             "isDeposit":false
         },
         {
+            "id": 6,
             "name":"DAI",
             "decimals": 18,
             "address": "0xd586E7F844cEa2F87f50152665BCbc2C279D8d70",
@@ -85,6 +91,7 @@
             "isDeposit":false
         },
         {
+            "id": 7,
             "name":"UNI",
             "decimals": 18,
             "address": "0x8eBAf22B6F053dFFeaf46f4Dd9eFA95D89ba8580",
@@ -99,6 +106,7 @@
             "isDeposit":false
         },
         {
+            "id": 8,
             "name":"WBTC",
             "decimals": 8,
             "address": "0x50b7545627a5162F82A992c33b87aDc75187B218",
@@ -113,6 +121,7 @@
             "isDeposit":false
         },
         {
+            "id": 9,
             "name":"LINK",
             "decimals": 18,
             "address": "0x5947BB275c521040051D82396192181b413227A3",

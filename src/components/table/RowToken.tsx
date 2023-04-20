@@ -1,11 +1,12 @@
 // import { currentNetwork } from "../../store/network/networkSlice";
-// import { useAppDispatch, useAppSelector } from '../../store/hooks';
+ import { useAppDispatch } from '../../store/hooks';
 import { useAccount } from 'wagmi';
 import { useEffect } from 'react';
 import EditorAddressesToken from '../assets/EditorAddressesToken';
+import { closeAllElements } from '../../store/token/tokenSlice';
 
 const RowToken = (props: any) => {
-    // const dispatch = useAppDispatch();
+    const dispatch = useAppDispatch();
     // const network = useAppSelector(currentNetwork)
     const { isConnected } = useAccount()
     useEffect(() => {
@@ -14,6 +15,12 @@ const RowToken = (props: any) => {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     },[])
+    useEffect(()=>{
+        if(props.isOpen === true){
+            dispatch(closeAllElements())
+        }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.isOpen])
     return (
         <div className={
             (props.isOpen ?

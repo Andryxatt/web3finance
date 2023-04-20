@@ -1,6 +1,7 @@
 {
     "Tokenization": [
         {
+            "id": 1,
             "name": "WMATIC",
             "decimals": 18,
             "address": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",
@@ -15,6 +16,7 @@
             "isDeposit":false
         },
         {
+            "id": 2,
             "name": "USDC",
             "decimals": 6,
             "address": "0xe11A86849d99F524cAC3E7A0Ec1241828e332C62",
@@ -29,6 +31,7 @@
             "isDeposit":false
         },
         {
+            "id": 3,
             "name": "MATIC",
             "decimals": 18,
             "address": "0x9c3C9283D3e44854697Cd22D3Faa240Cfb032889",

@@ -1,6 +1,7 @@
 {
     "Tokenization": [
         {
+            "id":1,
             "name": "USDT",
             "decimals": 18,
             "address": "0x94b008aA00579c1307B0EF2c499aD98a8ce58e58",
@@ -15,6 +16,7 @@
             "isDeposit":false
         },
         {
+            "id":2,
             "name":"USDC",
             "decimals": 18,
             "address": "0x7F5c764cBc14f9669B88837ca1490cCa17c31607",
@@ -29,6 +31,7 @@
             "isDeposit":false
         },
         {
+            "id":3,
             "name":"DAI",
             "decimals": 18,
             "address": "0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1",
@@ -43,6 +46,7 @@
             "isDeposit":false
         },
         {
+            "id":4,
             "name":"WBTC",
             "decimals": 18,
             "address": "0x68f180fcCe6836688e9084f035309E29Bf0A2095",
@@ -57,6 +61,7 @@
             "isDeposit":false
         },
         {
+            "id":5,
             "name":"LINK",
             "decimals": 18,
             "address": "0x350a791Bfc2C21F9Ed5d10980Dad2e2638ffa7f6",
@@ -71,6 +76,7 @@
             "isDeposit":false
         },
         {
+            "id":6,
             "name":"OP",
             "decimals": 18,
             "address": "0x4200000000000000000000000000000000000042",
@@ -85,6 +91,7 @@
             "isDeposit":false
         },
         {
+            "id":7,
             "name":"WETH",
             "decimals": 18,
             "address": "0x4200000000000000000000000000000000000006",
@@ -99,6 +106,7 @@
             "isDeposit":false
         },
         {
+            "id":8,
             "name":"ETH",
             "decimals": 18,
             "address": "0x4200000000000000000000000000000000000006",

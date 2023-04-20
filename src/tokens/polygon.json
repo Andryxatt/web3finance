@@ -1,6 +1,7 @@
 {
     "Tokenization": [
         {
+            "id":1,
             "name": "DAI",
             "decimals": 18,
             "address": "0x8f3Cf7ad23Cd3CaDbD9735AFf958023239c6A063",
@@ -15,6 +16,7 @@
             "isDeposit":false
         },
         {
+            "id":2,
             "name": "USDC",
             "decimals": 6,
             "address": "0x2791Bca1f2de4661ED88A30C99A7a9449Aa84174",
@@ -29,6 +31,7 @@
             "isDeposit":false
         },
         {
+            "id":3,
             "name": "USDT",
             "decimals": 6,
             "address": "0xc2132D05D31c914a87C6611C10748AEb04B58e8F",
@@ -43,6 +46,7 @@
             "isDeposit":false
         },
         {
+            "id":4,
             "name": "TUSD",
             "decimals": 18 ,
             "address": "0x2e1AD108fF1D8C782fcBbB89AAd783aC49586756",
@@ -57,6 +61,7 @@
             "isDeposit":false
         },
         {
+            "id":5,
             "name": "WMATIC",
             "decimals": 18,
             "address": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
@@ -71,6 +76,7 @@
             "isDeposit":false
         },
         {
+            "id":6,
             "name": "MATIC",
             "decimals": 18,
             "address": "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
@@ -85,6 +91,7 @@
             "isDeposit":false
         },
         {
+            "id":7,
             "name": "LINK",
             "decimals": 18,
             "address": "0x53E0bca35eC356BD5ddDFebbD1Fc0fD03FaBad39",
@@ -99,6 +106,7 @@
             "isDeposit":false
         },
         {
+            "id":8,
             "name": "WETH",
             "decimals": 18,
             "address": "0x7ceB23fD6bC0adD59E62ac25578270cFf1b9f619",
@@ -113,6 +121,7 @@
             "isDeposit":false
         },
         {
+            "id":9,
             "name": "BUSD",
             "decimals": 18,
             "address": "0xdAb529f40E671A1D4bF91361c21bf9f0C9712ab7",
@@ -127,6 +136,7 @@
             "isDeposit":false
         },
         {
+            "id":10,
             "name": "SHIB",
             "decimals": 18,
             "address": "0x6f8a06447Ff6FcF75d803135a7de15CE88C1d4ec",
@@ -141,6 +151,7 @@
             "isDeposit":false
         },
         {
+            "id":11,
             "name": "AVAX",
             "decimals": 18,
             "address": "0x2C89bbc92BD86F8075d1DEcc58C7F4E0107f286b",
@@ -155,6 +166,7 @@
             "isDeposit":false
         },  
         {
+            "id":12,
             "name": "UNI",
             "decimals": 18,
             "address": "0xb33EaAd8d922B1083446DC23f610c2567fB5180f",
@@ -168,6 +180,5 @@
             "inactive":false,
             "isDeposit":false
         }      
-
     ]
 }

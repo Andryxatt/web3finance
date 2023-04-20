@@ -1,6 +1,7 @@
 {
     "Tokenization": [
         {
+            "id": 1,
             "name": "WBNB",
             "decimals": 18,
             "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",
@@ -15,6 +16,7 @@
             "isDeposit":false
         },
         {
+            "id": 2,
             "name": "LINK",
             "decimals": 18,
             "address": "0x84b9B910527Ad5C03A9Ca831909E21e236EA7b06",
@@ -29,6 +31,7 @@
             "isDeposit":false
         },
         {
+            "id": 3,
             "name": "BNB",
             "decimals": 18,
             "address": "0xae13d989daC2f0dEbFf460aC112a837C89BAa7cd",

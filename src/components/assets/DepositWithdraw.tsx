@@ -72,7 +72,7 @@ const DepositWithdraw = (props: any) => {
                         await feeShare.deposit(token.address, ethers.utils.parseUnits(amount!.toString(), token.decimals)).then((result: any) => {
                             result.wait().then(async (recept: any) => {
                                 toast.update(idToastDepositApprove, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                               dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
+                             await dispatch(fetchUserBalanceSingleToken({address,token,networkName:network.name, provider}))
                             })
                         }).catch((err: any) => {
                             toast.update(idToastDepositApprove, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -135,8 +135,10 @@ const DepositWithdraw = (props: any) => {
             <div className={!props.isNativeFee ? "hidden" : "block"}>
                 <div className='font-bold text-center sm:text-sm'>To send token and pay fee in token make a deposit!</div>
                 <div className="flex flex-row md:flex-col mt-3 mb-4">
-                    <button className="p-2 bg-neutral-800 text-white w-full rounded-l-md md:mr-0 md:mb-3 sm:text-sm" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button><button onClick={()=>setMaxDeposit()} className="bg-transparent px-1 hover:bg-neutral-400 text-neutral-800 font-semibold hover:text-white border border-neutral-500 hover:border-transparent rounded-r-md">max</button>
-                    <button className="p-2 bg-neutral-800 text-white w-full rounded-l-md sm:text-sm ml-2" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button><button onClick={()=>setMaxWithdraw()} className="bg-transparent px-1 hover:bg-neutral-400 text-neutral-800 font-semibold hover:text-white border border-neutral-500 hover:border-transparent rounded-r-md">max</button>
+                    <button className="p-2 bg-neutral-800 text-white w-full rounded-l-md md:mr-0 md:mb-3 sm:mb-0 font-semibold sm:text-sm sm:rounded-t-md sm:rounded-b-none" onClick={() => { depositAmount(props.token, ammount) }}>Deposit</button>
+                    <button onClick={()=>setMaxDeposit()} className="bg-transparent p-1 hover:bg-neutral-400 text-neutral-800 font-semibold hover:text-white border border-neutral-500 hover:border-transparent rounded-r-md sm:rounded-t-none sm:rounded-b-md sm:mb-3">max</button>
+                    <button className="p-2 bg-neutral-800 text-white w-full rounded-l-md md:mr-0 md:mb-3 sm:mb-0 font-semibold sm:text-sm sm:rounded-t-md sm:rounded-b-none" onClick={() => { witdrawDeposit(props.token, ammount) }}>Withdraw</button>
+                    <button onClick={()=>setMaxWithdraw()} className="bg-transparent p-1 hover:bg-neutral-400 text-neutral-800 font-semibold hover:text-white border border-neutral-500 hover:border-transparent rounded-r-md sm:rounded-t-none sm:rounded-b-md">max</button>
                 </div>
                 <input value={ammount} onChange={(e) => { setAmmount(parseFloat(e.target.value)) }} type="number" className="w-full rounded-md p-2 sm:p-1" />
             </div>

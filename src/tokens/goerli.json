@@ -1,6 +1,7 @@
 {
     "Tokenization": [
         {
+            "id": 1,
             "name": "LINK",
             "decimals": 18,
             "address": "0x326C977E6efc84E512bB9C30f76E30c160eD06FB",
@@ -15,6 +16,7 @@
             "isDeposit":false
         },
         {
+            "id": 2,
             "name":"WETH",
             "decimals": 18,
             "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",
@@ -29,6 +31,7 @@
             "isDeposit":false
         },
         {
+            "id": 3,
             "name":"ETH",
             "decimals": 18,
             "address": "0xB4FBF271143F4FBf7B91A5ded31805e42b2208d6",

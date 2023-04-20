@@ -235,10 +235,69 @@ const GasFeeEstimator = () => {
       dispatch(setSelectedPriority(speedsOptimism[1]));
     }
     else if (chain.id === 137) {
+      fetch('https://gasstation-mainnet.matic.network/v2').then((res) => res.json()).then((data) => {
+        let speedsPolygon = [
+          {
+            "speedName": "Low",
+            "maxPriorityFeePerGas": data.safeLow.maxPriorityFee,
+            "baseFeePerGas": data.estimatedBaseFee,
+            "baseFeeFloat": parseFloat(data.estimatedBaseFee).toFixed(2),
+            "maxPriorityFeePerGasFloat": parseFloat(data.safeLow.maxPriorityFee).toFixed(2),
+            "maxFeePerGas": data.safeLow.maxFee,
+            "maxFeePerGasFloat": parseFloat(data.safeLow.maxFee).toFixed(2),
+            "selected": false
+          },
+          {
+            "speedName": "Average",
+            "maxPriorityFeePerGas": data.standard.maxPriorityFee,
+            "baseFeePerGas": data.estimatedBaseFee,
+            "baseFeeFloat": parseFloat(data.estimatedBaseFee).toFixed(2),
+            "maxPriorityFeePerGasFloat": parseFloat(data.standard.maxPriorityFee).toFixed(2),
+            "maxFeePerGas": data.standard.maxFee,
+            "maxFeePerGasFloat": parseFloat(data.standard.maxFee).toFixed(2),
+            "selected": false
+          },
+          {
+            "speedName": "High",
+            "maxPriorityFeePerGas": data.fast.maxPriorityFee,
+            "baseFeePerGas": data.estimatedBaseFee,
+            "baseFeeFloat": parseFloat(data.estimatedBaseFee).toFixed(2),
+            "maxPriorityFeePerGasFloat": parseFloat(data.fast.maxPriorityFee).toFixed(2),
+            "maxFeePerGas": data.fast.maxFee,
+            "maxFeePerGasFloat": parseFloat(data.fast.maxFee).toFixed(2),
+            "selected": false
+          }
+        ]
+        if (selectedSpeed === undefined) {
+          console.log('setSelectedSpeed', selectedSpeed)
+        speedsPolygon = speedsPolygon.map((speed, index) => {
+            if (index === 1) {
+              setSelectedSpeed(speed.speedName)
+              return { ...speed, selected: true }
+              
+            } else {
+              return { ...speed, selected: false }
+            }
+          })
+          dispatch(setSelectedPriority(speedsPolygon[1]))
+        }
+        else {
+          speedsPolygon = speedsPolygon.map((speed, index) => {
+            if (speed.speedName === selectedSpeed) {
+              setSelectedSpeed(speed.speedName)
+              return { ...speed, selected: true }
+            } else {
+              return { ...speed, selected: false }
+            }
+          })
+          dispatch(setSelectedPriority(speedsPolygon.filter(speed => speed.speedName === selectedSpeed)[0]))
+        }
+       
+        dispatch(getNetworkPriority(speedsPolygon))
+      })
       const timeOut =  setInterval(() => {
         // This line of code listens to the block mining and every time a block is mined, it will return blocknumber.
           fetch('https://gasstation-mainnet.matic.network/v2').then((res) => res.json()).then((data) => {
-            console.log('data', data)
             let speedsPolygon = [
               {
                 "speedName": "Low",
@@ -258,7 +317,7 @@ const GasFeeEstimator = () => {
                 "maxPriorityFeePerGasFloat": parseFloat(data.standard.maxPriorityFee).toFixed(2),
                 "maxFeePerGas": data.standard.maxFee,
                 "maxFeePerGasFloat": parseFloat(data.standard.maxFee).toFixed(2),
-                "selected": false
+                "selected": true
               },
               {
                 "speedName": "High",
@@ -271,31 +330,35 @@ const GasFeeEstimator = () => {
                 "selected": false
               }
             ]
+            console.log('selectedSpeed', selectedSpeed)
             if (selectedSpeed === undefined) {
               console.log('setSelectedSpeed', selectedSpeed)
             speedsPolygon = speedsPolygon.map((speed, index) => {
                 if (index === 1) {
-                  dispatch(setSelectedPriority(speed))
+                  setSelectedSpeed(speed.speedName)
                   return { ...speed, selected: true }
                   
                 } else {
                   return { ...speed, selected: false }
                 }
               })
+              dispatch(setSelectedPriority(speedsPolygon[1]))
             }
             else {
               speedsPolygon = speedsPolygon.map((speed, index) => {
                 if (speed.speedName === selectedSpeed) {
-                  dispatch(setSelectedPriority(speed))
+                  setSelectedSpeed(speed.speedName)
                   return { ...speed, selected: true }
                 } else {
                   return { ...speed, selected: false }
                 }
               })
+              dispatch(setSelectedPriority(speedsPolygon.filter(speed => speed.speedName === selectedSpeed)[0]))
             }
+           
             dispatch(getNetworkPriority(speedsPolygon))
           })
-        }, 5000
+        }, 10000
       )
       
       return () => {
@@ -318,11 +381,11 @@ const GasFeeEstimator = () => {
       };
     }
   
-    
+      console.log('selectedSpeed', selectedSpeed)
       // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [blockNumber])
+  }, [blockNumber, selectedSpeed])
 
- 
+  
   const selectPriority = async (e: any) => {
     setSelectedSpeed(e.speedName);
     dispatch(updateSpeedSelected(e.speedName));

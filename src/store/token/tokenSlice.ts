@@ -64,6 +64,7 @@ export interface Token {
   isStablecoin: boolean;
   inactive: boolean;
   isDeposit: boolean;
+  id: number;
 }
 
 const initialState: TokenState = {
@@ -155,7 +156,12 @@ export const tokenSlice = createSlice({
       if (chainId === 10) state.optimismTokens = [...state.optimismTokens, token];
       if (chainId === 56) state.bscTokens = [...state.bscTokens, token];
       if (chainId === 137) state.polygonTokens = [...state.polygonTokens, token];
-      if (chainId === 43114) state.avalancheTokens = [...state.avalancheTokens, token];
+      if (chainId === 43114){
+        const tokenIndex = state.avalancheTokens.findIndex((tok) => tok.id === token.id);
+        if (tokenIndex !== -1) {
+          state.avalancheTokens[tokenIndex] = token;
+        }
+      }
       if (chainId === 42161) state.arbitrumTokens = [...state.arbitrumTokens, token];
       // if(chainId === 80001) state.mumbaiTokens = [...state.mumbaiTokens, token]
     },
@@ -582,39 +588,39 @@ export const tokenSlice = createSlice({
       switch (action.payload.network) {
         case "Binance Smart Chain": {
           state.bscTokens = state.bscTokens.map((token: Token) => {
-            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+            return token.id === action.payload.token.id ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
           });
           break;
         }
         case "Ethereum": {
           state.ethTokens = state.ethTokens.map((token: Token) => {
-            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+            return token.id === action.payload.token.id ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
           });
           break;
         }
         case "Polygon": {
           state.polygonTokens = state.polygonTokens.map((token: Token) => {
-            return token.address === action.payload.token.address ? action.payload.token : token;
+            return token.id === action.payload.token.id ? action.payload.token : token;
           });
           break;
         }
         case "Avalanche": {
           state.avalancheTokens = state.avalancheTokens.map((token: Token) => {
-            return token.address === action.payload.token.address ? action.payload.token : token;
+            return token.id === action.payload.token.id ? action.payload.token : token;
           }
           );
           break;
         }
         case "Arbitrum": {
           state.arbitrumTokens = state.arbitrumTokens.map((token: Token) => {
-            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+            return token.id === action.payload.token.id ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
           }
           );
           break;
         }
         case "Optimism": {
           state.optimismTokens = state.optimismTokens.map((token: Token) => {
-            return token.address === action.payload.token.address ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
+            return token.id === action.payload.token.id ? action.payload.token : {...token, userBalanceDeposit: action.payload.token.userBalanceDeposit, userBalance: action.payload.token.userBalance, isDeposit: action.payload.token.isDeposit};
           }
           );
           break;
@@ -1325,8 +1331,9 @@ export const fetchUserBalanceSingleToken = createAsyncThunk(
     const userBalance = await provider.getBalance(address);
     const userBalanceToken = await contractToken.balanceOf(address);
     const deposits = token.isNative ? '-' : ethers.utils.formatUnits(totalSupply, decimalsRtoken);
-  
-    const newToken = { ...token, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance:token.isNative ? ethers.utils.formatUnits(userBalance, token.decimals) : ethers.utils.formatUnits(userBalanceToken, token.decimals), isDeposit: userBalanceDeposit.gt(0), deposits: deposits }
+    
+    const newToken = { ...token, id:token.id, isNative:token.isNative, name:token.name, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance:token.isNative ? ethers.utils.formatUnits(userBalance, token.decimals) : ethers.utils.formatUnits(userBalanceToken, token.decimals), isDeposit: userBalanceDeposit.gt(0), deposits: deposits }
+    console.log(newToken, "newToken")
     Promise.resolve(newToken);
     return { token: newToken, network: networkName }
   }

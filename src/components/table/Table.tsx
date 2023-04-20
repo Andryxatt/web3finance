@@ -93,7 +93,7 @@ const Table = () => {
             <ToastContainer />
             <TableHeader />
             {tokens && tokens.map((token: any, index: number) => {
-                return <Row key={index} token={token} />
+                return <Row key={index} token={token} tokenRowIsOpen={isOpen} handleOpen={handleOpen} />
             })}
             <RowToken isOpen={isOpen} handleOpen={handleOpen} />
         </>
