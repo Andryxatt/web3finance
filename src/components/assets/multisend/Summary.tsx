@@ -1,11 +1,12 @@
 import { Contract, ethers, Wallet } from "ethers";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import MultiSendError from "./MultiSendError";
 import {
     addressesToSend,
     calculateTotalAmountTokens,
     removeSendedAddress,
-    selectedSpeed
+    selectedSpeed,
+    
 } from "../../../store/multiDeposit/multiDepositSlice";
 import { useAppSelector, useAppDispatch } from "../../../store/hooks";
 import { currentNetwork } from "../../../store/network/networkSlice";
@@ -17,6 +18,7 @@ import RTokenAbi from "./../../../contracts/RTokenAbi.json";
 import MinimalForwarderAbi from "./../../../contracts/MinimalForwarderAbi.json";
 import { toast } from "react-toastify";
 import { fetchUserBalanceSingleToken } from "../../../store/token/tokenSlice";
+
 interface TxInformation {
     method: any;
     token: any;
@@ -56,6 +58,47 @@ export function Summary(props: any) {
     const [errorMessage, setErrorMessage] = useState("");
 
     const [isCalculated, setIsCalculated] = useState(false);
+    const returnAddressesAndAmounts = (isNative) => {
+        let addressesArray = [];
+        let amountsArray = [];
+        if (isNative) {
+            if (addressesAndAmounts.length > 254) {
+                addressesArray = addressesAndAmounts.slice(0, 254).map((item: any) => {
+                    return item.address;
+                });
+                amountsArray = addressesAndAmounts.slice(0, 254).map((item: any) => {
+                    return item.amount.toString().trim();
+                });
+            }
+            else {
+                addressesArray = addressesAndAmounts.map((item: any) => {
+                    return item.address;
+                });
+                amountsArray = addressesAndAmounts.map((item: any) => {
+                    return item.amount.toString().trim();
+                });
+            }
+        }
+        else {
+            if (addressesAndAmounts.length > 255) {
+                addressesArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
+                    return item.address;
+                });
+                amountsArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
+                    return item.amount.toString().trim();
+                });
+            }
+            else {
+                addressesArray = addressesAndAmounts.map((item: any) => {
+                    return item.address;
+                });
+                amountsArray = addressesAndAmounts.map((item: any) => {
+                    return item.amount.toString().trim();
+                });
+            }
+        }
+        return { addressesArray, amountsArray }
+    }
     const calculateNative = async () => {
         setIsCalculated(false)
         setError(false);
@@ -63,29 +106,14 @@ export function Summary(props: any) {
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const feePerAddressNative = await feeShare["calculateFee()"]();
-        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
-        let addressesArray = [];
-        let amountsArray = [];
+        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 254 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 254));
         if (addressesAndAmounts.length === 0) {
-            addressesArray = [];
-            amountsArray = [];
+            setError(true);
+            setErrorMessage("You need to add at least one address and amount to send");
+            setLoading(false);
+            setIsCalculated(true);
         }
-        else if (addressesAndAmounts.length > 253) {
-            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        else {
-            addressesArray = addressesAndAmounts.map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
+        const { addressesArray, amountsArray } = returnAddressesAndAmounts(props.token.isNative);
         setTotalAddressesPerTx(addressesArray.length + 1);
         const totalTokensToSend = addressesArray.length;
         //in for loop total amount of tokens to send
@@ -142,43 +170,29 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
     }
-    const calculateNativePolygon = async () => {
+
+   
+
+    const calculateNativePolygon = useCallback(async () => {
         setIsCalculated(false)
         setError(false);
         setErrorMessage('');
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const feePerAddressNative = await feeShare["calculateFee()"]();
-        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
-        let addressesArray = [];
-        let amountsArray = [];
+        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 254 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 254));
         if (addressesAndAmounts.length === 0) {
-                setGasPrice("0");
-                setTxFee("0");
-                setTotalFee("0");
-                setAmmount("0");
-                setLoading(false);
-                setIsCalculated(true);
-                setError(true);
-                setErrorMessage("You need to add at least one address to send tokens");
+            setGasPrice("0");
+            setTxFee("0");
+            setTotalFee("0");
+            setAmmount("0");
+            setLoading(false);
+            setIsCalculated(true);
+            setError(true);
+            setErrorMessage("You need to add at least one address to send tokens");
         }
-        else if (addressesAndAmounts.length > 253) {
-            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        else {
-            addressesArray = addressesAndAmounts.map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        setTotalAddressesPerTx(addressesArray.length + 1);
+        const { addressesArray, amountsArray } = returnAddressesAndAmounts(props.token.isNative);
+        setTotalAddressesPerTx(addressesArray.length);
         const totalTokensToSend = addressesArray.length;
         //in for loop total amount of tokens to send
 
@@ -190,12 +204,12 @@ export function Summary(props: any) {
         addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
         const msgValue = feePerAddressNative.mul(totalTokensToSend).add(total);
 
-        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei').mul(110).div(100);
-        const maxPriorityFeePerGas =  ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(1), 'gwei').mul(110).div(100);
+        const maxFeePerGas = ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei');
+        const maxPriorityFeePerGas = ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(1), 'gwei');
         const txInfo = {
             value: msgValue,
-            "maxPriorityFeePerGas": maxPriorityFeePerGas,
-            "maxFeePerGas": maxFeePerGas
+            maxPriorityFeePerGas,
+            maxFeePerGas
         }
 
         const txInform = {
@@ -207,14 +221,14 @@ export function Summary(props: any) {
             isApproved: true
         }
         try {
-                const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, txInfo);
-                setGasPrice(unitsUsed.mul(maxFeePerGas).toString());
-                setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
-                setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(maxFeePerGas.mul(unitsUsed))));
-                setTxToSend(txInform);
-                setAmmount(ethers.utils.formatUnits(total, props.token.decimals));
-                setLoading(false);
-                setIsCalculated(true);
+            const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, {value:msgValue});
+            setGasPrice(unitsUsed.mul(maxFeePerGas).toString());
+            setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
+            setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(maxFeePerGas.mul(unitsUsed))));
+            setTxToSend(txInform);
+            setAmmount(ethers.utils.formatUnits(total, props.token.decimals));
+            setLoading(false);
+            setIsCalculated(true);
 
         }
         catch {
@@ -223,7 +237,10 @@ export function Summary(props: any) {
             setLoading(false);
             setIsCalculated(true);
         }
-    }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [props.token.isNative, props.token.address, networkSpeed, props.contractsAddresses, props.addressesAndAmounts]);
+
+    // rest of component code
     const calculateNativeBSC = async () => {
         setIsCalculated(false)
         setError(false);
@@ -235,30 +252,9 @@ export function Summary(props: any) {
             setTotalTransactions(0)
         }
         else {
-            setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+            setTotalTransactions(addressesAndAmounts.length / 254 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 254));
         }
-        let addressesArray = [];
-        let amountsArray = [];
-        if (addressesAndAmounts.length === 0) {
-            addressesArray = [];
-            amountsArray = [];
-        }
-        else if (addressesAndAmounts.length > 253) {
-            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        else {
-            addressesArray = addressesAndAmounts.map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
+        const { addressesArray, amountsArray } = returnAddressesAndAmounts(props.token.isNative);
         setTotalAddressesPerTx(addressesArray.length + 1);
         const totalTokensToSend = addressesArray.length;
         // for(let i = 0; i < amountsArray.length; i++){
@@ -322,40 +318,14 @@ export function Summary(props: any) {
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const feePerAddressNative = await feeShare["calculateFee()"]();
-        setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
-        let addressesArray = [];
-        let amountsArray = [];
-        if (addressesAndAmounts.length === 0) {
-            addressesArray = [];
-            amountsArray = [];
-        }
-        else if (addressesAndAmounts.length > 253) {
-            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        else {
-            addressesArray = addressesAndAmounts.map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
+        setTotalTransactions(addressesAndAmounts.length / 254 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 254));
+        const { addressesArray, amountsArray } = returnAddressesAndAmounts(props.token.isNative);
         setTotalAddressesPerTx(addressesArray.length + 1);
         const totalTokensToSend = addressesArray.length;
-        // for(let i = 0; i < amountsArray.length; i++){
-        //     totalAmmountTokens += parseFloat((amountsArray[i] * 100000).toString());
-        // }
-        // const totalAmmountTokens = amountsArray.reduce((acc: any, b: any) => (parseFloat(acc) + parseFloat(b)), 0);
         const finalAmount = amountsArray.map((item: any) => {
             return ethers.utils.parseUnits(item.toString(), props.token.decimals);
         });
         const totalAmmountTokens = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
-
         finalAmount.unshift(totalAmmountTokens.toString());
         addressesArray.unshift(contractsAddresses[network.name][0].FeeShare);
         const msgValue = feePerAddressNative.mul(totalTokensToSend).add(totalAmmountTokens);
@@ -364,7 +334,6 @@ export function Summary(props: any) {
             value: msgValue,
             gasPrice: gasPrice
         }
-
         const txInform = {
             method: "multiSend(address[],uint256[])",
             token: props.token.address,
@@ -413,9 +382,21 @@ export function Summary(props: any) {
             const receipt = await tx.wait();
             if (receipt.status === 1) {
                 toast.update(idToastNative, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
-                await dispatch(removeSendedAddress(txToSend.addressesToSend.length));
+                dispatch(removeSendedAddress(txToSend.addressesToSend.length));
                 setIsCalculated(true);
-               await dispatch(fetchUserBalanceSingleToken({ address: address, roken: props.token, networkName: network.name, provider }))
+                await dispatch(fetchUserBalanceSingleToken({ address: address, roken: props.token, networkName: network.name, provider }))
+                if (network.id === 137) {
+                    calculateNativePolygon();
+                }
+                else if (network.id === 10) {
+                    calculateNativeOptimism();
+                }
+                else if (network.id === 56) {
+                    calculateNativeBSC();
+                }
+                else {
+                    calculateNative();
+                }
             }
             else {
                 toast.update(idToastNative, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -431,11 +412,9 @@ export function Summary(props: any) {
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const feePerAddressNative = await feeShare["calculateFee()"]();
-        let addressesArray = [];
-        let amountsArray = [];
+        const { addressesArray, amountsArray } = returnAddressesAndAmounts(props.token.isNative);
         if (addressesAndAmounts.length === 0) {
-            addressesArray = [];
-            amountsArray = [];
+
             setGasPrice("0");
             setTxFee("0");
             setTotalFee("0");
@@ -445,25 +424,10 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
         else {
-            if (addressesAndAmounts.length > 253) {
-                addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                    return item.address;
-                });
-                amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                    return item.amount.toString().trim();
-                });
-            }
-            else {
-                addressesArray = addressesAndAmounts.map((item: any) => {
-                    return item.address;
-                });
-                amountsArray = addressesAndAmounts.map((item: any) => {
-                    return item.amount.toString().trim();
-                });
-            }
+
             setTotalAddressesPerTx(addressesArray.length);
 
-            const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
+            const msgValue = feePerAddressNative.mul(addressesArray.length);
             const txInfo = {
                 value: msgValue,
                 "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(1), 'gwei'),
@@ -501,7 +465,7 @@ export function Summary(props: any) {
                     setIsCalculated(true);
                 }
                 else {
-                    try{
+                    try {
                         const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addressesArray, finalAmount, txInfo);
                         setTxToSend(txInform);
                         setGasPrice(ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei').mul(unitsUsed).toString());
@@ -510,20 +474,20 @@ export function Summary(props: any) {
                         setIsCalculated(true);
                         setLoading(false);
                     }
-                    catch(err){
+                    catch (err) {
                         console.log(err);
                         setError(true);
                         setErrorMessage("Error calculating gas fee. Please try again later");
                         setLoading(false);
                         setIsCalculated(true);
                     }
-                   
+
                 }
                 if (addressesAndAmounts.length === 0) {
                     setTotalTransactions(0)
                 }
                 else {
-                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+                    setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
                 }
             }
             else {
@@ -536,7 +500,10 @@ export function Summary(props: any) {
                         txInfo,
                         isApproved: false
                     }
-                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountT);
+                    const dataToApprove = addressesAndAmounts.map((item: any) => {
+                        return ethers.utils.parseUnits(item.amount.trim(), props.token.decimals);
+                    }).reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, dataToApprove);
 
                     setAmmount(ethers.utils.formatUnits(ammountT, props.token.decimals));
                     setGasPrice(ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei').mul(unitsUsed).toString());
@@ -548,11 +515,10 @@ export function Summary(props: any) {
                         setTotalTransactions(0)
                     }
                     else {
-                        setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
+                        setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 255) + 1);
                     }
                 }
                 catch (err) {
-                    console.log("Incufficient allowance")
                     setError(true);
                     setErrorMessage("Not enough allowance. Please try again later");
                     setLoading(false);
@@ -587,11 +553,11 @@ export function Summary(props: any) {
             setError(true);
         }
         else {
-            if (addressesAndAmounts.length > 253) {
-                addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+            if (addressesAndAmounts.length > 255) {
+                addressesArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                     return item.address;
                 });
-                amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                amountsArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                     return item.amount.toString().trim();
                 });
             }
@@ -605,7 +571,7 @@ export function Summary(props: any) {
             }
             setTotalAddressesPerTx(addressesArray.length);
 
-            const msgValue = feePerAddressNative.mul(addressesAndAmounts.length);
+            const msgValue = feePerAddressNative.mul(amountsArray.length);
             const txInfo = {
                 value: msgValue,
                 "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(1), 'gwei'),
@@ -642,8 +608,8 @@ export function Summary(props: any) {
                     setIsCalculated(true);
                 }
                 else {
-                    try{
-                        const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addressesArray, finalAmount, txInfo);
+                    try {
+                        const unitsUsed = await feeShare.estimateGas["multiSend(address,address[],uint256[])"](props.token.address, addressesArray, finalAmount);
                         setTxToSend(txInform);
                         setGasPrice(ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei').mul(unitsUsed).toString());
                         setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(addressesArray.length)))
@@ -651,20 +617,20 @@ export function Summary(props: any) {
                         setIsCalculated(true);
                         setLoading(false);
                     }
-                    catch(err){
+                    catch (err) {
                         console.log(err);
                         setError(true);
                         setErrorMessage("Error calculating gas fee. Please try again later");
                         setLoading(false);
                         setIsCalculated(true);
                     }
-                   
+
                 }
                 if (addressesAndAmounts.length === 0) {
                     setTotalTransactions(0)
                 }
                 else {
-                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+                    setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
                 }
             }
             else {
@@ -677,7 +643,10 @@ export function Summary(props: any) {
                         txInfo,
                         isApproved: false
                     }
-                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountT);
+                    const dataToApprove = addressesAndAmounts.map((item: any) => {
+                        return ethers.utils.parseUnits(item.amount.trim(), props.token.decimals);
+                    }).reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, dataToApprove);
 
                     setAmmount(ethers.utils.formatUnits(ammountT, props.token.decimals));
                     setGasPrice(ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei').mul(unitsUsed).toString());
@@ -689,7 +658,7 @@ export function Summary(props: any) {
                         setTotalTransactions(0)
                     }
                     else {
-                        setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
+                        setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 255) + 1);
                     }
                 }
                 catch (err) {
@@ -725,11 +694,11 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
         else {
-            if (addressesAndAmounts.length > 253) {
-                addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+            if (addressesAndAmounts.length > 255) {
+                addressesArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                     return item.address;
                 });
-                amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                amountsArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                     return item.amount.toString().trim();
                 });
             }
@@ -794,7 +763,7 @@ export function Summary(props: any) {
                     setTotalTransactions(0)
                 }
                 else {
-                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+                    setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
                 }
             }
             else {
@@ -807,7 +776,10 @@ export function Summary(props: any) {
                         txInfo,
                         isApproved: false
                     }
-                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountT);
+                    const dataToApprove = addressesAndAmounts.map((item: any) => {
+                        return ethers.utils.parseUnits(item.amount.trim(), props.token.decimals);
+                    }).reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, dataToApprove);
                     setAmmount(ethers.utils.formatUnits(ammountT, props.token.decimals));
                     setGasPrice(gasPrice.mul(unitsUsed).toString());
                     setTotalFee(ethers.utils.formatUnits(gasPrice.mul(unitsUsed)));
@@ -818,7 +790,7 @@ export function Summary(props: any) {
                         setTotalTransactions(0)
                     }
                     else {
-                        setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
+                        setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 255) + 1);
                     }
                 }
                 catch (err) {
@@ -828,8 +800,6 @@ export function Summary(props: any) {
             }
             setLoading(false);
         }
-
-
     }
     const calculateTokenAndPayNativeOptimism = async () => {
         setIsCalculated(false);
@@ -851,11 +821,11 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
         else {
-            if (addressesAndAmounts.length > 253) {
-                addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+            if (addressesAndAmounts.length > 255) {
+                addressesArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                     return item.address;
                 });
-                amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+                amountsArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                     return item.amount.toString().trim();
                 });
             }
@@ -920,7 +890,7 @@ export function Summary(props: any) {
                     setTotalTransactions(0)
                 }
                 else {
-                    setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+                    setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
                 }
             }
             else {
@@ -933,7 +903,10 @@ export function Summary(props: any) {
                         txInfo,
                         isApproved: false
                     }
-                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, ammountT);
+                    const dataToApprove = addressesAndAmounts.map((item: any) => {
+                        return ethers.utils.parseUnits(item.amount.trim(), props.token.decimals);
+                    }).reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+                    const unitsUsed = await tokenContract.estimateGas.approve(contractsAddresses[network.name][0].FeeShare, dataToApprove);
 
                     setAmmount(ethers.utils.formatUnits(ammountT, props.token.decimals));
                     setGasPrice(gasPrice.mul(unitsUsed).toString());
@@ -945,7 +918,7 @@ export function Summary(props: any) {
                         setTotalTransactions(0)
                     }
                     else {
-                        setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 253) + 1);
+                        setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 2 : Math.ceil(addressesAndAmounts.length / 255) + 1);
                     }
                 }
                 catch (err) {
@@ -957,7 +930,7 @@ export function Summary(props: any) {
         }
     }
     const sendTokenAndPayNative = async () => {
-        
+
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
@@ -971,7 +944,7 @@ export function Summary(props: any) {
                         calculateTokenAndPayNativeBSC();
                         dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                     }
-                    else if(isConnected && network.id === 137){
+                    else if (isConnected && network.id === 137) {
                         calculateTokenAndPayNativePolygon();
                         dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                     }
@@ -990,24 +963,20 @@ export function Summary(props: any) {
             });
         }
         else {
+            const dataToApprove = addressesAndAmounts.map((item: any) => {
+                return ethers.utils.parseUnits(item.amount.trim(), props.token.decimals);
+            }).reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
             const tokenContract = new Contract(props.token.address, RTokenAbi, signer);
             const approveToast = toast.loading("Approving please wait...")
             if (network.id === 56) {
                 // const gasPrice = await provider.getGasPrice();
-                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimals)).then((res: any) => {
+                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, dataToApprove).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
-                      
-                            calculateTokenAndPayNativeBSC();
-                           sendTokenAndPayNative();
-                    
+                        calculateTokenAndPayNativeBSC();
+                        sendTokenAndPayNative();
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                        // if(isConnected && provider && network){
-                        //     dispatch(fetchUserBalanceSingleToken({address,token:props.token,networkName:network.name, provider})).then(()=>{
-                        //      dispatch(fetchTokensPricesSingleToken({token:props.token, networkName:network.name, provider}))
-                        //     })
-                        // }
                     }).catch((err: any) => {
                         toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     });
@@ -1015,13 +984,13 @@ export function Summary(props: any) {
                     toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
             }
-            else if(network.id === 137){
-                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimals)).then((res: any) => {
+            else if (network.id === 137) {
+                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, dataToApprove).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
-                            calculateTokenAndPayNativePolygon();
-                           sendTokenAndPayNative();
+                        calculateTokenAndPayNativePolygon();
+                        sendTokenAndPayNative();
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                     }).catch((err: any) => {
                         toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -1031,13 +1000,13 @@ export function Summary(props: any) {
                 })
             }
             else {
-                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, ethers.utils.parseUnits(ammount, props.token.decimals), { "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei'), "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(1), 'gwei') }).then((res: any) => {
+                tokenContract.approve(contractsAddresses[network.name][0].FeeShare, dataToApprove, { "maxFeePerGas": ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(1), 'gwei'), "maxPriorityFeePerGas": ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(1), 'gwei') }).then((res: any) => {
                     res.wait().then(async (receipt: any) => {
                         toast.update(approveToast, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                         setTxToSend({ ...txToSend, isApproved: true });
-                       await calculateTokenAndPayNative()
+                        await calculateTokenAndPayNative()
                         await sendTokenAndPayNative()
-                     
+
                     }).catch((err: any) => {
                         toast.update(approveToast, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     });
@@ -1057,11 +1026,11 @@ export function Summary(props: any) {
         if (parseFloat(ethers.utils.formatUnits(isApproved, props.token.decimals)) >= parseFloat(ammount)) {
             const idToastSendTokenNativeFee = toast.loading("Sending transaction please wait...")
             feeShare[txToSend.method](props.token.address, txToSend.addressesToSend, txToSend.finalAmount, txToSend.txInfo).then((tx: any) => {
-                tx.wait().then(async(receipt: any) => {
+                tx.wait().then(async (receipt: any) => {
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction succesfuly", autoClose: 2000, type: "success", isLoading: false, position: toast.POSITION.TOP_CENTER });
                     dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                   await calculateTokenAndPayNativeOptimism();
-                   await dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
+                    await calculateTokenAndPayNativeOptimism();
+                    await dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                 }).catch((err: any) => {
                     console.log(err, "err")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
@@ -1097,7 +1066,7 @@ export function Summary(props: any) {
             setTotalTransactions(0)
         }
         else {
-            setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+            setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
         }
         let addressesArray = [];
         let amountsArray = [];
@@ -1105,11 +1074,11 @@ export function Summary(props: any) {
             addressesArray = [];
             amountsArray = [];
         }
-        else if (addressesAndAmounts.length > 253) {
-            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+        else if (addressesAndAmounts.length > 255) {
+            addressesArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                 return item.address;
             });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+            amountsArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                 return item.amount.toString().trim();
             });
         }
@@ -1117,7 +1086,7 @@ export function Summary(props: any) {
             addressesArray = addressesAndAmounts.map((item: any) => {
                 return item.address;
             });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+            amountsArray = addressesAndAmounts.map((item: any) => {
                 return item.amount.toString().trim();
             });
         }
@@ -1182,43 +1151,22 @@ export function Summary(props: any) {
             setTotalTransactions(0)
         }
         else {
-            setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+            setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
         }
-        let recipients = [];
-        let amounts = [];
-        if (addressesAndAmounts.length === 0) {
-            recipients = [];
-            amounts = [];
-        }
-        else if (addressesAndAmounts.length > 253) {
-            recipients = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.address;
-            });
-            amounts = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        else {
-            recipients = addressesAndAmounts.map((item: any) => {
-                return item.address;
-            });
-            amounts = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        const finalAmount = amounts.map((item: any) => {
+        const { addressesArray, amountsArray } = returnAddressesAndAmounts(props.token.isNative);
+        const finalAmount = amountsArray.map((item: any) => {
             return ethers.utils.parseUnits(item, props.token.decimals);
         });
         const ammountT = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
         setAmmount(ethers.utils.formatUnits(ammountT, props.token.decimals))
         const calculateFeeAsset = await feeShare["calculateFee(address)"](props.token.address);
-        setTotalAddressesPerTx(recipients.length)
+        setTotalAddressesPerTx(addressesArray.length)
         try {
-            const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, recipients, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(2), 'gwei').mul(110).div(100));
+            const unitsUsed = await feeShare.estimateGas["multiSendFee(address,address[],uint256[],uint256)"](props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(2), 'gwei').mul(110).div(100));
             const txFeeInToken = await feeShare["calculateTxfeeToken(address,uint256)"](props.token.address, ethers.utils.parseUnits(networkSpeed.maxFeePerGas.toFixed(2), 'gwei').mul(unitsUsed));
-            setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(recipients.length)), props.token.decimals))
+            setTotalFee(ethers.utils.formatUnits(txFeeInToken.add(calculateFeeAsset.mul(addressesArray.length)), props.token.decimals))
             const minimalForwarderContract = new Contract(contractsAddresses[network.name][0].MinimalForwarder, MinimalForwarderAbi, signer);
-            const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, recipients, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(2), 'gwei').mul(110).div(100)]);
+            const dataMessage = new ethers.utils.Interface(FeeShareAbi).encodeFunctionData("multiSendFee", [props.token.address, addressesArray, finalAmount, ethers.utils.parseUnits(networkSpeed.maxPriorityFeePerGas.toFixed(2), 'gwei').mul(110).div(100)]);
             if (+ethers.utils.formatUnits(ammountT) > +props.token.userBalanceDeposit) {
                 setError(true);
                 setErrorMessage("You don't have enough balance tokens to pay the fee.")
@@ -1237,7 +1185,7 @@ export function Summary(props: any) {
             const txInform = {
                 method: "multiSendFee(address,address[],uint256[],uint256)",
                 token: props.token.address,
-                addressesToSend: recipients,
+                addressesToSend: addressesArray,
                 finalAmount,
                 txInfo: values,
                 isApproved: true
@@ -1262,18 +1210,18 @@ export function Summary(props: any) {
         const signer = await fetchSigner()
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         //first 
-        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
+        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
         let addressesArray = [];
         let amountsArray = [];
         if (addressesAndAmounts.length === 0) {
             addressesArray = [];
             amountsArray = [];
         }
-        else if (addressesAndAmounts.length > 253) {
-            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+        else if (addressesAndAmounts.length > 255) {
+            addressesArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                 return item.address;
             });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+            amountsArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
                 return item.amount.toString().trim();
             });
         }
@@ -1281,7 +1229,7 @@ export function Summary(props: any) {
             addressesArray = addressesAndAmounts.map((item: any) => {
                 return item.address;
             });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
+            amountsArray = addressesAndAmounts.map((item: any) => {
                 return item.amount.toString().trim();
             });
         }
@@ -1342,29 +1290,8 @@ export function Summary(props: any) {
         //get signer drom provider
         const feeShare = new Contract(contractsAddresses[network.name][0].FeeShare, FeeShareAbi, signer);
         //first 
-        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 253 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 253));
-        let addressesArray = [];
-        let amountsArray = [];
-        if (addressesAndAmounts.length === 0) {
-            addressesArray = [];
-            amountsArray = [];
-        }
-        else if (addressesAndAmounts.length > 253) {
-            addressesArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
-        else {
-            addressesArray = addressesAndAmounts.map((item: any) => {
-                return item.address;
-            });
-            amountsArray = addressesAndAmounts.slice(0, 253).map((item: any) => {
-                return item.amount.toString().trim();
-            });
-        }
+        addressesAndAmounts.length === 0 ? setTotalTransactions(0) : setTotalTransactions(addressesAndAmounts.length / 255 === 0 ? 1 : Math.ceil(addressesAndAmounts.length / 255));
+        const { addressesArray, amountsArray } = returnAddressesAndAmounts(props.token.isNative);
         const finalAmount = amountsArray.map((item: any) => {
             return ethers.utils.parseUnits(item);
         });
@@ -1416,42 +1343,42 @@ export function Summary(props: any) {
         }
     }
     const signMetaTx = async (req: any) => {
-            const signature = await signTypedData({
-                domain: {
-                    chainId: chain.id,
-                    name: 'FeeShare',
-                    verifyingContract: contractsAddresses[network.name][0].MinimalForwarder,
-                    version: '1.0.0',
-                },
-                types: {
-                    // Refer to PrimaryType
-                    ForwardRequest: [
-                        { name: 'from', type: 'address' },
-                        { name: 'to', type: 'address' },
-                        { name: 'value', type: 'uint256' },
-                        { name: 'gas', type: 'uint256' },
-                        { name: 'nonce', type: 'uint256' },
-                        { name: 'data', type: 'bytes' },
-                    ],
-                    EIP712Domain: [
-                        { name: 'name', type: 'string' },
-                        { name: 'version', type: 'string' },
-                        { name: 'chainId', type: 'uint256' },
-                        { name: 'verifyingContract', type: 'address' },
-                    ],
-                },
-                value: {
-                    from: req.from,
-                    to: req.to,
-                    value: ethers.BigNumber.from("0"),
-                    gas: req.gas,
-                    nonce: req.nonce,
-                    data: req.data.toString()
-                  
-                },
-            })
-            return signature;
-      
+        const signature = await signTypedData({
+            domain: {
+                chainId: chain.id,
+                name: 'FeeShare',
+                verifyingContract: contractsAddresses[network.name][0].MinimalForwarder,
+                version: '1.0.0',
+            },
+            types: {
+                // Refer to PrimaryType
+                ForwardRequest: [
+                    { name: 'from', type: 'address' },
+                    { name: 'to', type: 'address' },
+                    { name: 'value', type: 'uint256' },
+                    { name: 'gas', type: 'uint256' },
+                    { name: 'nonce', type: 'uint256' },
+                    { name: 'data', type: 'bytes' },
+                ],
+                EIP712Domain: [
+                    { name: 'name', type: 'string' },
+                    { name: 'version', type: 'string' },
+                    { name: 'chainId', type: 'uint256' },
+                    { name: 'verifyingContract', type: 'address' },
+                ],
+            },
+            value: {
+                from: req.from,
+                to: req.to,
+                value: ethers.BigNumber.from("0"),
+                gas: req.gas,
+                nonce: req.nonce,
+                data: req.data.toString()
+
+            },
+        })
+        return signature;
+
     }
     const sendSignedTransaction = async () => {
         const signature = await signMetaTx(signedTxToSend);
@@ -1464,22 +1391,23 @@ export function Summary(props: any) {
             MinimalForwarderAbi,
             walletSigner
         );
-        try{
+        try {
             const toastSendSigned = toast.loading("Sending transaction please wait...")
-        contractForwarder.execute(dataBuffer.values, dataBuffer.signature).then((result: any) => {
-            result.wait().then((receipt: any) => {
-                toast.update(toastSendSigned, { render: "Transaction sended successfully", type: "success", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
-                dispatch(fetchUserBalanceSingleToken({address,token:props.token,networkName:network.name, provider}))
+            contractForwarder.execute(dataBuffer.values, dataBuffer.signature).then((result: any) => {
+                result.wait().then((receipt: any) => {
+                    toast.update(toastSendSigned, { render: "Transaction sended successfully", type: "success", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
+                    dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
+                    calculateTokenAndPayToken()
+                }).catch((error: any) => {
+                    console.log(error, "error")
+                    toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
+                });
             }).catch((error: any) => {
                 console.log(error, "error")
-                toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
+                toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER })
             });
-        }).catch((error: any) => {
-            console.log(error, "error")
-            toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER })
-        });
         }
-        catch(err){
+        catch (err) {
             console.log(err, "err")
             toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER })
         }
@@ -1496,40 +1424,41 @@ export function Summary(props: any) {
             walletSigner
         );
         //estimate gas used for execute function and send transaction
-        try{
+        try {
             const gasLimit = await contractForwarder.estimateGas.execute(dataBuffer.values, dataBuffer.signature);
             const gasPrice = await walletSigner.getGasPrice();
-        contractForwarder.execute(dataBuffer.values, dataBuffer.signature, 
-            {
-            gasPrice:gasPrice.mul(110).div(100), 
-            value: ethers.utils.parseEther("0"),
-            gasLimit: gasLimit.mul(110).div(100)
-        }).then((result: any) => {
-            const toastSendSigned = toast.loading("Sending transaction, please wait...");
-            result.wait().then((receipt: any) => {
-                toast.update(toastSendSigned, { 
-                    render: "Transaction sent successfully", 
-                    type: "success", 
-                    isLoading: false, 
-                    autoClose: 2000, 
-                    position: toast.POSITION.TOP_CENTER 
-                  });
-                dispatch(fetchUserBalanceSingleToken({address,token:props.token,networkName:network.name, provider}))
-            }).catch((error: any) => {
-                console.log(error, "error")
-                toast.update(toastSendSigned, { 
-                    render: "Transaction failed", 
-                    type: "error", 
-                    isLoading: false, 
-                    autoClose: 2000, 
-                    position: toast.POSITION.TOP_CENTER 
-                  });
-            });
-        }).catch((error: any) => {
-            toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
-        });
+            contractForwarder.execute(dataBuffer.values, dataBuffer.signature,
+                {
+                    gasPrice: gasPrice.mul(110).div(100),
+                    value: ethers.utils.parseEther("0"),
+                    gasLimit: gasLimit.mul(110).div(100)
+                }).then((result: any) => {
+                    const toastSendSigned = toast.loading("Sending transaction, please wait...");
+                    result.wait().then((receipt: any) => {
+                        toast.update(toastSendSigned, {
+                            render: "Transaction sent successfully",
+                            type: "success",
+                            isLoading: false,
+                            autoClose: 2000,
+                            position: toast.POSITION.TOP_CENTER
+                        });
+                        dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
+                        calculateTokenAndPayTokenPolygon()
+                    }).catch((error: any) => {
+                        console.log(error, "error")
+                        toast.update(toastSendSigned, {
+                            render: "Transaction failed",
+                            type: "error",
+                            isLoading: false,
+                            autoClose: 2000,
+                            position: toast.POSITION.TOP_CENTER
+                        });
+                    });
+                }).catch((error: any) => {
+                    toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
+                });
         }
-        catch(err){
+        catch (err) {
             toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
         }
     }
@@ -1545,45 +1474,45 @@ export function Summary(props: any) {
             walletSigner
         );
         //estimate gas used for execute function and send transaction
-        try{
+        try {
             const gasLimit = await contractForwarder.estimateGas.execute(dataBuffer.values, dataBuffer.signature);
-        contractForwarder.execute(dataBuffer.values, dataBuffer.signature, 
-            {
-            value: ethers.utils.parseEther("0"),
-            gasLimit: gasLimit.mul(110).div(100)
-        }).then((result: any) => {
-            const toastSendSigned = toast.loading("Sending transaction, please wait...");
-            result.wait().then((receipt: any) => {
-                toast.update(toastSendSigned, { 
-                    render: "Transaction sent successfully", 
-                    type: "success", 
-                    isLoading: false, 
-                    autoClose: 2000, 
-                    position: toast.POSITION.TOP_CENTER 
-                  });
-                dispatch(fetchUserBalanceSingleToken({address,token:props.token,networkName:network.name, provider}))
-                dispatch(removeSendedAddress(txToSend.addressesToSend.length))
-                calculateTokenAndPayToken()
-            }).catch((error: any) => {
-                console.log(error, "error")
-                toast.update(toastSendSigned, { 
-                    render: "Transaction failed", 
-                    type: "error", 
-                    isLoading: false, 
-                    autoClose: 2000, 
-                    position: toast.POSITION.TOP_CENTER 
-                  });
-            });
-        }).catch((error: any) => {
-            console.log(error, "error")
-            toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
-        });
+            contractForwarder.execute(dataBuffer.values, dataBuffer.signature,
+                {
+                    value: ethers.utils.parseEther("0"),
+                    gasLimit: gasLimit.mul(110).div(100)
+                }).then((result: any) => {
+                    const toastSendSigned = toast.loading("Sending transaction, please wait...");
+                    result.wait().then((receipt: any) => {
+                        toast.update(toastSendSigned, {
+                            render: "Transaction sent successfully",
+                            type: "success",
+                            isLoading: false,
+                            autoClose: 2000,
+                            position: toast.POSITION.TOP_CENTER
+                        });
+                        dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
+                        dispatch(removeSendedAddress(txToSend.addressesToSend.length))
+                        calculateTokenAndPayToken()
+                    }).catch((error: any) => {
+                        console.log(error, "error")
+                        toast.update(toastSendSigned, {
+                            render: "Transaction failed",
+                            type: "error",
+                            isLoading: false,
+                            autoClose: 2000,
+                            position: toast.POSITION.TOP_CENTER
+                        });
+                    });
+                }).catch((error: any) => {
+                    console.log(error, "error")
+                    toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
+                });
         }
-        catch(err){
+        catch (err) {
             console.log(err, "err")
             toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
         }
-       
+
     }
     useEffect(() => {
         if (!props.token.isOpen) {
@@ -1592,11 +1521,11 @@ export function Summary(props: any) {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.token.isOpen])
     useEffect(() => {
- 
+
         if (!props.token.isOpen || !networkSpeed) {
             return;
         }
-     
+
         switch (network.id) {
             case 97:
             case 56:
@@ -1622,6 +1551,7 @@ export function Summary(props: any) {
             case 43114:
                 if (props.isNative) {
                     calculateNativePolygon();
+                    // dispatch(calculateNativePolygon({token:props.token, isNative:props.isNative}))
                 }
                 else if (!props.isNativeFee) {
                     calculateTokenAndPayNativePolygon();
@@ -1640,6 +1570,7 @@ export function Summary(props: any) {
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [addressesAndAmounts, networkSpeed]);
+
     const sendTransaction = async () => {
         if (props.isNative) {
             sendNativeTx()
@@ -1653,16 +1584,16 @@ export function Summary(props: any) {
             }
         }
         else {
-            if(network.id === 137){
+            if (network.id === 137) {
                 sendSignedTransactionPolygon()
             }
-            else if(network.id === 42161){
+            else if (network.id === 42161) {
                 sendSignedTransactionArbitrum()
             }
             else {
                 sendSignedTransaction()
             }
-          
+
         }
     }
     return (
@@ -1678,7 +1609,7 @@ export function Summary(props: any) {
                                 <div className="flex flex-col w-full">
                                     <div className="px-3 py-3 flex flex-col border-b-2">
                                         <span className="text-xl text-blue-900 font-bold">
-                                            {props.isNative ? totalAddressesPerTx - 1 : totalAddressesPerTx}
+                                            {totalAddressesPerTx}
                                         </span>
                                         <span className="text-xs text-gray-400">Total number of addresses </span>
                                     </div>

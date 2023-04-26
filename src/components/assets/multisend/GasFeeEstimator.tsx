@@ -358,7 +358,7 @@ const GasFeeEstimator = () => {
            
             dispatch(getNetworkPriority(speedsPolygon))
           })
-        }, 10000
+        }, 5000
       )
       
       return () => {

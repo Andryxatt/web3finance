@@ -7,7 +7,6 @@ import DepositWithdraw from "./DepositWithdraw";
 
 const Editors = (props:{token:Token, isNativeFee:boolean, handleNativeFee:any}) => {
     const [isManual, setIsManual] = useState(true);
- 
     const showManual = () => {
         setIsManual(!isManual);
     }
@@ -29,8 +28,7 @@ const Editors = (props:{token:Token, isNativeFee:boolean, handleNativeFee:any}) 
             <div className="w-[380px] sm:w-auto">
                 <div className="flex-row">
                     <div className="flex-col">
-                      
-                        <ToogleFee tokenName={props.token.name} isNativeFee={props.isNativeFee} setIsNativeFee={props.handleNativeFee} />
+                        <ToogleFee token={props.token}  isNativeFee={props.isNativeFee} setIsNativeFee={props.handleNativeFee} />
                     </div>
                     <DepositWithdraw isNativeFee={props.isNativeFee}  token={props.token} />
                 </div>
