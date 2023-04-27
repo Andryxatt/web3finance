@@ -8,7 +8,6 @@
     "@emotion/styled": "^11.10.5",
     "@headlessui/react": "^1.6.6",
     "@material-tailwind/react": "^1.0.6",
-    "@material-ui/utils": "^4.11.3",
     "@mui/icons-material": "^5.8.4",
     "@mui/material": "^5.11.8",
     "@reduxjs/toolkit": "^1.8.3",
