@@ -23,6 +23,7 @@ const client = createClient({
   autoConnect: true,
   connectors: [
     new MetaMaskConnector({ chains, options:{
+      shimChainChangedDisconnect: true,
       shimDisconnect: true,
     } }),
     new CoinbaseWalletConnector({
@@ -34,8 +35,7 @@ const client = createClient({
     new WalletConnectConnector({
       chains,
       options: {
-        projectId: '0c8c0a5902fe87bab24b4a9a050cdaf7',
-        showQrModal: true,
+        qrcode: true,
       },
     }),
     new InjectedConnector({
