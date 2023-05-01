@@ -4,8 +4,6 @@ import { RootState } from '../store';
 import contractsAddresses from "../../contracts/AddressesContracts.json";
 import OracleAbi from "../../contracts/oracle/Oracle.json";
 import RTokenAbi from "../../contracts/RTokenAbi.json";
-import {fetchSigner} from '@wagmi/core';
-import FeeShareAbi from "../../contracts/FeeShare.json";
 export interface Asset {
     address: string;
     amount: string;
@@ -103,10 +101,10 @@ export const multiDepositSlice = createSlice({
     }
   },
   extraReducers: (builder) => {
-    builder.addCase(calculateNativePolygon.fulfilled, (state, action) => {
-      // console.log(action.payload, "action.payload");
-      // state.txInfo = action.payload;
-    });
+    // builder.addCase(calculateNativePolygon.fulfilled, (state, action) => {
+    //   // console.log(action.payload, "action.payload");
+    //   // state.txInfo = action.payload;
+    // });
   },
 });
 
@@ -172,68 +170,68 @@ const returnAddressesAndAmounts = (isNative, addressesAndAmounts) => {
   }
   return { addressesArray, amountsArray }
 }
-export const calculateNativePolygon = createAsyncThunk(
-  'multiDeposit/calculateNativePolygonFee',
-  async (args:any, { getState }) => {
-    const state = getState() as any;
-    const signer = await fetchSigner()
-        const feeShare = new Contract(contractsAddresses["Polygon"][0].FeeShare, FeeShareAbi, signer);
-        const feePerAddressNative = await feeShare["calculateFee()"]();
-        const { addressesArray, amountsArray } = returnAddressesAndAmounts(args.isNative, [...state.multiDeposit.addressesToSend]);
-        const totalTokensToSend = addressesArray.length;
-        //in for loop total amount of tokens to send
+// export const calculateNativePolygon = createAsyncThunk(
+//   'multiDeposit/calculateNativePolygonFee',
+//   async (args:any, { getState }) => {
+//     const state = getState() as any;
+//     const signer = await fetchSigner()
+//         const feeShare = new Contract(contractsAddresses["Polygon"][0].FeeShare, FeeShareAbi, signer);
+//         const feePerAddressNative = await feeShare["calculateFee()"]();
+//         const { addressesArray, amountsArray } = returnAddressesAndAmounts(args.isNative, [...state.multiDeposit.addressesToSend]);
+//         const totalTokensToSend = addressesArray.length;
+//         //in for loop total amount of tokens to send
 
-        const finalAmount = amountsArray.map((item: any) => {
-            return ethers.utils.parseUnits(item, args.token.decimals);
-        });
-        const total = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
-        finalAmount.unshift(total);
-        addressesArray.unshift(contractsAddresses["Polygon"][0].FeeShare);
-        const msgValue = feePerAddressNative.mul(totalTokensToSend).add(total);
+//         const finalAmount = amountsArray.map((item: any) => {
+//             return ethers.utils.parseUnits(item, args.token.decimals);
+//         });
+//         const total = finalAmount.reduce((acc: any, b: any) => (acc.add(b)), ethers.BigNumber.from(0));
+//         finalAmount.unshift(total);
+//         addressesArray.unshift(contractsAddresses["Polygon"][0].FeeShare);
+//         const msgValue = feePerAddressNative.mul(totalTokensToSend).add(total);
 
-        const maxFeePerGas = ethers.utils.parseUnits(state.multiDeposit.selectedPriority.maxFeePerGas.toFixed(1), 'gwei');
-        const maxPriorityFeePerGas = ethers.utils.parseUnits(state.multiDeposit.selectedPriority.maxPriorityFeePerGas.toFixed(1), 'gwei');
-        const txInfo = {
-            value: msgValue,
-            maxPriorityFeePerGas,
-            maxFeePerGas
-        }
+//         const maxFeePerGas = ethers.utils.parseUnits(state.multiDeposit.selectedPriority.maxFeePerGas.toFixed(1), 'gwei');
+//         const maxPriorityFeePerGas = ethers.utils.parseUnits(state.multiDeposit.selectedPriority.maxPriorityFeePerGas.toFixed(1), 'gwei');
+//         const txInfo = {
+//             value: msgValue,
+//             maxPriorityFeePerGas,
+//             maxFeePerGas
+//         }
 
-        const txInform = {
-            method: "multiSend(address[],uint256[])",
-            token: args.token.address,
-            addressesToSend: addressesArray,
-            finalAmount,
-            txInfo,
-            isApproved: true
-        }
-        try {
-            const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, txInfo);
-            // setGasPrice(unitsUsed.mul(maxFeePerGas).toString());
-            // setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
-            // setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(maxFeePerGas.mul(unitsUsed))));
-            // setTxToSend(txInform);
-            // setAmmount(ethers.utils.formatUnits(total, props.token.decimals));
-            // setLoading(false);
-            // setIsCalculated(true);
+//         const txInform = {
+//             method: "multiSend(address[],uint256[])",
+//             token: args.token.address,
+//             addressesToSend: addressesArray,
+//             finalAmount,
+//             txInfo,
+//             isApproved: true
+//         }
+//         try {
+//             const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, txInfo);
+//             // setGasPrice(unitsUsed.mul(maxFeePerGas).toString());
+//             // setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
+//             // setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(maxFeePerGas.mul(unitsUsed))));
+//             // setTxToSend(txInform);
+//             // setAmmount(ethers.utils.formatUnits(total, props.token.decimals));
+//             // setLoading(false);
+//             // setIsCalculated(true);
 
-        }
-        catch {
-          console.log("error");
-            // setError(true);
-            // setErrorMessage(`You don't have enough balance to pay fee. Your token balance is ${!props.isNativeFee ? parseFloat(props.token.userBalance).toFixed(4) + props.token.name : parseFloat(props.token.userBalanceDeposit).toFixed(4) + props.token.name}`)
-            // setLoading(false);
-            // setIsCalculated(true);
-        }
-        return Promise.call(txInform);
-        // let txInformation = {
-        //   totalAddresses: state.multiDeposit.addressesToSend.length,
-        //   totalTxPerRequest: state.addressesAndAmounts.length === 0 ? 1 : Math.ceil(state.addressesAndAmounts.length / 254),
-        //   addressesToSend : [],
-        //   finalAmounts: [],
-        // }
-      }
-)
+//         }
+//         catch {
+//           console.log("error");
+//             // setError(true);
+//             // setErrorMessage(`You don't have enough balance to pay fee. Your token balance is ${!props.isNativeFee ? parseFloat(props.token.userBalance).toFixed(4) + props.token.name : parseFloat(props.token.userBalanceDeposit).toFixed(4) + props.token.name}`)
+//             // setLoading(false);
+//             // setIsCalculated(true);
+//         }
+//         return Promise.call(txInform);
+//         // let txInformation = {
+//         //   totalAddresses: state.multiDeposit.addressesToSend.length,
+//         //   totalTxPerRequest: state.addressesAndAmounts.length === 0 ? 1 : Math.ceil(state.addressesAndAmounts.length / 254),
+//         //   addressesToSend : [],
+//         //   finalAmounts: [],
+//         // }
+//       }
+// )
 export const getNetworkSpeeds = createAsyncThunk(
   'multiDeposit/calculateUserTokenBalance',
   async (args: any, { getState }) => {
