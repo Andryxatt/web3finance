@@ -129,47 +129,7 @@ export const addressesToSend = (state: RootState) => state.multiDeposit.addresse
 export const arrayOfAmounts = (state: RootState) => state.multiDeposit.addressesToSend.map((asset: Asset) => asset.amount.toString().trim());
 export const arrayOfAddresses = (state: RootState) => state.multiDeposit.addressesToSend.map((asset: Asset) => asset.address.trim());
 export default multiDepositSlice.reducer;
-const returnAddressesAndAmounts = (isNative, addressesAndAmounts) => {
-  let addressesArray = [];
-  let amountsArray = [];
-  if (isNative) {
-      if (addressesAndAmounts.length > 254) {
-          addressesArray = addressesAndAmounts.slice(0, 254).map((item: any) => {
-              return item.address;
-          });
-          amountsArray = addressesAndAmounts.slice(0, 254).map((item: any) => {
-              return item.amount.toString().trim();
-          });
-      }
-      else {
-          addressesArray = addressesAndAmounts.map((item: any) => {
-              return item.address;
-          });
-          amountsArray = addressesAndAmounts.map((item: any) => {
-              return item.amount.toString().trim();
-          });
-      }
-  }
-  else {
-      if (addressesAndAmounts.length > 255) {
-          addressesArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
-              return item.address;
-          });
-          amountsArray = addressesAndAmounts.slice(0, 255).map((item: any) => {
-              return item.amount.toString().trim();
-          });
-      }
-      else {
-          addressesArray = addressesAndAmounts.map((item: any) => {
-              return item.address;
-          });
-          amountsArray = addressesAndAmounts.map((item: any) => {
-              return item.amount.toString().trim();
-          });
-      }
-  }
-  return { addressesArray, amountsArray }
-}
+
 // export const calculateNativePolygon = createAsyncThunk(
 //   'multiDeposit/calculateNativePolygonFee',
 //   async (args:any, { getState }) => {
