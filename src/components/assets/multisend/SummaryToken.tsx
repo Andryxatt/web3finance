@@ -155,7 +155,7 @@ export function SummaryToken(props: any) {
                         setLoading(false);
                         }
                         catch (error) {
-                            console.log(error)
+                            // console.log(error)
                             setError(true);
                             setErrorMessage(error.data.message);
                             setLoading(false);
@@ -194,7 +194,7 @@ export function SummaryToken(props: any) {
                         }
                     }
                     catch (err) {
-                        console.log(err)
+                        // console.log(err)
                         setError(true);
                         setErrorMessage("Not enough AVAX to send transaction.")
                         setLoading(false);
@@ -396,7 +396,7 @@ export function SummaryToken(props: any) {
 
             const tokenContract = new Contract(props.tokenAddress, RTokenAbi, signer);
             const isApproved = await tokenContract.allowance(address, contractsAddresses[network.name][0].FeeShare);
-            console.log(ethers.utils.formatUnits(ammountT, decimals), ethers.utils.formatUnits(userBalanceToken, decimals))
+            // console.log(ethers.utils.formatUnits(ammountT, decimals), ethers.utils.formatUnits(userBalanceToken, decimals))
             if (ethers.utils.formatUnits(ammountT, decimals) > ethers.utils.formatUnits(userBalanceToken, decimals)) {
                 setError(true);
                 setErrorMessage(`You don't have enough tokens to send transaction. Need ${ethers.utils.formatUnits(ammountT, decimals)} ${symbol} but you have ${userBalanceToken} ${symbol}`)
@@ -486,11 +486,11 @@ export function SummaryToken(props: any) {
                         calculateTokenAndPayNative();
                     }
                 }).catch((err: any) => {
-                    console.log(err, "err")
+                    // console.log(err, "err")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
             }).catch((err: any) => {
-                console.log(err, "err")
+                // console.log(err, "err")
                 toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
             });
         }

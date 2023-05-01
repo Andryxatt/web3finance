@@ -269,7 +269,6 @@ const GasFeeEstimator = () => {
           }
         ]
         if (selectedSpeed === undefined) {
-          console.log('setSelectedSpeed', selectedSpeed)
         speedsPolygon = speedsPolygon.map((speed, index) => {
             if (index === 1) {
               setSelectedSpeed(speed.speedName)
@@ -330,9 +329,7 @@ const GasFeeEstimator = () => {
                 "selected": false
               }
             ]
-            console.log('selectedSpeed', selectedSpeed)
             if (selectedSpeed === undefined) {
-              console.log('setSelectedSpeed', selectedSpeed)
             speedsPolygon = speedsPolygon.map((speed, index) => {
                 if (index === 1) {
                   setSelectedSpeed(speed.speedName)
@@ -381,7 +378,6 @@ const GasFeeEstimator = () => {
       };
     }
   
-      console.log('selectedSpeed', selectedSpeed)
       // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [blockNumber, selectedSpeed])
 

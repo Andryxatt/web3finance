@@ -475,7 +475,6 @@ export function Summary(props: any) {
                         setLoading(false);
                     }
                     catch (err) {
-                        console.log(err);
                         setError(true);
                         setErrorMessage("Error calculating gas fee. Please try again later");
                         setLoading(false);
@@ -618,7 +617,6 @@ export function Summary(props: any) {
                         setLoading(false);
                     }
                     catch (err) {
-                        console.log(err);
                         setError(true);
                         setErrorMessage("Error calculating gas fee. Please try again later");
                         setLoading(false);
@@ -794,7 +792,12 @@ export function Summary(props: any) {
                     }
                 }
                 catch (err) {
-                    console.log("Incufficient allowance")
+                    setGasPrice("0");
+                    setTxFee("0");
+                    setTotalFee("0");
+                    setAmmount("0");
+                    setLoading(false);
+                    setIsCalculated(true);
                 }
 
             }
@@ -922,7 +925,12 @@ export function Summary(props: any) {
                     }
                 }
                 catch (err) {
-                    console.log(err)
+                    setGasPrice("0");
+                    setTxFee("0");
+                    setTotalFee("0");
+                    setAmmount("0");
+                    setLoading(false);
+                    setIsCalculated(true);
                 }
 
             }
@@ -954,11 +962,11 @@ export function Summary(props: any) {
                     }
                     dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                 }).catch((err: any) => {
-                    console.log(err, "err")
+                    // console.log(err, "err")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
             }).catch((err: any) => {
-                console.log(err, "err")
+                // console.log(err, "err")
                 toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
             });
         }
@@ -1032,11 +1040,11 @@ export function Summary(props: any) {
                     await calculateTokenAndPayNativeOptimism();
                     await dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                 }).catch((err: any) => {
-                    console.log(err, "err")
+                    // console.log(err, "err")
                     toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
                 })
             }).catch((err: any) => {
-                console.log(err, "err")
+                // console.log(err, "err")
                 toast.update(idToastSendTokenNativeFee, { render: "Transaction rejected!", autoClose: 2000, type: "error", isLoading: false, position: toast.POSITION.TOP_CENTER });
             });
         }
@@ -1133,7 +1141,7 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
         catch (err) {
-            console.log(err, "err")
+            // console.log(err, "err")
             setError(true);
             setLoading(true);
             setErrorMessage("User deposit is less than amount needed to pay the fee")
@@ -1197,7 +1205,7 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
         catch (err) {
-            console.log(err, "err")
+            // console.log(err, "err")
             setError(true);
             setLoading(false);
             setErrorMessage("The amount deposited by the user is insufficient to cover the fee.")
@@ -1276,7 +1284,7 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
         catch (err) {
-            console.log(err, "err")
+            // console.log(err, "err")
             setError(true);
             setLoading(false);
             setErrorMessage("The amount deposited by the user is insufficient to cover the fee.")
@@ -1335,7 +1343,7 @@ export function Summary(props: any) {
             setIsCalculated(true);
         }
         catch (err) {
-            console.log(err, "err")
+            // console.log(err, "err")
             setError(true);
             setLoading(false);
             setErrorMessage("The amount deposited by the user is insufficient to cover the fee.")
@@ -1399,16 +1407,16 @@ export function Summary(props: any) {
                     dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                     calculateTokenAndPayToken()
                 }).catch((error: any) => {
-                    console.log(error, "error")
+                    // console.log(error, "error")
                     toast.update(toastSendSigned, { render: "Transaction failed", type: "error", isLoading: false, autoClose: 2000, position: toast.POSITION.TOP_CENTER })
                 });
             }).catch((error: any) => {
-                console.log(error, "error")
+                // console.log(error, "error")
                 toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER })
             });
         }
         catch (err) {
-            console.log(err, "err")
+            // console.log(err, "err")
             toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER })
         }
     }
@@ -1445,7 +1453,7 @@ export function Summary(props: any) {
                         dispatch(fetchUserBalanceSingleToken({ address, token: props.token, networkName: network.name, provider }))
                         calculateTokenAndPayTokenPolygon()
                     }).catch((error: any) => {
-                        console.log(error, "error")
+                        // console.log(error, "error")
                         toast.update(toastSendSigned, {
                             render: "Transaction failed",
                             type: "error",
@@ -1494,7 +1502,7 @@ export function Summary(props: any) {
                         dispatch(removeSendedAddress(txToSend.addressesToSend.length))
                         calculateTokenAndPayToken()
                     }).catch((error: any) => {
-                        console.log(error, "error")
+                        // console.log(error, "error")
                         toast.update(toastSendSigned, {
                             render: "Transaction failed",
                             type: "error",
@@ -1504,12 +1512,12 @@ export function Summary(props: any) {
                         });
                     });
                 }).catch((error: any) => {
-                    console.log(error, "error")
+                    // console.log(error, "error")
                     toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
                 });
         }
         catch (err) {
-            console.log(err, "err")
+            // console.log(err, "err")
             toast.error("Transaction failed", { autoClose: 2000, position: toast.POSITION.TOP_CENTER });
         }
 

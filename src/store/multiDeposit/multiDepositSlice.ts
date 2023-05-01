@@ -92,19 +92,19 @@ export const multiDepositSlice = createSlice({
     updateSpeedSelected: (state, action) =>{
       //update state array with selected speed
       const newState = state.networkPriority.map((speed:SpeedNetwork) => speed.speedName === action.payload ? {...speed, selected: true} : {...speed, selected: false}); 
-      console.log(newState, "newState");
+      // console.log(newState, "newState");
       state.selectedPriority = newState.filter((speed:SpeedNetwork) => speed.selected)[0];
       state.networkPriority = newState;
     },
 
     calculateNativePolygonFee: (state, action) => {
-      console.log(action.payload, "action.payload");
+      // console.log(action.payload, "action.payload");
       // state.txInfo = action.payload;
     }
   },
   extraReducers: (builder) => {
     builder.addCase(calculateNativePolygon.fulfilled, (state, action) => {
-      console.log(action.payload, "action.payload");
+      // console.log(action.payload, "action.payload");
       // state.txInfo = action.payload;
     });
   },
@@ -175,16 +175,11 @@ const returnAddressesAndAmounts = (isNative, addressesAndAmounts) => {
 export const calculateNativePolygon = createAsyncThunk(
   'multiDeposit/calculateNativePolygonFee',
   async (args:any, { getState }) => {
-    console.log(args, "args");
     const state = getState() as any;
     const signer = await fetchSigner()
-    console.log(signer, "signer");
-    console.log(state.network.selectedNetwork, "state.network.selectedNetwork");
         const feeShare = new Contract(contractsAddresses["Polygon"][0].FeeShare, FeeShareAbi, signer);
         const feePerAddressNative = await feeShare["calculateFee()"]();
-        console.log(state)
         const { addressesArray, amountsArray } = returnAddressesAndAmounts(args.isNative, [...state.multiDeposit.addressesToSend]);
-        console.log(addressesArray, "addressesArray");
         const totalTokensToSend = addressesArray.length;
         //in for loop total amount of tokens to send
 
@@ -214,7 +209,6 @@ export const calculateNativePolygon = createAsyncThunk(
         }
         try {
             const unitsUsed = await feeShare.estimateGas["multiSend(address[],uint256[])"](addressesArray, finalAmount, txInfo);
-            console.log(unitsUsed, "unitsUsed");
             // setGasPrice(unitsUsed.mul(maxFeePerGas).toString());
             // setTxFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend)))
             // setTotalFee(ethers.utils.formatUnits(feePerAddressNative.mul(totalTokensToSend).add(maxFeePerGas.mul(unitsUsed))));

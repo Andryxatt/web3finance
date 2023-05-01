@@ -1333,7 +1333,7 @@ export const fetchUserBalanceSingleToken = createAsyncThunk(
     const deposits = token.isNative ? '-' : ethers.utils.formatUnits(totalSupply, decimalsRtoken);
     
     const newToken = { ...token, id:token.id, isNative:token.isNative, name:token.name, userBalanceDeposit: ethers.utils.formatUnits(userBalanceDeposit, token.decimals), userBalance:token.isNative ? ethers.utils.formatUnits(userBalance, token.decimals) : ethers.utils.formatUnits(userBalanceToken, token.decimals), isDeposit: userBalanceDeposit.gt(0), deposits: deposits }
-    console.log(newToken, "newToken")
+    // console.log(newToken, "newToken")
     Promise.resolve(newToken);
     return { token: newToken, network: networkName }
   }
