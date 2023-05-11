@@ -7,7 +7,7 @@ const Help = () => {
             <h2 className="text-2xl font-extrabold text-center mb-5">How to use FeeShare service </h2>
             <p className="text-lg mb-3 font-bold">To use FeeShare with payment fee in native token(Ethereum, Matic, BNB, AVAX): </p>
             <div className="mb-3">
-                <ul className="text-md text-justify">
+                <ol className="list-decimal list-inside text-md text-justify">
                     <li className="mb-1"> Simply connect your wallet via the «Connect Wallet» button. </li>
                     <li className="mb-1"> Then select the network and coin you want to send from the provided list or enter your token contract address. </li>
                     <li className="mb-1"> Then specify the addresses and amounts of recipients or upload a file with such addresses in CSV / Excel / Txt format. </li>
@@ -15,11 +15,11 @@ const Help = () => {
                     <li className="mb-1"> You will see a summary of your transaction details (Total number of addresses, Total number of transactions needed, Total number of tokens to be sent, Your token balance, commission fee and transaction fee). At this stage, you can remove unwanted addresses, change the «network speed gwei» parameter. </li>
                     <li className="mb-1"> If everything fits, then click the "Next" button. </li>
                     <li className="mb-1"> Then confirm the transaction and wait for it to be processed. Everything is simple</li>
-                </ul>
+                </ol>
             </div>
             <div className="mb-3">
                 <p className="text-lg mb-3 font-bold">To use FeeShare with payment fee in token (USDT, USDC …..): </p>
-                <ul className="text-md text-justify">
+                <ol className="list-decimal list-inside text-md text-justify">
                     <li className="mb-1">Simply connect your wallet via the «Connect Wallet» button. </li>
                     <li className="mb-1">Then select the network and coin you want to send from the provided list or enter your token contract address. </li>
                     <li className="mb-1">Then specify the addresses and amounts of recipients or upload a file with such addresses in CSV / Excel / Txt format. </li>
@@ -27,20 +27,20 @@ const Help = () => {
                     <li className="mb-1">You will see a summary of your transaction details (Total number of addresses, Total number of transactions needed, Total number of tokens to be sent, Your token balance, commission fee and transaction fee). At this stage, you can remove unwanted addresses, change the «network speed gwei» parameter. </li>
                     <li className="mb-1">If everything fits, then click the "Next" button. </li>
                     <li className="mb-1"> Then confirm the transaction and wait for it to be processed. Everything is simple</li>
-                </ul>
+                </ol>
             </div>
             <div className="mb-3">
                 <h2 className="text-2xl font-extrabold text-center mb-5">FeeShare service fees</h2>
                 <p className="text-lg font-bold mb-3">Currently, the service is supported Ethereum, Polygon, BSC, Arbitrum, Optimism and Avalanche networks.
                     The service commission depends on the number of addresses to which the funds will be sent.</p>
-                <ul className=" text-md text-justify">
+                <ol className="list-inside list-hyphen text-md text-justify">
                     <li className="mb-1">Ethereum - 1$ per address for tokens that are in the list , 0.2 Ethereum for your contracts regardless of the number of addresses.</li>
                     <li className="mb-1">Polygon - 0.1$ per address for tokens that are in the list , 0.2 Matic for your contracts regardless of the number of addresses.</li>
                     <li className="mb-1">BSC - 0.1$ per address for tokens that are in the list , 0.2 BNB for your contracts regardless of the number of addresses.</li>
                     <li className="mb-1">Arbitrum -  0.1$ per address for tokens that are in the list , 0.2 Ethereum for your contracts regardless of the number of addresses.</li>
                     <li className="mb-1">Avalanche -  0.1$ per address for tokens that are in the list , 0.2 AVAX for your contracts regardless of the number of addresses.</li>
                     <li className="mb-1">Optimism - 1$ per address for tokens that are in the list , 0.2 Ethereum for your contracts regardless of the number of addresses.</li>
-                </ul>
+                </ol>
             </div>
 
             <span className="italic font-bold text-center">Service commissions are not constant and may change!</span>
