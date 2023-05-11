@@ -17,7 +17,6 @@ const Help = () => {
                     <li className="mb-1"> Then confirm the transaction and wait for it to be processed. Everything is simple</li>
                 </ul>
             </div>
-
             <div className="mb-3">
                 <p className="text-lg mb-3 font-bold">To use FeeShare with payment fee in token (USDT, USDC …..): </p>
                 <ul className="text-md text-justify">
@@ -30,7 +29,6 @@ const Help = () => {
                     <li className="mb-1"> Then confirm the transaction and wait for it to be processed. Everything is simple</li>
                 </ul>
             </div>
-
             <div className="mb-3">
                 <h2 className="text-2xl font-extrabold text-center mb-5">FeeShare service fees</h2>
                 <p className="text-lg font-bold mb-3">Currently, the service is supported Ethereum, Polygon, BSC, Arbitrum, Optimism and Avalanche networks.
@@ -42,7 +40,6 @@ const Help = () => {
                     <li className="mb-1">Arbitrum -  0.1$ per address for tokens that are in the list , 0.2 Ethereum for your contracts regardless of the number of addresses.</li>
                     <li className="mb-1">Avalanche -  0.1$ per address for tokens that are in the list , 0.2 AVAX for your contracts regardless of the number of addresses.</li>
                     <li className="mb-1">Optimism - 1$ per address for tokens that are in the list , 0.2 Ethereum for your contracts regardless of the number of addresses.</li>
-
                 </ul>
             </div>
 
