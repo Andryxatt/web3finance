@@ -9,7 +9,7 @@ const Help = () => {
             <div className="mb-3">
                 <ol className="list-decimal list-inside text-md text-justify">
                     <li className="mb-1"> Simply connect your wallet via the «Connect Wallet» button. </li>
-                    <li className="mb-1"> Then select the network and coin you want to send from the provided list or enter your token contract address. </li>
+                    <li className="mb-1"> Then select the network and coin you want to send from the provided list or enter your token contract address.</li>
                     <li className="mb-1"> Then specify the addresses and amounts of recipients or upload a file with such addresses in CSV / Excel / Txt format. </li>
                     <li className="mb-1"> Click "Next". </li>
                     <li className="mb-1"> You will see a summary of your transaction details (Total number of addresses, Total number of transactions needed, Total number of tokens to be sent, Your token balance, commission fee and transaction fee). At this stage, you can remove unwanted addresses, change the «network speed gwei» parameter. </li>
@@ -23,8 +23,9 @@ const Help = () => {
                     <li className="mb-1">Simply connect your wallet via the «Connect Wallet» button. </li>
                     <li className="mb-1">Then select the network and coin you want to send from the provided list or enter your token contract address. </li>
                     <li className="mb-1">Then specify the addresses and amounts of recipients or upload a file with such addresses in CSV / Excel / Txt format. </li>
+                    <li className="mb-1"> Use the switch "Switch to pay fee in token" and make a deposit of the desired amount. </li>
                     <li className="mb-1">Click "Next".</li>
-                    <li className="mb-1">You will see a summary of your transaction details (Total number of addresses, Total number of transactions needed, Total number of tokens to be sent, Your token balance, commission fee and transaction fee). At this stage, you can remove unwanted addresses, change the «network speed gwei» parameter. </li>
+                    <li className="mb-1">You will see a summary of your transaction details (Total number of addresses, Total number of transactions needed, Total number of tokens to be sent, Your token balance, commission fee and transaction fee). At this stage, you can remove unwanted addresses, change the «network speed gwei» parameter.  </li>
                     <li className="mb-1">If everything fits, then click the "Next" button. </li>
                     <li className="mb-1"> Then confirm the transaction and wait for it to be processed. Everything is simple</li>
                 </ol>
