@@ -97,6 +97,7 @@ const TxHistory = () => {
                     break;
 
             }
+            console.log(name)
             const contractFeeShare = new ethers.Contract(contractAddresses[name][0].FeeShare, FeeShareAbi, provider);
             const depositFilter = contractFeeShare.filters.Deposit(address, null);
             const withdrawFilter = contractFeeShare.filters.Withdraw(address, null);
@@ -171,8 +172,8 @@ const TxHistory = () => {
             {loading ? <div className="loader-container justify-center flex">
                 <div className="spinner"></div>
             </div> :
-                <table className="rounded w-full mb-3 text-sm text-left bg-white text-gray-500 dark:text-gray-400">
-                    <thead className='text-md rounded-md text-gray-700 bg-gray-100 dark:bg-gray-800 dark:text-gray-800'>
+                <table className="rounded w-full mb-3 text-sm text-left bg-white text-gray-500 ">
+                    <thead className='text-md rounded-md  bg-gray-100 text-gray-800'>
                         <tr>
                             <th scope="col" className="px-6 py-3">№</th>
                             <th scope="col" className="px-6 py-3">Date</th>
@@ -183,17 +184,17 @@ const TxHistory = () => {
                     <tbody>
                         {currentItems.map((tx: any) => {
                             return (
-                                <tr className='bg-white border-b dark:bg-gray-800 dark:border-gray-700"' key={tx.blockNumber}>
+                                <tr className='bg-white  border-b  dark:border-gray-700"' key={tx.blockNumber}>
                                     <td className='px-6 py-4'>{tx.id}</td>
                                     <td className='px-6 py-4'>{new Date(tx.timestamp * 1000).toLocaleDateString("en-US")}</td>
-                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">{tx.event === "FeeDetails" ? "MultiSendFee" : tx.event}</td>
+                                    <td className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap ">{tx.event === "FeeDetails" ? "MultiSendFee" : tx.event}</td>
                                     <td className='px-6 py-4'><a className='text-blue-900 hover:underline ' href={`${selectedScanName.url}${tx.transactionHash}`} target="_blank" rel="noreferrer">{`${tx.transactionHash}`.substring(0, 20)}...{`${tx.transactionHash}`.substring(`${tx.transactionHash}`.length - 4)}`{ }</a></td>
                                 </tr>
                             )
                         })}
                     </tbody>
                 </table>}
-            {txHistory.length === 0 && !loading && <div className='text-center text-gray-500 dark:text-gray-400'>No transactions found</div>}
+            {txHistory.length === 0 && !loading && <div className='text-center text-gray-500 '>No transactions found</div>}
             <PaginationTxHistory
                 currentCountPerPage={itemsPerPage}
                 pageCount={pageCount}
